@@ -15,9 +15,9 @@ public class Record extends Timestamped {
     @Column(name = "record_id")
     private Long id;
 
-    private int amount;
+    private int recordAmount;
 
-    private String memo;
+    private String memos;
 
     private LocalDateTime recordDate;
 
