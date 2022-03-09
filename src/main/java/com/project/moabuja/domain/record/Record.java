@@ -28,6 +28,15 @@ public class Record extends Timestamped {
     @Enumerated(EnumType.STRING)
     private RecordType recordType;
 
+    public Record(int recordAmount, String memos, LocalDateTime recordDate, Member member, RecordType recordType) {
+        this.recordAmount = recordAmount;
+        this.memos = memos;
+        this.recordDate = recordDate;
+        this.member = member;
+        this.recordType = recordType;
+    }
 
+    protected Record(){
 
+    }
 }

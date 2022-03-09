@@ -35,4 +35,17 @@ public class Member {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "done_goal_id")
     private DoneGoal doneGaol;
+
+    public Member(String email, String nickname, Hero hero, ChallengeGoal challengeGoal, GroupGoal groupGoal, DoneGoal doneGaol) {
+        this.email = email;
+        this.nickname = nickname;
+        this.hero = hero;
+        this.challengeGoal = challengeGoal;
+        this.groupGoal = groupGoal;
+        this.doneGaol = doneGaol;
+    }
+
+    protected Member(){
+
+    }
 }
