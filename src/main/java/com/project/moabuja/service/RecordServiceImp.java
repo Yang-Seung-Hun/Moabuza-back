@@ -60,5 +60,11 @@ public class RecordServiceImp implements RecordService{
         return new DayListResponseDto(dayRecordList,dayIncomeAmount,dayExpenseAmount,dayChallengeAmount,dayGroupAmount,0,0);
     }
 
+    @Override
+    @Transactional
+    public void deleteRecord(Long id) {
+        recordRepository.deleteRecordById(id);
+    }
+
 
 }

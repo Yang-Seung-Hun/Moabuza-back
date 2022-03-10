@@ -17,5 +17,7 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
 
     List<Record> findRecordsByRecordDateAndMember(LocalDateTime recordDate, Member currentUser);
 
+    void deleteRecordById(Long id);
+
 
 }
