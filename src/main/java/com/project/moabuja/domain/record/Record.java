@@ -17,7 +17,7 @@ public class Record extends Timestamped {
 
     private int recordAmount;
 
-    private String memos;
+    private String memo;
 
     private LocalDateTime recordDate;
 
@@ -28,9 +28,9 @@ public class Record extends Timestamped {
     @Enumerated(EnumType.STRING)
     private RecordType recordType;
 
-    public Record(int recordAmount, String memos, LocalDateTime recordDate, Member member, RecordType recordType) {
+    public Record(int recordAmount, String memo, LocalDateTime recordDate, Member member, RecordType recordType) {
         this.recordAmount = recordAmount;
-        this.memos = memos;
+        this.memo = memo;
         this.recordDate = recordDate;
         this.member = member;
         this.recordType = recordType;

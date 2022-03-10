@@ -1,4 +1,4 @@
-package com.project.moabuja.dto.request;
+package com.project.moabuja.dto.request.record;
 
 import com.project.moabuja.domain.record.RecordType;
 import lombok.Builder;

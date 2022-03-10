@@ -2,10 +2,7 @@ package com.project.moabuja.domain.goal;
 
 import lombok.Getter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -20,5 +17,6 @@ public class DoneGoal {
 
     private int doneGoalAmount;
 
-    private boolean doneGoalSuccess;
+    @Enumerated(EnumType.STRING)
+    private DoneGoalType doneGoalType;
 }

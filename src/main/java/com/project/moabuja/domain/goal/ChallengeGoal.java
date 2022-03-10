@@ -18,4 +18,8 @@ public class ChallengeGoal {
     private String challengeGoalName;
 
     private int challengeGoalAmount;
+
+    private int currentAmount;
+
+    private boolean isAcceptedChallenge;
 }

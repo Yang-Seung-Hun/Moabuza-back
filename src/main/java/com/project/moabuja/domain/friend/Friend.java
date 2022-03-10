@@ -18,5 +18,5 @@ public class Friend {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    private Long friendNum;
+    private Long friend;
 }

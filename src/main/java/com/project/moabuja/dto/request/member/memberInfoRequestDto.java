@@ -1,4 +1,4 @@
-package com.project.moabuja.dto.request;
+package com.project.moabuja.dto.request.member;
 
 import com.project.moabuja.domain.hero.HeroName;
 import lombok.Getter;

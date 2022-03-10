@@ -1,4 +1,4 @@
-package com.project.moabuja.dto.request;
+package com.project.moabuja.dto.request.record;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
