@@ -5,11 +5,13 @@ import com.project.moabuja.domain.goal.DoneGoal;
 import com.project.moabuja.domain.goal.GroupGoal;
 import com.project.moabuja.domain.hero.Hero;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,16 +38,9 @@ public class Member {
     @JoinColumn(name = "done_goal_id")
     private DoneGoal doneGaol;
 
-    public Member(String email, String nickname, Hero hero, ChallengeGoal challengeGoal, GroupGoal groupGoal, DoneGoal doneGaol) {
+    //테스트용 생성자임
+    public Member(String email, String nickname) {
         this.email = email;
         this.nickname = nickname;
-        this.hero = hero;
-        this.challengeGoal = challengeGoal;
-        this.groupGoal = groupGoal;
-        this.doneGaol = doneGaol;
-    }
-
-    protected Member(){
-
     }
 }

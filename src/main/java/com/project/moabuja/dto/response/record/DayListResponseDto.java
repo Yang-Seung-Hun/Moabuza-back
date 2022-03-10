@@ -23,4 +23,14 @@ public class DayListResponseDto {
     private int dayGroupAmount;
     private int wallet;
     private int totalAmount;
+
+    public DayListResponseDto(List<DayRecordResponseDto> dayRecordList, int dayIncomeAmount, int dayExpenseAmount, int dayChallengeAmount, int dayGroupAmount, int wallet, int totalAmount) {
+        this.dayRecordList = dayRecordList;
+        this.dayIncomeAmount = dayIncomeAmount;
+        this.dayExpenseAmount = dayExpenseAmount;
+        this.dayChallengeAmount = dayChallengeAmount;
+        this.dayGroupAmount = dayGroupAmount;
+        this.wallet = wallet;
+        this.totalAmount = totalAmount;
+    }
 }

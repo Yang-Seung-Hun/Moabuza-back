@@ -20,4 +20,11 @@ public class DayRecordResponseDto {
     private LocalDateTime recordDate;
     private String memos;
     private int recordAmount;
+
+    public DayRecordResponseDto(RecordType recordType, LocalDateTime recordDate, String memos, int recordAmount) {
+        this.recordType = recordType;
+        this.recordDate = recordDate;
+        this.memos = memos;
+        this.recordAmount = recordAmount;
+    }
 }

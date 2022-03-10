@@ -2,13 +2,16 @@ package com.project.moabuja.domain.record;
 
 import com.project.moabuja.domain.Timestamped;
 import com.project.moabuja.domain.member.Member;
+import com.project.moabuja.dto.request.record.RecordRequestDto;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Record extends Timestamped {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,15 +31,12 @@ public class Record extends Timestamped {
     @Enumerated(EnumType.STRING)
     private RecordType recordType;
 
-    public Record(int recordAmount, String memo, LocalDateTime recordDate, Member member, RecordType recordType) {
-        this.recordAmount = recordAmount;
-        this.memo = memo;
-        this.recordDate = recordDate;
-        this.member = member;
-        this.recordType = recordType;
+    public Record(RecordRequestDto recordRequestDto, Member currentMember){
+        this.recordType = recordRequestDto.getRecordType();
+        this.recordDate = recordRequestDto.getRecordDate();
+        this.memo = recordRequestDto.getMemos();
+        this.recordAmount = recordRequestDto.getRecordAmount();
+        this.member = currentMember;
     }
 
-    protected Record(){
-
-    }
 }
