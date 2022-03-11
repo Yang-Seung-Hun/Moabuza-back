@@ -8,5 +8,10 @@ import lombok.NoArgsConstructor;
 public class CreateChallengeMemberDto {
 
     private String challengeMemberNickname;
-    private String challengeMemberCanInvite;
+    private boolean challengeMemberCanInvite;
+
+    public CreateChallengeMemberDto(String challengeMemberNickname, boolean challengeMemberCanInvite) {
+        this.challengeMemberNickname = challengeMemberNickname;
+        this.challengeMemberCanInvite = challengeMemberCanInvite;
+    }
 }

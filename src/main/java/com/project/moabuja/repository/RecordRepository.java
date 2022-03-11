@@ -1,6 +1,7 @@
 package com.project.moabuja.repository;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
+import com.project.moabuja.domain.record.RecordType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +17,8 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
     List<Record> findRecordsByRecordDate(LocalDateTime recordDate);
 
     List<Record> findRecordsByRecordDateAndMember(LocalDateTime recordDate, Member currentUser);
+
+    List<Record> findRecordsByRecordTypeAndMember(RecordType recordType, Member member);
 
     void deleteRecordById(Long id);
 

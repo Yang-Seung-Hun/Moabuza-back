@@ -18,8 +18,13 @@ public class Alarm {
 
     private String alarmContents;
 
+    private boolean is_accepted;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
+    public void changeMember(Member member) {
+        this.member = member;
+    }
 }

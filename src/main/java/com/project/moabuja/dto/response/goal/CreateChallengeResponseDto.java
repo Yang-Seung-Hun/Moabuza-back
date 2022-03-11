@@ -10,4 +10,8 @@ import java.util.List;
 @NoArgsConstructor
 public class CreateChallengeResponseDto {
     private List<CreateChallengeMemberDto> challengeMembers = new ArrayList<>();
+
+    public CreateChallengeResponseDto(List<CreateChallengeMemberDto> challengeMembers) {
+        this.challengeMembers = challengeMembers;
+    }
 }

@@ -1,10 +1,21 @@
 package com.project.moabuja.service;
 
+import com.project.moabuja.domain.alarm.Alarm;
+import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.goal.ChallengeGoal;
+import com.project.moabuja.domain.goal.DoneGoal;
 import com.project.moabuja.domain.member.Member;
+import com.project.moabuja.domain.record.Record;
+import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
+import com.project.moabuja.dto.response.goal.ChallengeMemberDto;
+import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
+import com.project.moabuja.dto.response.goal.CreateChallengeMemberDto;
+import com.project.moabuja.dto.response.goal.CreateChallengeResponseDto;
 import com.project.moabuja.repository.ChallengeGoalRepository;
+import com.project.moabuja.repository.FriendRepository;
 import com.project.moabuja.repository.MemberRepository;
+import com.project.moabuja.repository.RecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +30,8 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
 
     private final MemberRepository memberRepository;
     private final ChallengeGoalRepository challengeGoalRepository;
+    private final RecordRepository recordRepository;
+    private final FriendRepository friendRepository;
 
     @Transactional
     @Override
@@ -38,5 +51,86 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
         challengeGoalRepository.save(challengeGoal);
 
         return challengeGoal;
+    }
+
+    @Override
+    public ChallengeResponseDto getChallengeInfo(Member currentUser) {
+
+        Optional<ChallengeGoal> challengeGoal = Optional.ofNullable(currentUser.getChallengeGoal());
+
+        //challengeGoal 있을때
+        if (challengeGoal.isPresent()){
+            if(challengeGoal.get().isAcceptedChallenge()){
+                String goalStatus = "goal";
+                List<ChallengeMemberDto> challengeMembers = new ArrayList<>();
+                for(Member user: challengeGoal.get().getMembers()){
+                    int currentAmount = 0;
+                    List<Record> records = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, user);
+                    for (Record record:records){
+                        currentAmount += record.getRecordAmount();
+                    }
+                    int leftAmount = challengeGoal.get().getChallengeGoalAmount() - currentAmount;
+                    int percent = (int)(((double)currentAmount/(double)(challengeGoal.get().getChallengeGoalAmount())) * 100);
+                    challengeMembers.add(new ChallengeMemberDto(user.getNickname(),null,leftAmount,percent));//임의로 hero null 넣어둔 상태임
+                }
+
+
+                List<String> challengeDoneGoalNames = new ArrayList<>();
+                for(DoneGoal doneGoal:currentUser.getDoneGaols()){
+                    challengeDoneGoalNames.add(doneGoal.getDoneGoalName());
+                }
+                return new ChallengeResponseDto(goalStatus,challengeMembers,challengeGoal.get().getChallengeGoalName(),challengeDoneGoalNames);
+
+            }
+            else{//수락대기중
+                String goalStatus = "waiting";
+                return new ChallengeResponseDto(goalStatus,null,null,null);
+            }
+        }
+        //challengeGoal 없을때
+        else{
+            String goalStatus = "noGoal";
+            return new ChallengeResponseDto(goalStatus,null,null,null);
+        }
+
+    }
+
+    @Override
+    public CreateChallengeResponseDto getChallengeMemberCandidates(Member currentUser) {
+
+        List<Friend> friends = friendRepository.findFriendsByMember(currentUser);
+        List<CreateChallengeMemberDto> challengeMembers = new ArrayList<>();
+
+        if (friends.size() == 0){
+            return new CreateChallengeResponseDto(challengeMembers);
+        }
+
+        for(Friend friend : friends){
+            //친구의 챌린지 골을 확인
+            Optional<Member> friendById = memberRepository.findById(friend.getFriend());
+            Optional<ChallengeGoal> friendChallengeGoal = Optional.ofNullable(friendById.get().getChallengeGoal());
+
+            if(friendChallengeGoal.isPresent()){
+                //이미 진행중인 챌린지 있음
+                if(friendChallengeGoal.get().isAcceptedChallenge()){
+                    if (friendById.isPresent()){
+                        challengeMembers.add(new CreateChallengeMemberDto(friendById.get().getNickname(),false));
+                    }
+                }
+                //진행중인 챌린지 없고, 대기만 있음
+                else{
+                    if(friendById.isPresent()){
+                        challengeMembers.add(new CreateChallengeMemberDto(friendById.get().getNickname(),true));
+                    }
+                }
+            }
+            else{//초대받은 챌린지 없고 진행중인것도 없을때
+                if (friendById.isPresent()){
+                    challengeMembers.add(new CreateChallengeMemberDto(friendById.get().getNickname(),true));
+                }
+            }
+        }
+
+        return new CreateChallengeResponseDto(challengeMembers);
     }
 }

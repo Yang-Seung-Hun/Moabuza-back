@@ -19,4 +19,10 @@ public class Friend {
     private Member member;
 
     private Long friend;
+
+    //테스트용 생성자입니다.
+    public Friend(Member member, Long friend) {
+        this.member = member;
+        this.friend = friend;
+    }
 }

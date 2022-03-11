@@ -5,7 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChallengeGoalRepository extends JpaRepository<ChallengeGoal,Long> {
 
-
-
-
 }

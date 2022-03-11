@@ -1,5 +1,6 @@
 package com.project.moabuja.domain.member;
 
+import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.DoneGoal;
 import com.project.moabuja.domain.goal.GroupGoal;
@@ -8,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -34,9 +37,11 @@ public class Member {
     @JoinColumn(name = "group_goal_id")
     private GroupGoal groupGoal;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "done_goal_id")
-    private DoneGoal doneGaol;
+    @OneToMany(mappedBy = "member")
+    private List<DoneGoal> doneGaols = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Alarm> alarms = new ArrayList<>();
 
     //테스트용 생성자임
     public Member(String email, String nickname) {
@@ -48,5 +53,14 @@ public class Member {
         this.challengeGoal = challengeGoal;
     }
 
+    public void addAlarm(Alarm alarm){
+        this.alarms.add(alarm);
+        alarm.changeMember(this);
+    }
+
+    public void addDoneGoal(DoneGoal doneGoal){
+        this.doneGaols.add(doneGoal);
+        doneGoal.changeMember(this);
+    }
 
 }

@@ -40,4 +40,9 @@ public class ChallengeGoal {
         this.currentAmount = currentAmount;
         this.isAcceptedChallenge = isAcceptedChallenge;
     }
+
+    //테스트용 setter입니다.
+    public void setIsAcceptedChallenge(Boolean bool){
+        this.isAcceptedChallenge = bool;
+    }
 }

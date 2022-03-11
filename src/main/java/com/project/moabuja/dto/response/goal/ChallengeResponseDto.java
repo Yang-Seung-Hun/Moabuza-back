@@ -1,7 +1,12 @@
 package com.project.moabuja.dto.response.goal;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
+@Getter
+@NoArgsConstructor
 public class ChallengeResponseDto {
     private String goalStatus;
     private List<ChallengeMemberDto> challengeMembers;
