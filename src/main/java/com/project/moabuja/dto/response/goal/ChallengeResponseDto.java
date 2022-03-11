@@ -7,4 +7,11 @@ public class ChallengeResponseDto {
     private List<ChallengeMemberDto> challengeMembers;
     private String challengeName;
     private List<String> challengeDoneGoals;
+
+    public ChallengeResponseDto(String goalStatus, List<ChallengeMemberDto> challengeMembers, String challengeName, List<String> challengeDoneGoals) {
+        this.goalStatus = goalStatus;
+        this.challengeMembers = challengeMembers;
+        this.challengeName = challengeName;
+        this.challengeDoneGoals = challengeDoneGoals;
+    }
 }

@@ -26,7 +26,7 @@ public class Member {
     @JoinColumn(name = "hero_id")
     private Hero hero;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "challenge_goal_id")
     private ChallengeGoal challengeGoal;
 
@@ -43,4 +43,10 @@ public class Member {
         this.email = email;
         this.nickname = nickname;
     }
+
+    public void changeChallengeGoal(ChallengeGoal challengeGoal){
+        this.challengeGoal = challengeGoal;
+    }
+
+
 }

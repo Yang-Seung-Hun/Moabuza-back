@@ -11,6 +11,12 @@ import java.util.List;
 public class CreateChallengeRequestDto {
 
     private String createChallengeName;
-    private String createChallengeAmount;
+    private int createChallengeAmount;
     private List<String> challengeFiends = new ArrayList<>();
+
+    public CreateChallengeRequestDto(String createChallengeName, int createChallengeAmount, List<String> challengeFiends) {
+        this.createChallengeName = createChallengeName;
+        this.createChallengeAmount = createChallengeAmount;
+        this.challengeFiends = challengeFiends;
+    }
 }

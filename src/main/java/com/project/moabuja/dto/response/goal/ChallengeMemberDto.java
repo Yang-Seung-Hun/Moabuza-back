@@ -11,4 +11,11 @@ public class ChallengeMemberDto {
     private HeroName challengeMemberHero;
     private int challengeMemberLeftAmount;
     private int challengeMemberNowPercent;
+
+    public ChallengeMemberDto(String challengeMemberNickname, HeroName challengeMemberHero, int challengeMemberLeftAmount, int challengeMemberNowPercent) {
+        this.challengeMemberNickname = challengeMemberNickname;
+        this.challengeMemberHero = challengeMemberHero;
+        this.challengeMemberLeftAmount = challengeMemberLeftAmount;
+        this.challengeMemberNowPercent = challengeMemberNowPercent;
+    }
 }

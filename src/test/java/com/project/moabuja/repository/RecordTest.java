@@ -6,7 +6,6 @@ import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.request.record.DayListRequestDto;
 import com.project.moabuja.dto.request.record.RecordRequestDto;
 import com.project.moabuja.dto.response.record.DayListResponseDto;
-import com.project.moabuja.dto.response.record.DayRecordResponseDto;
 import com.project.moabuja.service.RecordService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,15 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
 @Rollback(value = false)
-class RecordRepositoryTest {
+class RecordTest {
 
     @Autowired
     private RecordRepository recordRepository;
