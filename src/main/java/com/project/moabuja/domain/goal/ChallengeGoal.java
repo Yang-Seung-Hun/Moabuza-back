@@ -29,16 +29,21 @@ public class ChallengeGoal {
     @OneToMany(mappedBy = "challengeGoal",cascade = CascadeType.ALL)
     private List<Member> members = new ArrayList<>();
 
-    public void addMember(Member member){
-        this.members.add(member);
-        member.changeChallengeGoal(this);
-    }
-
     public ChallengeGoal(String challengeGoalName, int challengeGoalAmount, int currentAmount, boolean isAcceptedChallenge) {
         this.challengeGoalName = challengeGoalName;
         this.challengeGoalAmount = challengeGoalAmount;
         this.currentAmount = currentAmount;
         this.isAcceptedChallenge = isAcceptedChallenge;
+    }
+
+    public void addMember(Member member){
+        this.members.add(member);
+        member.changeChallengeGoal(this);
+    }
+
+    public void removeMember(Member member){
+        this.members.remove(member);
+        member.changeChallengeGoal(null);
     }
 
     //테스트용 setter입니다.

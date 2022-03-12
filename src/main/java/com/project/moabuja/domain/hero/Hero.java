@@ -18,4 +18,8 @@ public class Hero {
     @Enumerated(EnumType.STRING)
     private HeroLevel heroLevel;
 
+    public Hero(HeroName heroName, HeroLevel heroLevel) {
+        this.heroName = heroName;
+        this.heroLevel = heroLevel;
+    }
 }

@@ -44,15 +44,23 @@ public class Member {
     private List<Alarm> alarms = new ArrayList<>();
 
     //테스트용 생성자임
+    public Member(String email, String nickname, Hero hero) {
+        this.email = email;
+        this.nickname = nickname;
+        this.hero = hero;
+    }
+    //테스트용 생성자임
     public Member(String email, String nickname) {
         this.email = email;
         this.nickname = nickname;
     }
 
+    //반대쪽에서 연관관계편의메소드에서 사용될 setter
     public void changeChallengeGoal(ChallengeGoal challengeGoal){
         this.challengeGoal = challengeGoal;
     }
 
+    //연관관계 편의
     public void addAlarm(Alarm alarm){
         this.alarms.add(alarm);
         alarm.changeMember(this);
@@ -62,5 +70,4 @@ public class Member {
         this.doneGaols.add(doneGoal);
         doneGoal.changeMember(this);
     }
-
 }

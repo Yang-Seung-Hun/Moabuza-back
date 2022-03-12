@@ -2,18 +2,16 @@ package com.project.moabuja.challenge;
 
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.goal.ChallengeGoal;
+import com.project.moabuja.domain.hero.Hero;
+import com.project.moabuja.domain.hero.HeroLevel;
+import com.project.moabuja.domain.hero.HeroName;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import com.project.moabuja.dto.request.record.RecordRequestDto;
-import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
-import com.project.moabuja.dto.response.goal.CreateChallengeMemberDto;
-import com.project.moabuja.dto.response.goal.CreateChallengeResponseDto;
-import com.project.moabuja.repository.ChallengeGoalRepository;
-import com.project.moabuja.repository.FriendRepository;
-import com.project.moabuja.repository.MemberRepository;
-import com.project.moabuja.repository.RecordRepository;
+import com.project.moabuja.dto.response.goal.*;
+import com.project.moabuja.repository.*;
 import com.project.moabuja.service.ChallengeGoalService;
 import com.project.moabuja.service.RecordService;
 import org.assertj.core.api.Assertions;
@@ -46,6 +44,8 @@ class ChallengeTest {
     private ChallengeGoalService challengeGoalService;
     @Autowired
     private FriendRepository friendRepository;
+    @Autowired
+    private HeroRepository heroRepository;
 
     @Test
     public void save(){
@@ -79,13 +79,22 @@ class ChallengeTest {
 
         LocalDateTime now = LocalDateTime.now();
 
-        Member member1 = new Member("member1", "nickname1");
+        Hero hero1 = new Hero(HeroName.name1, HeroLevel.level1);
+        Hero hero2 = new Hero(HeroName.name2, HeroLevel.level2);
+        Hero hero3 = new Hero(HeroName.name1, HeroLevel.level3);
+        Hero hero4 = new Hero(HeroName.name2, HeroLevel.level2);
+        Hero savedHero1 = heroRepository.save(hero1);
+        Hero savedHero2 = heroRepository.save(hero2);
+        Hero savedHero3 = heroRepository.save(hero3);
+        Hero savedHero4 = heroRepository.save(hero4);
+
+        Member member1 = new Member("member1", "nickname1", hero1);
         Member savedMember1 = memberRepository.save(member1);
-        Member member2 = new Member("member2", "nickname2");
+        Member member2 = new Member("member2", "nickname2", hero2);
         Member savedMember2 = memberRepository.save(member2);
-        Member member3 = new Member("member2", "nickname3");
+        Member member3 = new Member("member2", "nickname3", hero3);
         Member savedMember3 = memberRepository.save(member3);
-        Member member4 = new Member("member3", "nickname4");
+        Member member4 = new Member("member3", "nickname4", hero4);
         Member savedMember4 = memberRepository.save(member4);
 
         Friend friend1 = new Friend(savedMember1, savedMember2.getId());
@@ -106,23 +115,51 @@ class ChallengeTest {
 
         CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("100만원 모으기", 1000000, friends);
         ChallengeGoal savedChallenge = challengeGoalService.save(createChallengeRequestDto);
-        System.out.println(savedChallenge.getClass());
         savedChallenge.setIsAcceptedChallenge(true);
 
         RecordRequestDto recordRequestDto = new RecordRequestDto(RecordType.income, now, "편의점", 10000);
-        Record savedRecord = recordService.save(recordRequestDto, savedMember1);
+        recordService.save(recordRequestDto, savedMember1);
         RecordRequestDto recordRequestDto2 = new RecordRequestDto(RecordType.income, now, "설거지 심부름", 10000);
-        Record savedRecord2 = recordService.save(recordRequestDto2, savedMember1);
+        recordService.save(recordRequestDto2, savedMember1);
         RecordRequestDto recordRequestDto3 = new RecordRequestDto(RecordType.challenge, now, "가즈아!!!", 20000);
-        Record savedRecord3 = recordService.save(recordRequestDto3, savedMember1);
+        recordService.save(recordRequestDto3, savedMember1);
         RecordRequestDto recordRequestDto4 = new RecordRequestDto(RecordType.challenge, now, "내가 일등!!", 20000);
-        Record savedRecord4 = recordService.save(recordRequestDto4, savedMember1);
+        recordService.save(recordRequestDto4, savedMember1);
         RecordRequestDto recordRequestDto5 = new RecordRequestDto(RecordType.challenge, now, "어림 없지 나두 간다!!!", 50000);
-        Record savedRecord5 = recordService.save(recordRequestDto5, savedMember2);
+        recordService.save(recordRequestDto5, savedMember2);
+        RecordRequestDto recordRequestDto6 = new RecordRequestDto(RecordType.challenge, LocalDateTime.now().plusDays(1), "내가 다시 일등!!", 200000);
+        recordService.save(recordRequestDto6, savedMember1);
+//        RecordRequestDto recordRequestDto7 = new RecordRequestDto(RecordType.challenge, LocalDateTime.now().plusDays(1), "내가 다시 일등!!", 800000);
+//        recordService.save(recordRequestDto7, savedMember1);
+
 
         ChallengeResponseDto challengeInfo = challengeGoalService.getChallengeInfo(savedMember1);
-        Assertions.assertThat(challengeInfo.getGoalStatus()).isEqualTo("goal");
-        Assertions.assertThat(challengeInfo.getChallengeMembers().size()).isEqualTo(2);
+        System.out.println("=======================================================================");
+        System.out.println(challengeInfo.getGoalStatus());
+        System.out.println(challengeInfo.getChallengeName());
+        System.out.println(challengeInfo.getChallengeDoneGoals());
+        System.out.println("=========================================================================");
+        List<ChallengeMemberDto> tmp = challengeInfo.getChallengeMembers();
+        if (tmp != null){
+            for (ChallengeMemberDto challengeMemberDto : tmp) {
+                System.out.println(challengeMemberDto.getChallengeMemberNickname());
+                System.out.println(challengeMemberDto.getChallengeMemberHero());
+                System.out.println(challengeMemberDto.getChallengeMemberLeftAmount());
+                System.out.println(challengeMemberDto.getChallengeMemberNowPercent());
+            }
+        }
+        System.out.println("===========================================================================");
+        List<ChallengeListDto> challengeLists = challengeInfo.getChallengeLists();
+        if(challengeLists != null){
+            for (ChallengeListDto challengeList : challengeLists) {
+                System.out.println(challengeList.getChallengeRecordDate());
+                System.out.println(challengeList.getChallengeMemo());
+                System.out.println(challengeList.getChallengeAmount());
+            }
+        }
+
+//        Assertions.assertThat(challengeInfo.getGoalStatus()).isEqualTo("goal");
+//        Assertions.assertThat(challengeInfo.getChallengeMembers().size()).isEqualTo(2);
 
     }
 
@@ -149,10 +186,10 @@ class ChallengeTest {
         Friend friend2 = new Friend(savedMember2, savedMember1.getId());
         Friend friend3 = new Friend(savedMember1, savedMember3.getId());
         Friend friend4 = new Friend(savedMember3, savedMember1.getId());
-        Friend savedFriend1 = friendRepository.save(friend1);
-        Friend savedFriend2 = friendRepository.save(friend2);
-        Friend savedFriend3 = friendRepository.save(friend3);
-        Friend savedFriend4 = friendRepository.save(friend4);
+        friendRepository.save(friend1);
+        friendRepository.save(friend2);
+        friendRepository.save(friend3);
+        friendRepository.save(friend4);
 
         List<Friend> friendsByMember = friendRepository.findFriendsByMember(savedMember1);
         List<String> friends = new ArrayList<>();

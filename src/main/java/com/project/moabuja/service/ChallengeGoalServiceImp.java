@@ -8,10 +8,7 @@ import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
-import com.project.moabuja.dto.response.goal.ChallengeMemberDto;
-import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
-import com.project.moabuja.dto.response.goal.CreateChallengeMemberDto;
-import com.project.moabuja.dto.response.goal.CreateChallengeResponseDto;
+import com.project.moabuja.dto.response.goal.*;
 import com.project.moabuja.repository.ChallengeGoalRepository;
 import com.project.moabuja.repository.FriendRepository;
 import com.project.moabuja.repository.MemberRepository;
@@ -23,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +55,10 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
     public ChallengeResponseDto getChallengeInfo(Member currentUser) {
 
         Optional<ChallengeGoal> challengeGoal = Optional.ofNullable(currentUser.getChallengeGoal());
+        List<String> challengeDoneGoalNames = new ArrayList<>();
+        for(DoneGoal doneGoal:currentUser.getDoneGaols()){
+            challengeDoneGoalNames.add(doneGoal.getDoneGoalName());
+        }
 
         //challengeGoal 있을때
         if (challengeGoal.isPresent()){
@@ -71,26 +73,26 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
                     }
                     int leftAmount = challengeGoal.get().getChallengeGoalAmount() - currentAmount;
                     int percent = (int)(((double)currentAmount/(double)(challengeGoal.get().getChallengeGoalAmount())) * 100);
-                    challengeMembers.add(new ChallengeMemberDto(user.getNickname(),null,leftAmount,percent));//임의로 hero null 넣어둔 상태임
+                    challengeMembers.add(new ChallengeMemberDto(user.getNickname(),user.getHero().getHeroName(),leftAmount,percent));
                 }
 
+                List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentUser);
+                List<ChallengeListDto> challengeLists = challengeRecords.stream().map(record -> {
+                    return new ChallengeListDto(record.getRecordDate(), record.getMemo(), record.getRecordAmount());
+                }).collect(Collectors.toList());
 
-                List<String> challengeDoneGoalNames = new ArrayList<>();
-                for(DoneGoal doneGoal:currentUser.getDoneGaols()){
-                    challengeDoneGoalNames.add(doneGoal.getDoneGoalName());
-                }
-                return new ChallengeResponseDto(goalStatus,challengeMembers,challengeGoal.get().getChallengeGoalName(),challengeDoneGoalNames);
+                return new ChallengeResponseDto(goalStatus,challengeMembers,challengeGoal.get().getChallengeGoalName(),challengeDoneGoalNames, challengeLists);
 
             }
             else{//수락대기중
                 String goalStatus = "waiting";
-                return new ChallengeResponseDto(goalStatus,null,null,null);
+                return new ChallengeResponseDto(goalStatus,null,null,challengeDoneGoalNames,null);
             }
         }
         //challengeGoal 없을때
         else{
             String goalStatus = "noGoal";
-            return new ChallengeResponseDto(goalStatus,null,null,null);
+            return new ChallengeResponseDto(goalStatus,null,null,challengeDoneGoalNames,null);
         }
 
     }

@@ -21,6 +21,4 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
     List<Record> findRecordsByRecordTypeAndMember(RecordType recordType, Member member);
 
     void deleteRecordById(Long id);
-
-
 }

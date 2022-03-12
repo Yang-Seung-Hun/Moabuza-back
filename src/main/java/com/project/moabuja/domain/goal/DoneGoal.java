@@ -28,4 +28,11 @@ public class DoneGoal {
     public void changeMember(Member member) {
         this.member = member;
     }
+
+    public DoneGoal(String doneGoalName, int doneGoalAmount, Member member, DoneGoalType doneGoalType) {
+        this.doneGoalName = doneGoalName;
+        this.doneGoalAmount = doneGoalAmount;
+        this.member = member;
+        this.doneGoalType = doneGoalType;
+    }
 }
