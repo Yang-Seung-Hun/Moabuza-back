@@ -5,6 +5,7 @@ import com.project.moabuja.dto.TokenDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.MemberService;
+import com.project.moabuja.util.CustomResponseEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,6 @@ public class MemberController {
     // access 토큰 만료 시 재발급 api : access, refresh 모두 재발급
     @GetMapping("/api/reissue")
     public ResponseEntity reissue(HttpServletRequest request){
-        System.out.println("-------------컨트롤러 reissue");
         TokenDto tokenDto = memberService.reissue(request);
         CustomResponseEntity response = CustomResponseEntity.builder()
                 .data(tokenDto)

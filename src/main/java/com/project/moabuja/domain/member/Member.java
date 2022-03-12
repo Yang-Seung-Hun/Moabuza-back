@@ -4,6 +4,8 @@ import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.DoneGoal;
 import com.project.moabuja.domain.goal.GroupGoal;
+import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
+import com.project.moabuja.dto.request.member.RegisterRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
