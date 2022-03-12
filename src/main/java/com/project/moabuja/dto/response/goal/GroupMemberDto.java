@@ -1,6 +1,6 @@
 package com.project.moabuja.dto.response.goal;
 
-import com.project.moabuja.domain.hero.HeroName;
+import com.project.moabuja.domain.member.Hero;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 public class GroupMemberDto {
 
     private String groupMemberNickname;
-    private HeroName groupMemberHero;
+    private Hero groupMemberHero;
 }

@@ -1,6 +1,6 @@
 package com.project.moabuja.dto.request.member;
 
-import com.project.moabuja.domain.hero.HeroName;
+import com.project.moabuja.domain.member.Hero;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class memberInfoRequestDto {
     private String nickname;
-    private HeroName heroName;
+    private Hero heroName;
 }

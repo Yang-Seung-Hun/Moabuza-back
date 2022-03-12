@@ -2,9 +2,7 @@ package com.project.moabuja.repository;
 
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.goal.ChallengeGoal;
-import com.project.moabuja.domain.hero.Hero;
-import com.project.moabuja.domain.hero.HeroLevel;
-import com.project.moabuja.domain.hero.HeroName;
+import com.project.moabuja.domain.member.Hero;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
@@ -23,7 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +34,6 @@ class RecordTest {
     @Autowired private RecordRepository recordRepository;
     @Autowired private RecordService recordService;
     @Autowired private MemberRepository memberRepository;
-    @Autowired private HeroRepository heroRepository;
     @Autowired private ChallengeGoalService challengeGoalService;
     @Autowired private FriendRepository friendRepository;
 
@@ -64,22 +60,13 @@ class RecordTest {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime tomorrow = LocalDateTime.now().plusDays(1);
 
-        Hero hero1 = new Hero(HeroName.name1, HeroLevel.level1);
-        Hero hero2 = new Hero(HeroName.name2, HeroLevel.level2);
-        Hero hero3 = new Hero(HeroName.name1, HeroLevel.level3);
-        Hero hero4 = new Hero(HeroName.name2, HeroLevel.level2);
-        Hero savedHero1 = heroRepository.save(hero1);
-        Hero savedHero2 = heroRepository.save(hero2);
-        Hero savedHero3 = heroRepository.save(hero3);
-        Hero savedHero4 = heroRepository.save(hero4);
-
-        Member member1 = new Member("member1", "nickname1", hero1);
+        Member member1 = new Member("member1", "nickname1", Hero.hero1);
         Member savedMember1 = memberRepository.save(member1);
-        Member member2 = new Member("member2", "nickname2", hero2);
+        Member member2 = new Member("member2", "nickname2", Hero.hero2);
         Member savedMember2 = memberRepository.save(member2);
-        Member member3 = new Member("member2", "nickname3", hero3);
+        Member member3 = new Member("member2", "nickname3", Hero.hero3);
         Member savedMember3 = memberRepository.save(member3);
-        Member member4 = new Member("member3", "nickname4", hero4);
+        Member member4 = new Member("member3", "nickname4", Hero.hero2);
         Member savedMember4 = memberRepository.save(member4);
 
         Friend friend1 = new Friend(savedMember1, savedMember2.getId());
@@ -121,8 +108,8 @@ class RecordTest {
         Assertions.assertThat(isDone1.isComplete()).isFalse();
         Assertions.assertThat(isDone2.isComplete()).isTrue();
 
-        DayListRequestDto dayListRequestDto = new DayListRequestDto(tomorrow);
-        DayListResponseDto dayList = recordService.getDayList(dayListRequestDto, savedMember1);
+        DayListRequestDto dayListRequestDto = new DayListRequestDto(now);
+        DayListResponseDto dayList = recordService.getDayList(dayListRequestDto, savedMember2);
         System.out.println("====================================================");
         List<DayRecordResponseDto> list = dayList.getDayRecordList();
         for (DayRecordResponseDto dto : list) {

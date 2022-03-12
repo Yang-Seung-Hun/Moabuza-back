@@ -1,10 +1,6 @@
 package com.project.moabuja.dto.response.member;
 
-import com.project.moabuja.domain.hero.HeroLevel;
-import com.project.moabuja.domain.hero.HeroName;
-import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.domain.record.Record;
-import lombok.Builder;
+import com.project.moabuja.domain.member.Hero;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,8 +21,8 @@ public class HomeResponseDto {
     private int challengePercent;
     private String challengeName;
 
-    private HeroName heroName;
-    private HeroLevel heroLevel;
+    private Hero hero;
+    private int heroLevel;
 
     private int totalAmount;
     private int wallet;

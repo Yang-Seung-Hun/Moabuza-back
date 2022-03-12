@@ -4,7 +4,6 @@ import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.DoneGoal;
 import com.project.moabuja.domain.goal.GroupGoal;
-import com.project.moabuja.domain.hero.Hero;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,8 +24,7 @@ public class Member {
 
     private String nickname;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hero_id")
+    @Enumerated(EnumType.STRING)
     private Hero hero;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

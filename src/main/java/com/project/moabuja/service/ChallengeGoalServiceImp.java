@@ -1,6 +1,5 @@
 package com.project.moabuja.service;
 
-import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.DoneGoal;
@@ -73,7 +72,7 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
                     }
                     int leftAmount = challengeGoal.get().getChallengeGoalAmount() - currentAmount;
                     int percent = (int)(((double)currentAmount/(double)(challengeGoal.get().getChallengeGoalAmount())) * 100);
-                    challengeMembers.add(new ChallengeMemberDto(user.getNickname(),user.getHero().getHeroName(),leftAmount,percent));
+                    challengeMembers.add(new ChallengeMemberDto(user.getNickname(),user.getHero(),leftAmount,percent));
                 }
 
                 List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentUser);
