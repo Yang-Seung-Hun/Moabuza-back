@@ -4,6 +4,7 @@ import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.DoneGoal;
 import com.project.moabuja.domain.goal.GroupGoal;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,10 @@ public class Member {
     private Long id;
 
     private String email;
+
+    private Long kakaoId;
+
+    private String password;
 
     private String nickname;
 
@@ -40,6 +45,36 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private List<Alarm> alarms = new ArrayList<>();
+
+    @Builder
+    public Member(String password, Long kakaoId, String nickname, String email, Hero hero) {
+        this.password = password;
+        this.kakaoId = kakaoId;
+        this.nickname = nickname;
+        this.email = email;
+        this.hero = hero;
+    }
+
+    public Member updateInfo(MemberUpdateRequestDto dto){
+        this.nickname = dto.getNickname();
+        this.hero = dto.getHero();
+        System.out.println("서비스--------------------" + hero);
+        return Member.builder()
+                .password(this.getPassword())
+                .email(this.getEmail())
+                .nickname(this.getNickname())
+                .kakaoId(this.getKakaoId())
+                .hero(this.getHero())
+                .build();
+    }
+
+    public Member fromDto(RegisterRequestDto dto, String password) {
+        return new Member().builder()
+                .password(password)
+                .kakaoId(dto.getKakaoId())
+                .email(dto.getEmail())
+                .build();
+    }
 
     //테스트용 생성자임
     public Member(String email, String nickname, Hero hero) {
