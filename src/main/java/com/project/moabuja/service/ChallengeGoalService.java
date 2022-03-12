@@ -13,4 +13,6 @@ public interface ChallengeGoalService {
     public ChallengeResponseDto getChallengeInfo(Member currentUser);
 
     public CreateChallengeResponseDto getChallengeMemberCandidates(Member currentUser);
+
+    public void exitChallenge(Long id);
 }

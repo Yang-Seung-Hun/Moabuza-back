@@ -135,4 +135,18 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
 
         return new CreateChallengeResponseDto(challengeMembers);
     }
+
+    @Override
+    public void exitChallenge(Long id) {
+
+        Optional<ChallengeGoal> challengeGoal = challengeGoalRepository.findById(id);
+        if(challengeGoal.isPresent() && !challengeGoal.get().isAcceptedChallenge()){
+
+            List<Member> members = challengeGoal.get().getMembers();
+            while (members.size() > 0){
+                challengeGoal.get().removeMember(members.get(0));
+            }
+            challengeGoalRepository.deleteChallengeGoalById(id);
+        }
+    }
 }

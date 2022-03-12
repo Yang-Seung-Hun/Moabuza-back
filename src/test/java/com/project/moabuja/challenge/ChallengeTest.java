@@ -221,4 +221,64 @@ class ChallengeTest {
         Assertions.assertThat(challengeMemberCandidates3.getChallengeMembers().get(1).isChallengeMemberCanInvite()).isFalse();
 
     }
+
+    @Test
+    public void exitChallenge(){
+
+        LocalDateTime now = LocalDateTime.now();
+
+        Hero hero1 = new Hero(HeroName.name1, HeroLevel.level1);
+        Hero hero2 = new Hero(HeroName.name2, HeroLevel.level2);
+        Hero hero3 = new Hero(HeroName.name1, HeroLevel.level3);
+        Hero hero4 = new Hero(HeroName.name2, HeroLevel.level2);
+        Hero savedHero1 = heroRepository.save(hero1);
+        Hero savedHero2 = heroRepository.save(hero2);
+        Hero savedHero3 = heroRepository.save(hero3);
+        Hero savedHero4 = heroRepository.save(hero4);
+
+        Member member1 = new Member("member1", "nickname1", hero1);
+        Member savedMember1 = memberRepository.save(member1);
+        Member member2 = new Member("member2", "nickname2", hero2);
+        Member savedMember2 = memberRepository.save(member2);
+        Member member3 = new Member("member2", "nickname3", hero3);
+        Member savedMember3 = memberRepository.save(member3);
+        Member member4 = new Member("member3", "nickname4", hero4);
+        Member savedMember4 = memberRepository.save(member4);
+
+        Friend friend1 = new Friend(savedMember1, savedMember2.getId());
+        Friend friend2 = new Friend(savedMember2, savedMember1.getId());
+        Friend savedFriend1 = friendRepository.save(friend1);
+        Friend savedFriend2 = friendRepository.save(friend2);
+
+        //친구목록(초대자포함) 만드는 과정
+        List<Friend> friendsByMember = friendRepository.findFriendsByMember(savedMember1);
+        List<String> friends = new ArrayList<>();
+        friends.add(savedMember1.getNickname());
+        for(Friend friend : friendsByMember){
+            Optional<Member> memberById = memberRepository.findById(friend.getFriend());
+            if(memberById.isPresent()){
+                friends.add(memberById.get().getNickname());
+            }
+        }
+
+        CreateChallengeRequestDto createChallengeRequestDto1 = new CreateChallengeRequestDto("100만원 모으기", 1000000, friends);
+        ChallengeGoal savedChallenge1 = challengeGoalService.save(createChallengeRequestDto1);
+        savedChallenge1.setIsAcceptedChallenge(false);
+
+        challengeGoalService.exitChallenge(savedChallenge1.getId());
+        Optional<ChallengeGoal> testChallenge1 = challengeGoalRepository.findById(savedChallenge1.getId());
+        Assertions.assertThat(testChallenge1).isEmpty();
+
+
+        CreateChallengeRequestDto createChallengeRequestDto2 = new CreateChallengeRequestDto("100만원 모으기", 1000000, friends);
+        ChallengeGoal savedChallenge2 = challengeGoalService.save(createChallengeRequestDto2);
+        savedChallenge2.setIsAcceptedChallenge(true);
+
+        challengeGoalService.exitChallenge(savedChallenge2.getId());
+        Optional<ChallengeGoal> testChallenge2 = challengeGoalRepository.findById(savedChallenge2.getId());
+        Assertions.assertThat(testChallenge2.get().getChallengeGoalName()).isEqualTo("100만원 모으기");
+
+
+
+    }
 }

@@ -2,11 +2,13 @@ package com.project.moabuja.domain.friend;
 
 import com.project.moabuja.domain.member.Member;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Friend {
 
     @Id
