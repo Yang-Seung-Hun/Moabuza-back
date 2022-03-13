@@ -16,7 +16,7 @@ import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
-    private long accessTokenTime = 1000 * 30 * 1; // 30초
+    private long accessTokenTime = 1000 * 30 * 1; // 2분
     private long refreshTokenTime = 1000 * 60 * 30; // 30분
 
     @Autowired

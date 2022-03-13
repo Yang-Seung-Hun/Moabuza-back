@@ -46,7 +46,8 @@ public class MemberService {
                 .email(kakaoUserInfoDto.getEmail())
                 .build();
 
-        register(dto);  // 회원가입, 로그인 처리
+        // 회원가입, 로그인 처리
+        register(dto);
 
         // access, refresh 둘다 만들어줌
         String access = jwtTokenProvider.createAccessToken(kakaoUserInfoDto.getEmail());
