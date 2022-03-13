@@ -128,9 +128,6 @@ public class MemberService {
             memberRepository.save(member.fromDto(dto, password));
             return new ResponseEntity("회원가입 완료", null, HttpStatus.OK);
             // 회원가입한 회원은 온보딩 화면을 보여주도록 한다.
-            // boolean 으로 : 회원가입, 로그인 인지를 알려주고
-            // FE에서 온보딩 API를 호출한다.
-            // 캐릭터 설정, 닉네임 설정 => PATCH API를 날려서 유저가 설정한 값으로 DEFAULRT 값을 수정하도록 한다.
         }
         // 기존 회원이면 그냥 로그인완료 메세지
         return new ResponseEntity("로그인 완료", HttpStatus.OK);
@@ -151,6 +148,10 @@ public class MemberService {
     public TokenDto reissue(HttpServletRequest request) {
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         String refresh = request.getHeader("R-AUTH-TOKEN").substring(7);
+
+        System.out.println("어세스 토큰 : " + access);
+        System.out.println("리프래쉬 토큰 : " + refresh);
+
         // 1. Refresh Token 검증
         if (!jwtTokenProvider.validateToken(refresh)) {
             throw new RuntimeException("Refresh Token 이 유효하지 않습니다.");

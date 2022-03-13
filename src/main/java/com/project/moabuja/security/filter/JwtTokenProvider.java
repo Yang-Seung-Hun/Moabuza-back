@@ -65,14 +65,6 @@ public class JwtTokenProvider {
         }
         return new UsernamePasswordAuthenticationToken(userDetails, "", null);
     }
-//
-//    //request header에서 token값을 가지고온다
-//    public String resolveAccessToken(HttpServletRequest request) {
-//        return request.getHeader("A-AUTH-TOKEN");
-//    }
-//    public String resolveRefreshToken(HttpServletRequest request) {
-//        return request.getHeader("R-AUTH-TOKEN");
-//    }
 
     //토큰의 유효성 검증
     public boolean validateToken(String jwtToken) {

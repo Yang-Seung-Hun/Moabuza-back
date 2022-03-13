@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "oauth2.kakao.redirect_url",
+      "type": "java.lang.String",
+      "description": "Description for oauth2.kakao.redirect_url."
+    },
+    {
+      "name": "secretKey",
+      "type": "java.lang.String",
+      "description": "Description for secretKey."
+    }
+  ] }
