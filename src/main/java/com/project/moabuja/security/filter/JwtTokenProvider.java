@@ -1,5 +1,6 @@
 package com.project.moabuja.security.filter;
 
+import com.project.moabuja.exception.exceptionClass.JwtExpiredException;
 import com.project.moabuja.security.userdetails.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
-    private long accessTokenTime = 1000 * 60 * 1; // 3분
+    private long accessTokenTime = 1000 * 30 * 1; // 30초
     private long refreshTokenTime = 1000 * 60 * 30; // 30분
 
     @Autowired
@@ -76,8 +77,8 @@ public class JwtTokenProvider {
             throw new JwtException("인수가 Claims JWS를 나타내지 않는 경우");
         } catch (MalformedJwtException e) {
             throw new MalformedJwtException(" 문자열이 유효한 JWS가 아닌 경우");
-        } catch (ExpiredJwtException e) {
-            throw new ExpiredJwtException(null, claims.getBody(), "만료된 토큰");
+        } catch (JwtExpiredException e) {
+            throw new JwtExpiredException(null, claims.getBody(), "만료된 토큰");
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("문자열이 null이거나 비어 있거나 공백만 있는 경우");
         }
