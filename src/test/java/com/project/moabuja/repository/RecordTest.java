@@ -81,7 +81,7 @@ class RecordTest {
         //친구목록(초대자포함) 만드는 과정
         List<Friend> friendsByMember = friendRepository.findFriendsByMember(savedMember1);
         List<String> friends = new ArrayList<>();
-        friends.add(savedMember1.getNickname());
+//        friends.add(savedMember1.getNickname());
         for(Friend friend : friendsByMember){
             Optional<Member> memberById = memberRepository.findById(friend.getFriend());
             if(memberById.isPresent()){
@@ -90,7 +90,7 @@ class RecordTest {
         }
 
         CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("100만원 모으기", 1000000, friends);
-        ChallengeGoal savedChallenge = challengeGoalService.save(createChallengeRequestDto);
+        ChallengeGoal savedChallenge = challengeGoalService.save(createChallengeRequestDto,savedMember1);
         System.out.println(savedChallenge.getClass());
         savedChallenge.setIsAcceptedChallenge(true);
 
@@ -145,10 +145,9 @@ class RecordTest {
         Member savedMember2 = memberRepository.save(member2);
 
         List<String> friends = new ArrayList<>();
-        friends.add("nickname1");
         friends.add("nickname2");
         CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("100만원 모으기", 1000000, friends);
-        ChallengeGoal savedChallenge = challengeGoalService.save(createChallengeRequestDto);
+        ChallengeGoal savedChallenge = challengeGoalService.save(createChallengeRequestDto,savedMember);
 
         RecordRequestDto recordRequestDto = new RecordRequestDto(RecordType.income, now, "편의점", 10000);
         recordService.save(recordRequestDto, savedMember);
