@@ -38,5 +38,4 @@ out/
 *.yml
 #*.properties
 application.yml
-build.gradle
 #application-local.properties

@@ -8,4 +8,5 @@ public class JwtExpiredException extends ExpiredJwtException {
     public JwtExpiredException(Header header, Claims claims, String message) {
         super(header, claims, message);
     }
+
 }

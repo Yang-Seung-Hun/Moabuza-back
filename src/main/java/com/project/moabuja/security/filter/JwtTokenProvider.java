@@ -13,20 +13,21 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
-    private long accessTokenTime = 1000 * 30 * 1; // 2분
+    private long accessTokenTime = 1000 * 60 * 1; // 30초
     private long refreshTokenTime = 1000 * 60 * 30; // 30분
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
     // todo : aaplication-local에 올려둠.
-    @Value("${jwt.secret.key}")
-    private String secretKey;
+//    @Value("${jwt.secret.key}")
+    private String secretKey = "abwieineprmdspowejropsadasdasdasdvsddvsdvasd";
 
     @PostConstruct
     protected void init() {
@@ -75,15 +76,13 @@ public class JwtTokenProvider {
         Jws<Claims> claims = null;
         try {
             claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(jwtToken);
+            System.out.println("잡히면 안되지 ");
             return !claims.getBody().getExpiration().before(new Date());
         } catch (UnsupportedJwtException e) {
             throw new JwtException("인수가 Claims JWS를 나타내지 않는 경우");
         } catch (MalformedJwtException e) {
             throw new MalformedJwtException(" 문자열이 유효한 JWS가 아닌 경우");
-        } catch (JwtExpiredException e) {
-            // todo : custom 예외처리 클래스 사용
-            throw new JwtExpiredException(null, claims.getBody(), "만료된 토큰");
-        } catch (IllegalArgumentException e) {
+        }  catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("문자열이 null이거나 비어 있거나 공백만 있는 경우");
         }
     }
