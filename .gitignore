@@ -36,6 +36,7 @@ out/
 ### VS Code ###
 .vscode/
 *.yml
-*.properties
+#*.properties
 application.yml
 build.gradle
+#application-local.properties

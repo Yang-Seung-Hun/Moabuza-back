@@ -4,6 +4,8 @@ import com.project.moabuja.exception.exceptionClass.JwtExpiredException;
 import com.project.moabuja.security.userdetails.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,8 +24,9 @@ public class JwtTokenProvider {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    // todo : secretKey 숨기기 (git Ignore)
-    private String secretKey = "abwieineprmdspowejropsadasdasdasdvsddvsdvasd";
+    // todo : aaplication-local에 올려둠.
+    @Value("${jwt.secret.key}")
+    private String secretKey;
 
     @PostConstruct
     protected void init() {
@@ -78,6 +81,7 @@ public class JwtTokenProvider {
         } catch (MalformedJwtException e) {
             throw new MalformedJwtException(" 문자열이 유효한 JWS가 아닌 경우");
         } catch (JwtExpiredException e) {
+            // todo : custom 예외처리 클래스 사용
             throw new JwtExpiredException(null, claims.getBody(), "만료된 토큰");
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("문자열이 null이거나 비어 있거나 공백만 있는 경우");
