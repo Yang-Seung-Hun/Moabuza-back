@@ -74,7 +74,7 @@ public class RecordServiceImp implements RecordService{
         List<Record> recordsByRecordDate = recordRepository.findRecordsByRecordDateAndMember(LocalDateTime.parse(dayListRequestDto.getRecordDate(),formatter),currentUser);
 
         List<DayRecordResponseDto> dayRecordList = recordsByRecordDate.stream().map(record -> {
-            return new DayRecordResponseDto(record.getRecordType(), record.getRecordDate(), record.getMemo(), record.getRecordAmount());
+            return new DayRecordResponseDto(record.getId(),record.getRecordType(), record.getRecordDate(), record.getMemo(), record.getRecordAmount());
         }).collect(Collectors.toList());
 
         int dayIncomeAmount = 0;

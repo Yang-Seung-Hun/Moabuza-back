@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ChallengeGoalServiceImp implements ChallengeGoalService{
 
@@ -32,8 +33,10 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
 
     @Transactional
     @Override
-    public ChallengeGoal save(CreateChallengeRequestDto createChallengeRequestDto) {
+    public ChallengeGoal save(CreateChallengeRequestDto createChallengeRequestDto, Member current) {
 
+        Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
+        Member currentUser = currentUserTmp.get();
 
         ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(),
                                                         createChallengeRequestDto.getCreateChallengeAmount(),
@@ -45,13 +48,18 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
             challengeGoal.addMember(memberByNickname.get());
         }
 
-        challengeGoalRepository.save(challengeGoal);
-
-        return challengeGoal;
+        //member랑 challengegoal 연관관계 맺음
+        ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
+        savedGoal.addMember(currentUser);
+        return savedGoal;
     }
 
     @Override
-    public ChallengeResponseDto getChallengeInfo(Member currentUser) {
+    public ChallengeResponseDto getChallengeInfo(Member current) {
+
+        //여기는 프록시 생명주기 문제 땜에 필요
+        Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
+        Member currentUser = currentUserTmp.get();
 
         Optional<ChallengeGoal> challengeGoal = Optional.ofNullable(currentUser.getChallengeGoal());
         List<String> challengeDoneGoalNames = new ArrayList<>();
@@ -80,18 +88,18 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
                     return new ChallengeListDto(record.getRecordDate(), record.getMemo(), record.getRecordAmount());
                 }).collect(Collectors.toList());
 
-                return new ChallengeResponseDto(goalStatus,challengeMembers,challengeGoal.get().getChallengeGoalName(),challengeDoneGoalNames, challengeLists);
+                return new ChallengeResponseDto(challengeGoal.get().getId(),goalStatus,challengeMembers,challengeGoal.get().getChallengeGoalName(),challengeDoneGoalNames, challengeLists);
 
             }
             else{//수락대기중
                 String goalStatus = "waiting";
-                return new ChallengeResponseDto(goalStatus,null,null,challengeDoneGoalNames,null);
+                return new ChallengeResponseDto(challengeGoal.get().getId(), goalStatus,null,null,challengeDoneGoalNames,null);
             }
         }
         //challengeGoal 없을때
         else{
             String goalStatus = "noGoal";
-            return new ChallengeResponseDto(goalStatus,null,null,challengeDoneGoalNames,null);
+            return new ChallengeResponseDto(null,goalStatus,null,null,challengeDoneGoalNames,null);
         }
 
     }
@@ -136,6 +144,7 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
     }
 
     @Override
+    @Transactional
     public void exitChallenge(Long id) {
 
         Optional<ChallengeGoal> challengeGoal = challengeGoalRepository.findById(id);
