@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -73,7 +74,9 @@ class ChallengeTest {
     @Test
     public void getChallengeInfo(){
 
-        LocalDateTime now = LocalDateTime.now();
+        String now = "2021-11-05 00:00:00.000";
+        String tomorrow = "2021-11-06 00:00:00.000";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
         Member member1 = new Member("member1", "nickname1", Hero.hero1);
         Member savedMember1 = memberRepository.save(member1);
@@ -114,13 +117,13 @@ class ChallengeTest {
         recordService.save(recordRequestDto4, savedMember1);
         RecordRequestDto recordRequestDto5 = new RecordRequestDto(RecordType.challenge, now, "어림 없지 나두 간다!!!", 50000);
         recordService.save(recordRequestDto5, savedMember2);
-        RecordRequestDto recordRequestDto6 = new RecordRequestDto(RecordType.challenge, LocalDateTime.now().plusDays(1), "내가 다시 일등!!", 200000);
+        RecordRequestDto recordRequestDto6 = new RecordRequestDto(RecordType.challenge, tomorrow, "내가 다시 일등!!", 200000);
         recordService.save(recordRequestDto6, savedMember1);
-        RecordRequestDto recordRequestDto7 = new RecordRequestDto(RecordType.challenge, LocalDateTime.now().plusDays(1), "내가 다시 일등!!", 800000);
+        RecordRequestDto recordRequestDto7 = new RecordRequestDto(RecordType.challenge, tomorrow, "내가 다시 일등!!", 800000);
         recordService.save(recordRequestDto7, savedMember1);
 
 
-        ChallengeResponseDto challengeInfo = challengeGoalService.getChallengeInfo(savedMember1);
+        ChallengeResponseDto challengeInfo = challengeGoalService.getChallengeInfo(savedMember3);
         System.out.println("=======================================================================");
         System.out.println(challengeInfo.getGoalStatus());
         System.out.println(challengeInfo.getChallengeName());
@@ -153,7 +156,9 @@ class ChallengeTest {
     @Test
     public void getChallengeCandidates(){
 
-        LocalDateTime now = LocalDateTime.now();
+        String now = "2021-11-05 00:00:00.000";
+        String tomorrow = "2021-11-06 00:00:00.000";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
         //member1기준!!
         Member member1 = new Member("member1", "nickname1");

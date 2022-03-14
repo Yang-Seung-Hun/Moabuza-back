@@ -3,13 +3,14 @@ package com.project.moabuja.dto.request.member;
 import com.project.moabuja.domain.member.Hero;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 @Getter
-@Builder
+@NoArgsConstructor
 @Setter
 public class MemberUpdateRequestDto {
 

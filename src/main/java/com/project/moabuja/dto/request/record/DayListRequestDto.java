@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class DayListRequestDto {
-    private LocalDateTime recordDate;
+    private String recordDate;
 
-    public DayListRequestDto(LocalDateTime recordDate) {
+    public DayListRequestDto(String recordDate) {
         this.recordDate = recordDate;
     }
 }
