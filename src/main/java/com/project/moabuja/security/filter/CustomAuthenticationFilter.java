@@ -1,5 +1,6 @@
 package com.project.moabuja.security.filter;
 
+import com.project.moabuja.exception.exceptionClass.LogoutJwtUseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -42,6 +43,8 @@ public class CustomAuthenticationFilter extends GenericFilterBean {
             if (isLogout == null) {
                 Authentication authentication = jwtProvider.getAuthentication(jwtAccess);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else{
+                throw new LogoutJwtUseException("로그아웃 되어 사용할 수 없는 토큰입니다.");
             }
         } else if (jwtRefresh != null){
             checkToken(jwtRefresh);
@@ -72,4 +75,5 @@ public class CustomAuthenticationFilter extends GenericFilterBean {
         }
         return null;
     }
+
 }

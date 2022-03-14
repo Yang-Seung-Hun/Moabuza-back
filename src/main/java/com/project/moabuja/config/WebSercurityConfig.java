@@ -1,6 +1,7 @@
 package com.project.moabuja.config;
 
 import com.project.moabuja.security.filter.CustomAuthenticationFilter;
+import com.project.moabuja.security.filter.JwtExceptionFilter;
 import com.project.moabuja.security.filter.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,8 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/h2-console/**"); }
+        web.ignoring().antMatchers("/h2-console/**")
+                .antMatchers("/api/reissue");; }
 
 
     @Override
@@ -44,5 +46,7 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated();
 
         http    .addFilterBefore(new CustomAuthenticationFilter(jwtProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
+        // todo : exception을 핸들링 하기 위한 필터를 설치
+        http    .addFilterBefore(new JwtExceptionFilter(), CustomAuthenticationFilter.class);
     }
 }
