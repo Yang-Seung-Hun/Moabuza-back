@@ -76,7 +76,6 @@ public class JwtTokenProvider {
         Jws<Claims> claims = null;
         try {
             claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(jwtToken);
-            System.out.println("잡히면 안되지 ");
             return !claims.getBody().getExpiration().before(new Date());
         } catch (UnsupportedJwtException e) {
             throw new JwtException("인수가 Claims JWS를 나타내지 않는 경우");
