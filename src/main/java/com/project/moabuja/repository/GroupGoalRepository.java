@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GroupGoalRepository extends JpaRepository<GroupGoal,Long> {
 
-
+    public void deleteGroupGoalById(Long id);
 
 
 }
