@@ -43,6 +43,7 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/index.html").permitAll()
                 .antMatchers(HttpMethod.GET, "/user/kakao/callback").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/reissue").permitAll()
+                .antMatchers(HttpMethod.GET, "/health").permitAll()
                 .anyRequest().authenticated();
 
         http    .addFilterBefore(new CustomAuthenticationFilter(jwtProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
