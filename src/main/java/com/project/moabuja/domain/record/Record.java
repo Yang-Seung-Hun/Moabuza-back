@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Getter
@@ -32,8 +33,9 @@ public class Record extends Timestamped {
     private RecordType recordType;
 
     public Record(RecordRequestDto recordRequestDto, Member currentMember){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(("yyyy-MM-dd HH:mm:ss.SSS"));
         this.recordType = recordRequestDto.getRecordType();
-        this.recordDate = recordRequestDto.getRecordDate();
+        this.recordDate = LocalDateTime.parse(recordRequestDto.getRecordDate(),formatter);
         this.memo = recordRequestDto.getMemos();
         this.recordAmount = recordRequestDto.getRecordAmount();
         this.member = currentMember;

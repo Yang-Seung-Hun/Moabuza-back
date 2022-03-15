@@ -21,7 +21,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +42,8 @@ class RecordTest {
     @Test
     public void save(){
 
-        LocalDateTime now = LocalDateTime.now();
+        String now = "2021-11-05 00:00:00.000";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
         Member member = new Member("email1", "nickname1");
         Member savedMember = memberRepository.save(member);
@@ -48,7 +51,7 @@ class RecordTest {
         RecordRequestDto recordRequestDto = new RecordRequestDto(RecordType.income, now, "편의점", 10000);
         RecordResponseDto isDoneGoal = recordService.save(recordRequestDto, savedMember);
 
-        List<Record> findRecord = recordRepository.findRecordsByRecordDate(now);
+        List<Record> findRecord = recordRepository.findRecordsByRecordDate(LocalDateTime.parse(now, formatter));
 
         Assertions.assertThat(findRecord.get(0).getMemo()).isEqualTo("편의점");
         Assertions.assertThat(isDoneGoal.isComplete()).isFalse();
@@ -57,8 +60,9 @@ class RecordTest {
     @Test
     public void getDayList(){
 
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1);
+        String now = "2021-11-05 00:00:00.000";
+        String tomorrow = "2021-11-06 00:00:00.000";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
         Member member1 = new Member("member1", "nickname1", Hero.hero1);
         Member savedMember1 = memberRepository.save(member1);
@@ -77,7 +81,7 @@ class RecordTest {
         //친구목록(초대자포함) 만드는 과정
         List<Friend> friendsByMember = friendRepository.findFriendsByMember(savedMember1);
         List<String> friends = new ArrayList<>();
-        friends.add(savedMember1.getNickname());
+//        friends.add(savedMember1.getNickname());
         for(Friend friend : friendsByMember){
             Optional<Member> memberById = memberRepository.findById(friend.getFriend());
             if(memberById.isPresent()){
@@ -86,7 +90,7 @@ class RecordTest {
         }
 
         CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("100만원 모으기", 1000000, friends);
-        ChallengeGoal savedChallenge = challengeGoalService.save(createChallengeRequestDto);
+        ChallengeGoal savedChallenge = challengeGoalService.save(createChallengeRequestDto,savedMember1);
         System.out.println(savedChallenge.getClass());
         savedChallenge.setIsAcceptedChallenge(true);
 
@@ -109,7 +113,7 @@ class RecordTest {
         Assertions.assertThat(isDone2.isComplete()).isTrue();
 
         DayListRequestDto dayListRequestDto = new DayListRequestDto(now);
-        DayListResponseDto dayList = recordService.getDayList(dayListRequestDto, savedMember2);
+        DayListResponseDto dayList = recordService.getDayList(dayListRequestDto, savedMember1);
         System.out.println("====================================================");
         List<DayRecordResponseDto> list = dayList.getDayRecordList();
         for (DayRecordResponseDto dto : list) {
@@ -130,7 +134,9 @@ class RecordTest {
     @Test
     public void deleteRecord(){
 
-        LocalDateTime now = LocalDateTime.now();
+        String now = "2021-11-05 00:00:00.000";
+        String tomorrow = "2021-11-06 00:00:00.000";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
         Member member = new Member("email1", "nickname1");
         Member savedMember = memberRepository.save(member);
@@ -139,10 +145,9 @@ class RecordTest {
         Member savedMember2 = memberRepository.save(member2);
 
         List<String> friends = new ArrayList<>();
-        friends.add("nickname1");
         friends.add("nickname2");
         CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("100만원 모으기", 1000000, friends);
-        ChallengeGoal savedChallenge = challengeGoalService.save(createChallengeRequestDto);
+        ChallengeGoal savedChallenge = challengeGoalService.save(createChallengeRequestDto,savedMember);
 
         RecordRequestDto recordRequestDto = new RecordRequestDto(RecordType.income, now, "편의점", 10000);
         recordService.save(recordRequestDto, savedMember);

@@ -8,7 +8,7 @@ import com.project.moabuja.dto.response.goal.CreateChallengeResponseDto;
 
 public interface ChallengeGoalService {
 
-    public ChallengeGoal save(CreateChallengeRequestDto challengeRequestDto);
+    public ChallengeGoal save(CreateChallengeRequestDto challengeRequestDto, Member currentUser);
 
     public ChallengeResponseDto getChallengeInfo(Member currentUser);
 

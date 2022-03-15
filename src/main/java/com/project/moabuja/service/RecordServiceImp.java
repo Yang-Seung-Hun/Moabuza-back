@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,10 +68,13 @@ public class RecordServiceImp implements RecordService{
 
     @Override//wallet, totalAmount 보류
     public DayListResponseDto getDayList(DayListRequestDto dayListRequestDto, Member currentUser) {
-        List<Record> recordsByRecordDate = recordRepository.findRecordsByRecordDateAndMember(dayListRequestDto.getRecordDate(),currentUser);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+
+        List<Record> recordsByRecordDate = recordRepository.findRecordsByRecordDateAndMember(LocalDateTime.parse(dayListRequestDto.getRecordDate(),formatter),currentUser);
 
         List<DayRecordResponseDto> dayRecordList = recordsByRecordDate.stream().map(record -> {
-            return new DayRecordResponseDto(record.getRecordType(), record.getRecordDate(), record.getMemo(), record.getRecordAmount());
+            return new DayRecordResponseDto(record.getId(),record.getRecordType(), record.getRecordDate(), record.getMemo(), record.getRecordAmount());
         }).collect(Collectors.toList());
 
         int dayIncomeAmount = 0;

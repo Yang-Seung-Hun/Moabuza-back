@@ -16,12 +16,14 @@ public class DayRecordResponseDto {
      * [string] memos(메모),
      * [int] recordAmount(금액) }
      */
+    private Long id;
     private RecordType recordType;
     private LocalDateTime recordDate;
     private String memos;
     private int recordAmount;
 
-    public DayRecordResponseDto(RecordType recordType, LocalDateTime recordDate, String memos, int recordAmount) {
+    public DayRecordResponseDto(Long id, RecordType recordType, LocalDateTime recordDate, String memos, int recordAmount) {
+        this. id = id;
         this.recordType = recordType;
         this.recordDate = recordDate;
         this.memos = memos;
