@@ -86,16 +86,16 @@ public class GoalTest {
         recordService.save(recordRequestDto2, savedMember1);
         RecordRequestDto recordRequestDto3 = new RecordRequestDto(RecordType.group, now, "가즈아!!!", 20000);
         recordService.save(recordRequestDto3, savedMember1);
-        RecordRequestDto recordRequestDto4 = new RecordRequestDto(RecordType.group, now, "오 제주도!", 20000);
+        RecordRequestDto recordRequestDto4 = new RecordRequestDto(RecordType.expense, now, "편이점!", 20000);
         recordService.save(recordRequestDto4, savedMember3);
         RecordRequestDto recordRequestDto5 = new RecordRequestDto(RecordType.group, now, "세부!!!!", 50000);
         recordService.save(recordRequestDto5, savedMember2);
         RecordRequestDto recordRequestDto6 = new RecordRequestDto(RecordType.group, tomorrow, "할라봉 가즈아", 200000);
         recordService.save(recordRequestDto6, savedMember4);
-        RecordRequestDto recordRequestDto7 = new RecordRequestDto(RecordType.group, tomorrow, "떠나요 제주도~~", 800000);
-        recordService.save(recordRequestDto7, savedMember1);
+//        RecordRequestDto recordRequestDto7 = new RecordRequestDto(RecordType.group, tomorrow, "떠나요 제주도~~", 800000);
+//        recordService.save(recordRequestDto7, savedMember1);
 
-        GroupResponseDto groupInfo = groupGoalService.getGroupInfo(savedMember1);
+        GroupResponseDto groupInfo = groupGoalService.getGroupInfo(savedMember2);
         System.out.println("=============================goal status=================================");
         System.out.println(groupInfo.getGoalStatus());
         System.out.println("=============================member info=================================");
