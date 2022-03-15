@@ -1,4 +1,4 @@
-package com.project.moabuja.dto.request;
+package com.project.moabuja.dto.request.record;
 
 import com.project.moabuja.domain.record.RecordType;
 import lombok.Builder;
@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class RecordRequestDto {
     private RecordType recordType;
-    private LocalDateTime recordDate;
+    private String recordDate;
     private String memos;
     private int recordAmount;
 
     @Builder
-    public RecordRequestDto(RecordType recordType, LocalDateTime recordDate, String memos, int recordAmount) {
+    public RecordRequestDto(RecordType recordType, String recordDate, String memos, int recordAmount) {
         this.recordType = recordType;
         this.recordDate = recordDate;
         this.memos = memos;

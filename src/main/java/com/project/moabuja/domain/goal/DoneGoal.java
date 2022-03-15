@@ -1,11 +1,9 @@
 package com.project.moabuja.domain.goal;
 
+import com.project.moabuja.domain.member.Member;
 import lombok.Getter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -20,5 +18,21 @@ public class DoneGoal {
 
     private int doneGoalAmount;
 
-    private boolean doneGoalSuccess;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @Enumerated(EnumType.STRING)
+    private DoneGoalType doneGoalType;
+
+    public void changeMember(Member member) {
+        this.member = member;
+    }
+
+    public DoneGoal(String doneGoalName, int doneGoalAmount, Member member, DoneGoalType doneGoalType) {
+        this.doneGoalName = doneGoalName;
+        this.doneGoalAmount = doneGoalAmount;
+        this.member = member;
+        this.doneGoalType = doneGoalType;
+    }
 }

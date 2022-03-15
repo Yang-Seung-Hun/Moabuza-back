@@ -19,4 +19,8 @@ public class GroupGoal {
     private String groupGoalName;
 
     private int groupGoalAmount;
+
+    private int groupCurrentAmount;
+
+    private boolean isAcceptedGroup;
 }
