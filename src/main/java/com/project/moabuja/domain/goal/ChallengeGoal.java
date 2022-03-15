@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ChallengeGoal {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "challenge_goal_id")
     private Long id;
 

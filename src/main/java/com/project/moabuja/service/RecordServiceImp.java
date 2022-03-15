@@ -63,6 +63,12 @@ public class RecordServiceImp implements RecordService{
                 recordResponseDto.changeIsComplete();
             }
         }
+
+        //group goal 완료 로직
+//        else if(recordRequestDto.getRecordType() == RecordType.group){
+//
+//        }
+
         return recordResponseDto;
     }
 

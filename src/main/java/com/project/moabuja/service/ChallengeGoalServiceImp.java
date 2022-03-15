@@ -38,10 +38,7 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
         Member currentUser = currentUserTmp.get();
 
-        ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(),
-                                                        createChallengeRequestDto.getCreateChallengeAmount(),
-                                                        0,
-                                                        false);
+        ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(), createChallengeRequestDto.getCreateChallengeAmount(), 0, false);
 
         for(String name :createChallengeRequestDto.getChallengeFiends()){
             Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);

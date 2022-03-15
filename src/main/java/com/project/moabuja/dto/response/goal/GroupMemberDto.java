@@ -7,7 +7,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class GroupMemberDto {
-
     private String groupMemberNickname;
     private Hero groupMemberHero;
+
+    public GroupMemberDto(String groupMemberNickname, Hero groupMemberHero) {
+        this.groupMemberNickname = groupMemberNickname;
+        this.groupMemberHero = groupMemberHero;
+    }
 }

@@ -9,4 +9,9 @@ import lombok.NoArgsConstructor;
 public class CreateGroupMemberDto {
     private String groupMemberNickname;
     private boolean groupMemberCanInvite;
+
+    public CreateGroupMemberDto(String groupMemberNickname, boolean groupMemberCanInvite) {
+        this.groupMemberNickname = groupMemberNickname;
+        this.groupMemberCanInvite = groupMemberCanInvite;
+    }
 }
