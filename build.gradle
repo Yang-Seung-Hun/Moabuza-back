@@ -8,11 +8,10 @@ group = 'com.pang'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
-<<<<<<< HEAD
-=======
+
 jar { enabled = false }
 
->>>>>>> origin/dev
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -41,10 +40,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
-<<<<<<< HEAD
-=======
+
     runtimeOnly 'mysql:mysql-connector-java'
->>>>>>> origin/dev
+
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
