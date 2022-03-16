@@ -35,7 +35,6 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.headers().frameOptions().sameOrigin();
         http.csrf().disable();
-//        http.csrf().ignoringAntMatchers("/h2-console/**").disable();
         http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
         http.httpBasic().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
