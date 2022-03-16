@@ -1,7 +1,6 @@
 package com.project.moabuja.service;
 
 import com.project.moabuja.domain.friend.Friend;
-import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.DoneGoal;
 import com.project.moabuja.domain.goal.DoneGoalType;
 import com.project.moabuja.domain.goal.GroupGoal;

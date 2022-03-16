@@ -3,12 +3,21 @@ package com.project.moabuja.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.moabuja.domain.goal.ChallengeGoal;
+import com.project.moabuja.domain.goal.GroupGoal;
+import com.project.moabuja.domain.member.Hero;
 import com.project.moabuja.domain.member.Member;
+import com.project.moabuja.domain.record.Record;
+import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.KakaoUserInfoDto;
 import com.project.moabuja.dto.TokenDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.RegisterRequestDto;
+import com.project.moabuja.dto.response.goal.GroupListDto;
+import com.project.moabuja.dto.response.goal.GroupMemberDto;
+import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.repository.MemberRepository;
+import com.project.moabuja.repository.RecordRepository;
 import com.project.moabuja.security.filter.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,6 +32,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +44,7 @@ public class MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final RedisTemplate redisTemplate;
+    private final RecordRepository recordRepository;
 
     @Transactional
     public TokenDto kakaoLogin(String code) throws JsonProcessingException {
@@ -211,5 +223,86 @@ public class MemberService {
         redisTemplate.opsForValue()
                 .set(access, "logout", expiration, TimeUnit.MILLISECONDS);
         return ResponseEntity.ok().body("로그아웃 성공");
+    }
+
+    public HomeResponseDto getHomeInfo(Member current){
+
+        Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
+        Member currentUser = currentUserTmp.get();
+
+        Hero hero = currentUser.getHero();
+
+        int groupCurrentAmount = 0;
+        int groupNeedAmount = 0;
+        int groupAmount = 0;
+        int groupPercent = 0;
+        String groupName = null;
+
+        int challengeCurrentAmount = 0;
+        int challengeNeedAmount = 0;
+        int challengeAmount = 0;
+        int challengePercent = 0;
+        String challengeName = null;
+
+        int totalAmount = 0;
+        int wallet = 0;
+
+        GroupGoal groupGoal = currentUser.getGroupGoal();
+        if (groupGoal != null && groupGoal.isAcceptedGroup()) {
+
+            List<Member> members = groupGoal.getMembers();
+            int currentGroupAmount = 0;
+            for (Member member : members) {
+                List<Record> memberGroupRecord = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
+                for (Record record : memberGroupRecord) {
+                    groupCurrentAmount += record.getRecordAmount();
+                }
+            }
+            groupNeedAmount = groupGoal.getGroupGoalAmount() - groupCurrentAmount;
+            groupPercent = (int) (((double) groupCurrentAmount / (double) (groupGoal.getGroupGoalAmount())) * 100);
+            groupName = groupGoal.getGroupGoalName();
+        }
+
+        ChallengeGoal challengeGoal = currentUser.getChallengeGoal();
+        if (challengeGoal != null && challengeGoal.isAcceptedChallenge()) {
+
+            List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentUser);
+            for (Record challengeRecord : challengeRecords) {
+                challengeCurrentAmount += challengeRecord.getRecordAmount();
+            }
+            challengeNeedAmount = challengeGoal.getChallengeGoalAmount() - challengeCurrentAmount;
+            challengePercent = (int) (((double) challengeCurrentAmount / (double) (challengeGoal.getChallengeGoalAmount())) * 100);
+            challengeName = challengeGoal.getChallengeGoalName();
+        }
+
+        //hero랑 heroLevel(레벨은 기준 정해야 함)
+        //순자산(지갑+저금통), 지갑 계산
+        int groupUserWallet = 0;//해당 user가 group에 넣은 돈
+        List<Record> groupUserRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, currentUser);
+        for (Record groupUserRecord : groupUserRecords) {
+            groupUserWallet += groupUserRecord.getRecordAmount();
+        }
+
+        List<Record> recordsByMember = recordRepository.findRecordsByMember(currentUser);
+        for (Record record : recordsByMember) {
+            if (record.getRecordType() == RecordType.expense) {
+                wallet -= record.getRecordAmount();
+            }
+            if (record.getRecordType() == RecordType.income) {
+                wallet += record.getRecordAmount();
+            }
+            if (record.getRecordType() == RecordType.challenge && record.getRecordAmount() > 0) {
+                wallet -= record.getRecordAmount();
+            }
+            if (record.getRecordType() == RecordType.group && record.getRecordAmount() > 0) {
+                wallet -= record.getRecordAmount();
+            }
+        }
+        totalAmount = wallet + challengeCurrentAmount + groupUserWallet;
+
+        return new HomeResponseDto(groupCurrentAmount, groupNeedAmount, groupAmount, groupPercent, groupName,
+                challengeCurrentAmount, challengeNeedAmount, challengeAmount, challengePercent, challengeName,
+                hero, 0, totalAmount, wallet);//heroLevel 일단 0으로
+
     }
 }
