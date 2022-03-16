@@ -10,4 +10,8 @@ import java.util.List;
 @NoArgsConstructor
 public class CreateGroupResponseDto {
     List<CreateGroupMemberDto> groupMembers = new ArrayList<>();
+
+    public CreateGroupResponseDto(List<CreateGroupMemberDto> groupMembers) {
+        this.groupMembers = groupMembers;
+    }
 }
