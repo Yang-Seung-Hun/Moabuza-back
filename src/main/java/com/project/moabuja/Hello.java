@@ -1,5 +1,6 @@
 package com.project.moabuja;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,7 +28,7 @@ public class Hello {
 
 
     @GetMapping("/health")
-    public String healthCheck(){
-        return "건강";
+    public ResponseEntity healthCheck(){
+        return ResponseEntity.ok().body("데이터 : 건강!");
     }
 }
