@@ -23,6 +23,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
+
     // 카카오 로그인 api
     @GetMapping("/user/kakao/callback")
     public ResponseEntity kakaoLogin(@RequestParam String code) throws JsonProcessingException {
