@@ -71,7 +71,7 @@ public class MemberService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "f367d5c13479608400bba9be2af87fc6");
-        body.add("redirect_uri", "https://panghoon.shop/user/kakao/callback");
+        body.add("redirect_uri", "https://moabuza.com/user/kakao/callback");
         body.add("code", code);
         body.add("client_secret", "X8m672khDWbTiYJlRBNwNGtH8K3k7HVE");
 
@@ -86,6 +86,7 @@ public class MemberService {
                 kakaoTokenRequest,
                 String.class
         );
+
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
