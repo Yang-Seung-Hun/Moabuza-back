@@ -39,8 +39,8 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
         http.httpBasic().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.requiresChannel()
-                .antMatchers("/h2-console/**").requiresInsecure();
+//        http.requiresChannel()
+//                .antMatchers("/h2-console/**").requiresInsecure();
 
         http
                 .authorizeRequests()
