@@ -1,8 +1,10 @@
 package com.project.moabuja.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.TokenDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
+import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.MemberService;
 import com.project.moabuja.util.CustomResponseEntity;
@@ -70,4 +72,12 @@ public class MemberController {
         return memberService.logout(request);
     }
 
+
+    @GetMapping("/home")
+    public HomeResponseDto getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
+
+        Member currentUser = userDetails.getMember();
+        return memberService.getHomeInfo(currentUser);
+
+    }
 }
