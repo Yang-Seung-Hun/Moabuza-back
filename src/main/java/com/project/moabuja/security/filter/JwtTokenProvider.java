@@ -25,9 +25,12 @@ public class JwtTokenProvider {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    // todo : aaplication-local에 올려둠.
-//    @Value("${jwt.secret.key}")
-    private String secretKey = "abwieineprmdspowejropsadasdasdasdvsddvsdvasd";
+    private String secretKey;
+    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
+        this.secretKey = secretKey;
+    }
+
+
 
     @PostConstruct
     protected void init() {
