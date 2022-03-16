@@ -1,0 +1,30 @@
+server:
+  port: 8080  # Spring boot Server port
+
+spring:
+  h2:
+    console:
+      enabled: true  # H2 웹 콘솔을 사용하겠다는 의미
+
+  datasource:
+    driver-class-name: org.h2.Driver  #h2 드라이버 설정
+    url: jdbc:h2:mem:testdb  #접속 URL
+    username: sa  # 사용자 이름 (로그인 시 사용)
+    password:  # 사용자 암호 (로그인 시 사용)# 콘솔의 경로
+
+  reids:
+    host:
+      #여기 부분은 자신의 ip에 맞춰서 바꾸기
+      # ec2 redis 설치 후 연결 ip
+      127.0.0.1
+    port:
+      6379
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+logging.level:
+  org.hibernate.SQL: debug
