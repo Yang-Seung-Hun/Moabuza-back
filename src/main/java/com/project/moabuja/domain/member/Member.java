@@ -38,7 +38,7 @@ public class Member {
     @JoinColumn(name = "challenge_goal_id")
     private ChallengeGoal challengeGoal;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "group_goal_id")
     private GroupGoal groupGoal;
 
@@ -93,6 +93,11 @@ public class Member {
     //반대쪽에서 연관관계편의메소드에서 사용될 setter
     public void changeChallengeGoal(ChallengeGoal challengeGoal){
         this.challengeGoal = challengeGoal;
+    }
+
+    //반대쪽에서 연관관계편의메소드에서 사용될 setter
+    public void changeGroupGoal(GroupGoal groupGoal){
+        this.groupGoal = groupGoal;
     }
 
     //연관관계 편의

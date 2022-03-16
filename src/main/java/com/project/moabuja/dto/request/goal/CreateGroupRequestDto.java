@@ -10,6 +10,12 @@ import java.util.List;
 @NoArgsConstructor
 public class CreateGroupRequestDto {
     private String createGroupName;
-    private String createGroupAmount;
+    private int createGroupAmount;
     private List<String> groupFiends = new ArrayList<>();
+
+    public CreateGroupRequestDto(String createGroupName, int createGroupAmount, List<String> groupFiends) {
+        this.createGroupName = createGroupName;
+        this.createGroupAmount = createGroupAmount;
+        this.groupFiends = groupFiends;
+    }
 }

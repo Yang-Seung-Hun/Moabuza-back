@@ -3,6 +3,7 @@ package com.project.moabuja.service;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.DoneGoal;
+import com.project.moabuja.domain.goal.DoneGoalType;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
@@ -38,10 +39,7 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
         Member currentUser = currentUserTmp.get();
 
-        ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(),
-                                                        createChallengeRequestDto.getCreateChallengeAmount(),
-                                                        0,
-                                                        false);
+        ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(), createChallengeRequestDto.getCreateChallengeAmount(), 0, false);
 
         for(String name :createChallengeRequestDto.getChallengeFiends()){
             Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
@@ -64,7 +62,9 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
         Optional<ChallengeGoal> challengeGoal = Optional.ofNullable(currentUser.getChallengeGoal());
         List<String> challengeDoneGoalNames = new ArrayList<>();
         for(DoneGoal doneGoal:currentUser.getDoneGaols()){
-            challengeDoneGoalNames.add(doneGoal.getDoneGoalName());
+            if(doneGoal.getDoneGoalType() == DoneGoalType.CHALLENGE){
+                challengeDoneGoalNames.add(doneGoal.getDoneGoalName());
+            }
         }
 
         //challengeGoal 있을때

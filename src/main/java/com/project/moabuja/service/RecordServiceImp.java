@@ -2,6 +2,7 @@ package com.project.moabuja.service;
 
 import com.project.moabuja.domain.goal.DoneGoal;
 import com.project.moabuja.domain.goal.DoneGoalType;
+import com.project.moabuja.domain.goal.GroupGoal;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
@@ -18,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,6 +66,34 @@ public class RecordServiceImp implements RecordService{
                 recordResponseDto.changeIsComplete();
             }
         }
+
+        //group goal 완료 로직
+        else if(recordRequestDto.getRecordType() == RecordType.group){
+            int goalAmount = currentMember.getGroupGoal().getGroupGoalAmount();
+
+            GroupGoal groupGoal = currentMember.getGroupGoal();
+            HashMap<Member, Integer> separateAmount = countSeparateCurrentGroup(groupGoal);
+            int currentAmount = 0;
+            for (Member member : separateAmount.keySet()) {
+                currentAmount += separateAmount.get(member);
+            }
+
+            if(currentAmount >= goalAmount){
+                //완료 로직 => 각 사용자 저금통에서 각자 낸 만큼 빼주기(도전해부자랑 다름, 도전해부자는 다시 넣어주는것 까지 있음)
+                for (Member member : separateAmount.keySet()) {
+                    RecordRequestDto dto = new RecordRequestDto(RecordType.group, recordRequestDto.getRecordDate(), "같이해부자 완료!!", -1*separateAmount.get(member));
+                    Record minusRecord = new Record(dto, member);
+                    recordRepository.save(minusRecord);
+
+                    DoneGoal doneGoal = new DoneGoal(member.getGroupGoal().getGroupGoalName(),member.getGroupGoal().getGroupGoalAmount(),member,DoneGoalType.GROUP);
+                    doneGoalRepository.save(doneGoal);
+                    member.addDoneGoal(doneGoal);
+                    member.getGroupGoal().removeMember(member);
+                }
+                recordResponseDto.changeIsComplete();
+            }
+        }
+
         return recordResponseDto;
     }
 
@@ -111,5 +142,21 @@ public class RecordServiceImp implements RecordService{
             currentAmount += challengeRecord.getRecordAmount();
         }
         return currentAmount;
+    }
+
+    public HashMap<Member,Integer> countSeparateCurrentGroup(GroupGoal groupGoal){
+
+        HashMap<Member,Integer> separateAmounts = new HashMap<>();
+
+        List<Member> members = groupGoal.getMembers();
+        for (Member member : members) {
+            int tmpAmount = 0;
+            List<Record> groupRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
+            for (Record groupRecord : groupRecords) {
+                tmpAmount += groupRecord.getRecordAmount();
+            }
+            separateAmounts.put(member,tmpAmount);
+        }
+        return separateAmounts;
     }
 }
