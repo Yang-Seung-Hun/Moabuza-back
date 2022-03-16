@@ -33,7 +33,9 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.headers().frameOptions().sameOrigin();
         http.csrf().disable();
+//        http.csrf().ignoringAntMatchers("/h2-console/**").disable();
         http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
         http.httpBasic().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -44,6 +46,8 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/user/kakao/callback").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/reissue").permitAll()
                 .antMatchers(HttpMethod.GET, "/health").permitAll()
+                .antMatchers("/h2-console/**").permitAll()
+                // h2 콘솔 추가
                 .anyRequest().authenticated();
 
         http    .addFilterBefore(new CustomAuthenticationFilter(jwtProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
