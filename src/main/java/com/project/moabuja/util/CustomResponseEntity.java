@@ -1,5 +1,6 @@
 package com.project.moabuja.util;
 
+import com.project.moabuja.dto.TokenDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,9 +27,26 @@ public class CustomResponseEntity {
         this.data = data;
     }
 
+    public ResponseEntity responseAccessRefresh(TokenDto dto){
+        // 헤더에 access, refresh 토큰 담아서 주기
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        headers.add("AccessToken", dto.getAccess());
+        headers.add("RefreshToken", dto.getRefresh());
+
+        CustomResponseEntity response = CustomResponseEntity.builder()
+                .code(this.code)
+                .message(this.message)
+                .data(this.data)
+                .authorization(this.authorization)
+                .build();
+        return new ResponseEntity(response, headers, this.code);
+    }
+
     public ResponseEntity responseAll(){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+
         CustomResponseEntity response = CustomResponseEntity.builder()
                 .code(this.code)
                 .message(this.message)

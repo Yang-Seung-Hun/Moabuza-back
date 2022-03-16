@@ -7,12 +7,15 @@ import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.MemberService;
 import com.project.moabuja.util.CustomResponseEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.Charset;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,13 +27,14 @@ public class MemberController {
     @GetMapping("/user/kakao/callback")
     public ResponseEntity kakaoLogin(@RequestParam String code) throws JsonProcessingException {
         TokenDto dto = memberService.kakaoLogin(code);
+
         CustomResponseEntity response = CustomResponseEntity.builder()
                 .authorization(null)
                 .code(HttpStatus.OK)
                 .message("어세스토큰 : authorization")
                 .data(dto)  // data 안에 access, refresh  두개 다 담겨있다.
                 .build();
-        return response.responseAll();
+        return response.responseAccessRefresh(dto);
     }
 
     // 닉네임, 캐릭터 선택 api
@@ -42,6 +46,7 @@ public class MemberController {
         return memberService.updateMemberInfo(dto, email);
     }
 
+    // 닉네임 이름 중복체크  api
     @PostMapping("nickname/validation")
     public ResponseEntity nicknameValid(@RequestBody String nickname){
         return memberService.nicknameValid(nickname);

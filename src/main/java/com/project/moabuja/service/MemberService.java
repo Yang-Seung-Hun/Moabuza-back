@@ -138,7 +138,7 @@ public class MemberService {
         if(memberRepository.existsByNickname(nickname)){
             return ResponseEntity.badRequest().body("중복된 닉네임 사용");
         }
-        return ResponseEntity.ok().body("아이디 사용 가능");
+        return ResponseEntity.ok().body("닉네임 사용 가능");
     }
 
     // todo : 회원이 회원이 캐릭터랑 닉네임 설정한 경우
@@ -198,11 +198,13 @@ public class MemberService {
         }
         // 2. Access Token 에서 User email 을 가져옵니다.
         Authentication authentication = jwtTokenProvider.getAuthentication(access);
+
         // 3. Redis 에서 해당 User email 로 저장된 Refresh Token 이 있는지 여부를 확인 후 있을 경우 삭제합니다.
         if (redisTemplate.opsForValue().get("RT:" + authentication.getName()) != null) {
             // Refresh Token 삭제
             redisTemplate.delete("RT:" + authentication.getName());
         }
+
         // 4. 해당 Access Token 유효시간 가지고 와서 BlackList 로 저장하기
         Long expiration = jwtTokenProvider.getExpiration(access);
         redisTemplate.opsForValue()
