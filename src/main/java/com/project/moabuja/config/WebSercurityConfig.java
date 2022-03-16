@@ -47,6 +47,7 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/reissue").permitAll()
                 .antMatchers(HttpMethod.GET, "/health").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
+                // h2 콘솔 추가
                 .anyRequest().authenticated();
 
         http    .addFilterBefore(new CustomAuthenticationFilter(jwtProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
