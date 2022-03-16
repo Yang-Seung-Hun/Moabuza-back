@@ -42,6 +42,11 @@ public class MemberController {
         return memberService.updateMemberInfo(dto, email);
     }
 
+    @PostMapping("nickname/validation")
+    public ResponseEntity nicknameValid(@RequestBody String nickname){
+        return memberService.nicknameValid(nickname);
+    }
+
     // access 토큰 만료 시 재발급 api : access, refresh 모두 재발급
     @GetMapping("/api/reissue")
     public ResponseEntity reissue(HttpServletRequest request){

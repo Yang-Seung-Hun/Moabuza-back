@@ -133,6 +133,14 @@ public class MemberService {
         return new ResponseEntity("로그인 완료", HttpStatus.OK);
     }
 
+    @Transactional
+    public ResponseEntity nicknameValid(String nickname){
+        if(memberRepository.existsByNickname(nickname)){
+            return ResponseEntity.badRequest().body("중복된 닉네임 사용");
+        }
+        return ResponseEntity.ok().body("아이디 사용 가능");
+    }
+
     // todo : 회원이 회원이 캐릭터랑 닉네임 설정한 경우
     @Transactional
     public ResponseEntity updateMemberInfo(MemberUpdateRequestDto dto, String email){
