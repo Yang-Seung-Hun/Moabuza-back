@@ -97,7 +97,6 @@ public class Member {
     }
 
     //반대쪽에서 연관관계편의메소드에서 사용될 setter
-    @Transactional
     public void changeGroupGoal(GroupGoal groupGoal){
         this.groupGoal = groupGoal;
     }
