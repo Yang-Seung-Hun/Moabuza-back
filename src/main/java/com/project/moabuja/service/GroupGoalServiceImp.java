@@ -41,14 +41,15 @@ public class GroupGoalServiceImp implements GroupGoalService{
 
         GroupGoal groupGoal = new GroupGoal(groupRequestDto.getCreateGroupName(), groupRequestDto.getCreateGroupAmount(), 0, false);
 
-        for(String name :groupRequestDto.getGroupFiends()){
-            Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
-            groupGoal.addMember(memberByNickname.get());
-        }
-
         //member랑 groupGoal 연관관계 맺음
         GroupGoal savedGoal = groupGoalRepository.save(groupGoal);
         savedGoal.addMember(currentUser);
+
+        for(String name :groupRequestDto.getGroupFiends()){
+            Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
+
+            groupGoal.addMember(memberByNickname.get());
+        }
         return savedGoal;
     }
 
