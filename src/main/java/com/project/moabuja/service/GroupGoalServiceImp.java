@@ -43,7 +43,15 @@ public class GroupGoalServiceImp implements GroupGoalService{
 
         //member랑 groupGoal 연관관계 맺음
         GroupGoal savedGoal = groupGoalRepository.save(groupGoal);
+        /**
+         * 여기
+         */
+        System.out.println(savedGoal.getId());
         Optional<GroupGoal> goal = groupGoalRepository.findById(savedGoal.getId());
+        /**
+         * 여기
+         */
+        System.out.println(currentUser.getId());
         goal.get().addMember(currentUser);
 
         for(String name :groupRequestDto.getGroupFiends()){
