@@ -9,6 +9,7 @@ import com.project.moabuja.dto.request.member.RegisterRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -96,6 +97,7 @@ public class Member {
     }
 
     //반대쪽에서 연관관계편의메소드에서 사용될 setter
+    @Transactional
     public void changeGroupGoal(GroupGoal groupGoal){
         this.groupGoal = groupGoal;
     }
