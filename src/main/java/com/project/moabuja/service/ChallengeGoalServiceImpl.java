@@ -42,7 +42,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(), createChallengeRequestDto.getCreateChallengeAmount(), 0, false);
 
-        for(String name :createChallengeRequestDto.getChallengeFiends()){
+        for(String name :createChallengeRequestDto.getChallengeFriends()){
             Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
             challengeGoal.addMember(memberByNickname.get());
         }
