@@ -25,7 +25,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ChallengeGoalServiceImp implements ChallengeGoalService{
+
+public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
     private final MemberRepository memberRepository;
     private final ChallengeGoalRepository challengeGoalRepository;
@@ -41,14 +42,14 @@ public class ChallengeGoalServiceImp implements ChallengeGoalService{
 
         ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(), createChallengeRequestDto.getCreateChallengeAmount(), 0, false);
 
+        for(String name :createChallengeRequestDto.getChallengeFiends()){
+            Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
+            challengeGoal.addMember(memberByNickname.get());
+        }
+
         //member랑 challengegoal 연관관계 맺음
         ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
         savedGoal.addMember(currentUser);
-
-        for(String name :createChallengeRequestDto.getChallengeFriends()){
-            Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
-            savedGoal.addMember(memberByNickname.get());
-        }
         return savedGoal;
     }
 

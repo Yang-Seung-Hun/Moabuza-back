@@ -12,7 +12,6 @@ import com.project.moabuja.dto.response.record.DayListResponseDto;
 import com.project.moabuja.dto.response.record.DayRecordResponseDto;
 import com.project.moabuja.dto.response.record.RecordResponseDto;
 import com.project.moabuja.repository.DoneGoalRepository;
-import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -30,18 +28,14 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class RecordServiceImp implements RecordService{
+public class RecordServiceImpl implements RecordService{
 
     private final RecordRepository recordRepository;
     private final DoneGoalRepository doneGoalRepository;
-    private final MemberRepository memberRepository;
 
     @Transactional
     @Override
-    public RecordResponseDto save(RecordRequestDto recordRequestDto, Member current) {
-
-        Optional<Member> tmp = memberRepository.findById(current.getId());
-        Member currentMember = tmp.get();
+    public RecordResponseDto save(RecordRequestDto recordRequestDto, Member currentMember) {
 
         RecordResponseDto recordResponseDto = new RecordResponseDto(false);
 
