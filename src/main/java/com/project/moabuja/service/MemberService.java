@@ -83,7 +83,8 @@ public class MemberService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "f367d5c13479608400bba9be2af87fc6");
-        body.add("redirect_uri", "https://moabuza.com/user/kakao/callback");
+        body.add("redirect_uri", "http://localhost:3000/user/kakao/callback");
+//        body.add("redirect_uri", "https://moabuza.com/user/kakao/callback");
         body.add("code", code);
         body.add("client_secret", "X8m672khDWbTiYJlRBNwNGtH8K3k7HVE");
 
@@ -149,9 +150,9 @@ public class MemberService {
     @Transactional
     public ResponseEntity nicknameValid(String nickname){
         if(memberRepository.existsByNickname(nickname)){
-            return ResponseEntity.badRequest().body("중복된 닉네임 사용");
+            return ResponseEntity.badRequest().body(nickname + "이미 사용 중인 닉네임입니다.");
         }
-        return ResponseEntity.ok().body("닉네임 사용 가능");
+        return ResponseEntity.ok().body(nickname + "닉네임 사용 가능");
     }
 
     // todo : 회원이 회원이 캐릭터랑 닉네임 설정한 경우

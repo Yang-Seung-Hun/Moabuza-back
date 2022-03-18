@@ -50,7 +50,7 @@ public class MemberController {
     }
 
     // 닉네임 이름 중복체크  api
-    @PostMapping("nickname/validation")
+    @PostMapping("/nickname/validation")
     public ResponseEntity nicknameValid(@RequestBody String nickname){
         return memberService.nicknameValid(nickname);
     }

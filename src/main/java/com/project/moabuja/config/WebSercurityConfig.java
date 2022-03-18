@@ -41,11 +41,11 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
-                .antMatchers("/index.html").permitAll()
-                .antMatchers(HttpMethod.GET, "/user/kakao/callback").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/reissue").permitAll()
-                .antMatchers(HttpMethod.GET, "/health").permitAll()
-                .anyRequest().authenticated();
+//                .antMatchers("/index.html").permitAll()
+//                .antMatchers(HttpMethod.GET, "/user/kakao/callback").permitAll()
+//                .antMatchers(HttpMethod.GET, "/api/reissue").permitAll()
+//                .antMatchers(HttpMethod.GET, "/health").permitAll()
+                .anyRequest().permitAll();
 
         http    .addFilterBefore(new CustomAuthenticationFilter(jwtProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
         // todo : exception을 핸들링 하기 위한 필터를 설치
