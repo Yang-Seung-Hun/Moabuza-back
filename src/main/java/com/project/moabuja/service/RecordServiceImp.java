@@ -126,7 +126,7 @@ public class RecordServiceImp implements RecordService{
                 dayGroupAmount += dayRecordResponseDto.getRecordAmount();
             }
         }
-        return new DayListResponseDto(dayRecordList,dayIncomeAmount,dayExpenseAmount,dayChallengeAmount,dayGroupAmount,0,0);
+        return new DayListResponseDto(dayRecordList,dayIncomeAmount,dayExpenseAmount,dayChallengeAmount,dayGroupAmount);
     }
 
     @Override
