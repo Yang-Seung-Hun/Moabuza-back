@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.TokenDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
+import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.MemberService;
@@ -51,8 +52,8 @@ public class MemberController {
 
     // 닉네임 이름 중복체크  api
     @PostMapping("/nickname/validation")
-    public ResponseEntity nicknameValid(@RequestBody String nickname){
-        return memberService.nicknameValid(nickname);
+    public ResponseEntity nicknameValid(@RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
+        return memberService.nicknameValid(nicknameValidationRequestDto);
     }
 
     // access 토큰 만료 시 재발급 api : access, refresh 모두 재발급

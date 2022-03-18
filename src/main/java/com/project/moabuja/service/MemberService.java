@@ -12,6 +12,7 @@ import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.KakaoUserInfoDto;
 import com.project.moabuja.dto.TokenDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
+import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.request.member.RegisterRequestDto;
 import com.project.moabuja.dto.response.goal.GroupListDto;
 import com.project.moabuja.dto.response.goal.GroupMemberDto;
@@ -148,7 +149,8 @@ public class MemberService {
     }
 
     @Transactional
-    public ResponseEntity nicknameValid(String nickname){
+    public ResponseEntity nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto){
+        String nickname = nicknameValidationRequestDto.getNickname();
         if(memberRepository.existsByNickname(nickname)){
             return ResponseEntity.badRequest().body(nickname + "이미 사용 중인 닉네임입니다.");
         }
