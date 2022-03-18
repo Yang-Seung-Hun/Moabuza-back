@@ -12,6 +12,7 @@ import com.project.moabuja.dto.response.record.DayListResponseDto;
 import com.project.moabuja.dto.response.record.DayRecordResponseDto;
 import com.project.moabuja.dto.response.record.RecordResponseDto;
 import com.project.moabuja.repository.DoneGoalRepository;
+import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,10 +33,14 @@ public class RecordServiceImp implements RecordService{
 
     private final RecordRepository recordRepository;
     private final DoneGoalRepository doneGoalRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     @Override
-    public RecordResponseDto save(RecordRequestDto recordRequestDto, Member currentMember) {
+    public RecordResponseDto save(RecordRequestDto recordRequestDto, Member current) {
+
+        Optional<Member> tmp = memberRepository.findById(current.getId());
+        Member currentMember = tmp.get();
 
         RecordResponseDto recordResponseDto = new RecordResponseDto(false);
 
