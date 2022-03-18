@@ -9,10 +9,8 @@ spring:
     password: moabuza123
 
   reids:
-    host:
-      #여기 부분은 자신의 ip에 맞춰서 바꾸기
-      # ec2 redis 설치 후 연결 ip
-      127.0.0.1
+    host: #여기 부분은 자신의 ip에 맞춰서 바꾸기 -> ec2 redis 설치 후 연결 ip
+      0.0.0.0
     port:
       6379
 
