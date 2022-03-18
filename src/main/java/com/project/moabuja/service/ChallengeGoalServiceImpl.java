@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ChallengeGoalServiceImp implements ChallengeGoalService{
+public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
     private final MemberRepository memberRepository;
     private final ChallengeGoalRepository challengeGoalRepository;

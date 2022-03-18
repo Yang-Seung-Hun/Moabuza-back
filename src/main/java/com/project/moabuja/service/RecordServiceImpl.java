@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class RecordServiceImp implements RecordService{
+public class RecordServiceImpl implements RecordService{
 
     private final RecordRepository recordRepository;
     private final DoneGoalRepository doneGoalRepository;

@@ -20,12 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class GroupGoalServiceImp implements GroupGoalService{
+public class GroupGoalServiceImpl implements GroupGoalService{
 
     private final MemberRepository memberRepository;
     private final GroupGoalRepository groupGoalRepository;
