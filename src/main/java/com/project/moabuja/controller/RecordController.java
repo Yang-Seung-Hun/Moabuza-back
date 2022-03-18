@@ -38,19 +38,6 @@ public class RecordController {
         return recordService.getDayList(dayListRequestDto,currentUser);
     }
 
-    @GetMapping("/money/dayList")
-    public DayListResponseDto getToday(@AuthenticationPrincipal UserDetailsImpl userDetails){
-
-        LocalDate now = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String date = now.format(formatter);
-        date = date + " 00:00:00.000";
-
-        Member currentUser = userDetails.getMember();
-        DayListRequestDto dayListRequestDto = new DayListRequestDto(date);
-        return recordService.getDayList(dayListRequestDto,currentUser);
-    }
-
     @DeleteMapping("/money/dayList/delete/{id}")
     public ResponseEntity DeleteDay(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails){
 
