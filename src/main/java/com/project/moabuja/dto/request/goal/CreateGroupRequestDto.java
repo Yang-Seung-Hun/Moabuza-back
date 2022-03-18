@@ -11,11 +11,11 @@ import java.util.List;
 public class CreateGroupRequestDto {
     private String createGroupName;
     private int createGroupAmount;
-    private List<String> groupFiends = new ArrayList<>();
+    private List<String> groupFriends = new ArrayList<>();
 
     public CreateGroupRequestDto(String createGroupName, int createGroupAmount, List<String> groupFiends) {
         this.createGroupName = createGroupName;
         this.createGroupAmount = createGroupAmount;
-        this.groupFiends = groupFiends;
+        this.groupFriends = groupFiends;
     }
 }
