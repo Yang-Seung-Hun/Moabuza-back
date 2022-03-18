@@ -134,7 +134,7 @@ public class RecordServiceImpl implements RecordService{
     @Transactional
     public ResponseEntity deleteRecord(Long id, Member currentMember) {
         Optional<Record> selectRecord = recordRepository.findRecordById(id);
-        if (selectRecord.get().getMember().equals(currentMember)) {
+        if (selectRecord.get().getMember().getId().equals(currentMember)) {
             recordRepository.deleteRecordById(id);
             return ResponseEntity.ok().body("내역 삭제 완료");
         }
