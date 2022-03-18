@@ -12,11 +12,11 @@ public class CreateChallengeRequestDto {
 
     private String createChallengeName;
     private int createChallengeAmount;
-    private List<String> challengeFiends = new ArrayList<>();
+    private List<String> challengeFriends = new ArrayList<>();
 
     public CreateChallengeRequestDto(String createChallengeName, int createChallengeAmount, List<String> challengeFiends) {
         this.createChallengeName = createChallengeName;
         this.createChallengeAmount = createChallengeAmount;
-        this.challengeFiends = challengeFiends;
+        this.challengeFriends = challengeFriends;
     }
 }
