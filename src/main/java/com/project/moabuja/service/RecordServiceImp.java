@@ -14,6 +14,7 @@ import com.project.moabuja.dto.response.record.RecordResponseDto;
 import com.project.moabuja.repository.DoneGoalRepository;
 import com.project.moabuja.repository.RecordRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -131,8 +133,13 @@ public class RecordServiceImp implements RecordService{
 
     @Override
     @Transactional
-    public void deleteRecord(Long id) {
-        recordRepository.deleteRecordById(id);
+    public ResponseEntity deleteRecord(Long id, Member currentMember) {
+        Optional<Record> selectRecord = recordRepository.findRecordById(id);
+        if (selectRecord.get().getMember().equals(currentMember)) {
+            recordRepository.deleteRecordById(id);
+            return ResponseEntity.ok().body("내역 삭제 완료");
+        }
+        return ResponseEntity.badRequest().body("내역을 등록한 사용자가 아닙니다.");
     }
 
     public int countCurrentChallenge(Member member){

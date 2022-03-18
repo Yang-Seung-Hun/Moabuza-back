@@ -9,6 +9,7 @@ import com.project.moabuja.dto.response.record.RecordResponseDto;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.RecordService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,11 +35,10 @@ public class RecordController {
     }
 
     @DeleteMapping("/money/dayList/delete/{id}")
-    public String DeleteDay(@PathVariable Long id){
+    public ResponseEntity DeleteDay(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails){
 
-        recordService.deleteRecord(id);
-
-        return "삭제요 완료!!!";
+        Member currentUser = userDetails.getMember();
+        return recordService.deleteRecord(id, currentUser);
     }
 
 }
