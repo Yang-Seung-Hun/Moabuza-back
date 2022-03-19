@@ -26,7 +26,6 @@ public class MemberController {
 
     private final MemberService memberService;
 
-
     // 카카오 로그인 api
     @GetMapping("/user/kakao/callback")
     public ResponseEntity kakaoLogin(@RequestParam String code) throws JsonProcessingException {
@@ -35,7 +34,7 @@ public class MemberController {
         CustomResponseEntity response = CustomResponseEntity.builder()
                 .authorization(null)
                 .code(HttpStatus.OK)
-                .message("어세스토큰 : authorization")
+                .message(dto.getResultMsg())
                 .data(dto)  // data 안에 access, refresh  두개 다 담겨있다.
                 .build();
         return response.responseAccessRefresh(dto);
