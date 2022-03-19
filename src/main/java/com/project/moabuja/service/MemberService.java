@@ -147,7 +147,11 @@ public class MemberService {
         }
 
         // todo : ptional --> 예외처리 할까?
-         String nickname = memberRepository.findByEmail(dto.getEmail()).getNickname();
+        Optional<Member> byEmail = Optional
+                .ofNullable(memberRepository.findByEmails(dto.getEmail()))
+                .orElseThrow(() -> new UsernameNotFoundException("해당 유저 없음"));
+
+         String nickname = byEmail.get().getNickname();
         // 기존 회원이면 그냥 로그인완료 메세지
         return nickname;
     }
