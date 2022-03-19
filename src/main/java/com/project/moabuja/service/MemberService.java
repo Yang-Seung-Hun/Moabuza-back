@@ -85,7 +85,7 @@ public class MemberService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "f367d5c13479608400bba9be2af87fc6");
-        body.add("redirect_uri", "http://localhost:3000/user/kakao/callback");
+        body.add("redirect_uri", "http://localhost:8080/user/kakao/callback");
 //        body.add("redirect_uri", "https://moabuza.com/user/kakao/callback");
         body.add("code", code);
         body.add("client_secret", "X8m672khDWbTiYJlRBNwNGtH8K3k7HVE");
@@ -137,15 +137,15 @@ public class MemberService {
 
     public String register(RegisterRequestDto dto){
         Member member = new Member();
-        
+
         // 기존회원이 아니면 회원가입 완료
         if(!memberRepository.existsByEmail(dto.getEmail())){
+            System.out.println("-------------1111-----------");
             String password = String.valueOf(UUID.randomUUID());
             memberRepository.save(member.fromDto(dto, password));
             return "닉네임 없다.";
             // 회원가입한 회원은 온보딩 화면을 보여주도록 한다.
         }
-
         // todo : ptional --> 예외처리 할까?
         Optional<Member> byEmail = Optional
                 .ofNullable(memberRepository.findByEmails(dto.getEmail()))
