@@ -60,7 +60,7 @@ public class MemberService {
                 .build();
 
         // 회원가입, 로그인 처리
-        register(dto);
+        String resultMsg = register(dto);
 
         // access, refresh 둘다 만들어줌
         String access = jwtTokenProvider.createAccessToken(kakaoUserInfoDto.getEmail());
@@ -73,6 +73,7 @@ public class MemberService {
         return TokenDto.builder()
                 .access(access)
                 .refresh(refresh)
+                .resultMsg(resultMsg)
                 .build();
     }
 
@@ -134,18 +135,18 @@ public class MemberService {
         return new KakaoUserInfoDto(kakaoId, email);
     }
 
-    public ResponseEntity register(RegisterRequestDto dto){
+    public String register(RegisterRequestDto dto){
         Member member = new Member();
         
         // 기존회원이 아니면 회원가입 완료
         if(!memberRepository.existsByEmail(dto.getEmail())){
             String password = String.valueOf(UUID.randomUUID());
             memberRepository.save(member.fromDto(dto, password));
-            return new ResponseEntity("회원가입 완료", null, HttpStatus.OK);
+            return "회원가입 완료";
             // 회원가입한 회원은 온보딩 화면을 보여주도록 한다.
         }
         // 기존 회원이면 그냥 로그인완료 메세지
-        return new ResponseEntity("로그인 완료", HttpStatus.OK);
+        return "로그인 완료";
     }
 
     @Transactional

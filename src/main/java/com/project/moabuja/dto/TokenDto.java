@@ -10,4 +10,5 @@ import lombok.Getter;
 public class TokenDto {
     private String access;
     private String refresh;
+    private String resultMsg;
 }
