@@ -142,7 +142,7 @@ public class MemberService {
         if(!memberRepository.existsByEmail(dto.getEmail())){
             String password = String.valueOf(UUID.randomUUID());
             memberRepository.save(member.fromDto(dto, password));
-            return null;
+            return "닉네임 없다.";
             // 회원가입한 회원은 온보딩 화면을 보여주도록 한다.
         }
 
