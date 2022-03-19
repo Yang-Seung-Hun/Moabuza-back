@@ -21,7 +21,7 @@ public class FriendServiceImpl implements FriendService{
 
     @Transactional
     @Override
-    public Friend save(FriendInvitationRequestDto friendRequestDto, Member current) {
+    public void save(FriendInvitationRequestDto friendRequestDto, Member current) {
 
         Optional<Member> currentUserTemp = memberRepository.findById(current.getId());
         Member currentUser = currentUserTemp.get();
@@ -29,8 +29,7 @@ public class FriendServiceImpl implements FriendService{
 
         Friend saveFriend = new Friend();
         saveFriend.changeUser(currentUser, friend);
-
-        return friendRepository.save(saveFriend);
+        friendRepository.save(saveFriend);
     }
 
     @Transactional
@@ -40,7 +39,7 @@ public class FriendServiceImpl implements FriendService{
         Member currentUser = currentUserTemp.get();
         Member friend = memberRepository.findMemberByNickname(friendDelete.getNickname()).get();
 
-        Friend deleteFriend = friendRepository.findByMemberAAndFriend(currentUser, friend);
+        Friend deleteFriend = friendRepository.findByMemberAndFriend(currentUser, friend);
         friendRepository.delete(deleteFriend);
     }
 }

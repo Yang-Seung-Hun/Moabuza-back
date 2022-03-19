@@ -7,7 +7,7 @@ import com.project.moabuja.dto.request.friend.FriendInvitationRequestDto;
 
 public interface FriendService {
 
-    public Friend save(FriendInvitationRequestDto friendRequestDto, Member currentUser);
+    public void save(FriendInvitationRequestDto friendRequestDto, Member currentUser);
 
     public void deleteFriend(FriendInvitationDelete friendDelete, Member currentUser);
 }
