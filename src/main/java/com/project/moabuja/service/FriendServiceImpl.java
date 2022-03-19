@@ -30,6 +30,9 @@ public class FriendServiceImpl implements FriendService{
         Friend saveFriend = new Friend();
         saveFriend.changeUser(currentUser, friend);
         friendRepository.save(saveFriend);
+        Friend eachFriend = new Friend();
+        eachFriend.changeUser(friend, currentUser);
+        friendRepository.save(eachFriend);
     }
 
     @Transactional
@@ -41,5 +44,7 @@ public class FriendServiceImpl implements FriendService{
 
         Friend deleteFriend = friendRepository.findByMemberAndFriend(currentUser, friend);
         friendRepository.delete(deleteFriend);
+        Friend deleteEachFriend = friendRepository.findByMemberAndFriend(friend, currentUser);
+        friendRepository.delete(deleteEachFriend);
     }
 }
