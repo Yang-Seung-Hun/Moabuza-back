@@ -20,12 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class GroupGoalServiceImp implements GroupGoalService{
+public class GroupGoalServiceImpl implements GroupGoalService{
 
     private final MemberRepository memberRepository;
     private final GroupGoalRepository groupGoalRepository;
@@ -54,16 +53,8 @@ public class GroupGoalServiceImp implements GroupGoalService{
         System.out.println(currentUser.getId());
         goal.get().addMember(currentUser);
 
-        for(String name :groupRequestDto.getGroupFiends()){
-            /**
-             * 여기
-             */
-            System.out.println(name);
+        for(String name :groupRequestDto.getGroupFriends()){
             Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
-            /**
-             * 여기
-             */
-            System.out.println(memberByNickname.get().getId());
             goal.get().addMember(memberByNickname.get());
         }
         return savedGoal;

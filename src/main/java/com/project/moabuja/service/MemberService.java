@@ -152,9 +152,9 @@ public class MemberService {
     public ResponseEntity nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto){
         String nickname = nicknameValidationRequestDto.getNickname();
         if(memberRepository.existsByNickname(nickname)){
-            return ResponseEntity.badRequest().body(nickname + "이미 사용 중인 닉네임입니다.");
+            return ResponseEntity.badRequest().body("이미 사용 중인 닉네임입니다.");
         }
-        return ResponseEntity.ok().body(nickname + "닉네임 사용 가능");
+        return ResponseEntity.ok().body("닉네임 사용 가능");
     }
 
     // todo : 회원이 회원이 캐릭터랑 닉네임 설정한 경우
