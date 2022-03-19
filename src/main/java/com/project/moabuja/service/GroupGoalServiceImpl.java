@@ -125,7 +125,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         for(Friend friend : friends){
             //친구의 그룹 골을 확인
-            Optional<Member> friendById = memberRepository.findById(friend.getFriend());
+            Optional<Member> friendById = memberRepository.findById(friend.getFriend().getId());
             Optional<GroupGoal> friendGroupGoal = Optional.ofNullable(friendById.get().getGroupGoal());
 
             if(friendGroupGoal.isPresent()){
