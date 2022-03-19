@@ -76,7 +76,6 @@ public class MemberService {
                 .resultMsg(resultMsg)
                 .build();
     }
-
     public String getAccessToken(String code) throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
