@@ -44,7 +44,11 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         for(String name :createChallengeRequestDto.getChallengeFriends()){
             Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
-            challengeGoal.addMember(memberByNickname.get());
+            if (memberByNickname.isPresent()) {
+                challengeGoal.addMember(memberByNickname.get());
+            } else {
+                throw new IllegalArgumentException("선택하신 친구 중 존재하지 않는 사용자가 있습니다.");
+            }
         }
 
         //member랑 challengegoal 연관관계 맺음
@@ -117,7 +121,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         for(Friend friend : friends){
             //친구의 챌린지 골을 확인
-            Optional<Member> friendById = memberRepository.findById(friend.getFriend());
+            Optional<Member> friendById = memberRepository.findById(friend.getFriend().getId());
             Optional<ChallengeGoal> friendChallengeGoal = Optional.ofNullable(friendById.get().getChallengeGoal());
 
             if(friendChallengeGoal.isPresent()){
