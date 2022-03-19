@@ -60,7 +60,7 @@ public class MemberService {
                 .build();
 
         // 회원가입, 로그인 처리
-        String resultMsg = register(dto);
+        String nickname = register(dto);
 
         // access, refresh 둘다 만들어줌
         String access = jwtTokenProvider.createAccessToken(kakaoUserInfoDto.getEmail());
@@ -73,9 +73,10 @@ public class MemberService {
         return TokenDto.builder()
                 .access(access)
                 .refresh(refresh)
-                .resultMsg(resultMsg)
+                .nickname(nickname)
                 .build();
     }
+
     public String getAccessToken(String code) throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
@@ -141,11 +142,14 @@ public class MemberService {
         if(!memberRepository.existsByEmail(dto.getEmail())){
             String password = String.valueOf(UUID.randomUUID());
             memberRepository.save(member.fromDto(dto, password));
-            return "회원가입 완료";
+            return null;
             // 회원가입한 회원은 온보딩 화면을 보여주도록 한다.
         }
+
+        // todo : ptional --> 예외처리 할까?
+         String nickname = memberRepository.findByEmail(dto.getEmail()).getNickname();
         // 기존 회원이면 그냥 로그인완료 메세지
-        return "로그인 완료";
+        return nickname;
     }
 
     @Transactional
