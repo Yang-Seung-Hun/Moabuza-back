@@ -146,7 +146,6 @@ public class MemberService {
             return "닉네임 없다.";
             // 회원가입한 회원은 온보딩 화면을 보여주도록 한다.
         }
-
         // todo : ptional --> 예외처리 할까?
         Optional<Member> byEmail = Optional
                 .ofNullable(memberRepository.findByEmails(dto.getEmail()))
