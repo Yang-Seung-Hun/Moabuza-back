@@ -6,7 +6,6 @@ import com.project.moabuja.dto.KakaoUserInfoDto;
 import com.project.moabuja.dto.TokenDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
-import com.project.moabuja.dto.request.member.RegisterRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.dto.response.member.ReissueDto;
 import org.springframework.http.ResponseEntity;
