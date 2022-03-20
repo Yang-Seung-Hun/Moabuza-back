@@ -26,16 +26,16 @@ public class MemberController {
 
     private final MemberService memberService;
 
-
     // 카카오 로그인 api
     @GetMapping("/user/kakao/callback")
     public ResponseEntity kakaoLogin(@RequestParam String code) throws JsonProcessingException {
         TokenDto dto = memberService.kakaoLogin(code);
-
+            
+        // todo : CustomResponseEntity --> authorization 필요없음 , 필요없는거 버리기
         CustomResponseEntity response = CustomResponseEntity.builder()
                 .authorization(null)
                 .code(HttpStatus.OK)
-                .message("어세스토큰 : authorization")
+                .message("카카오 로그인 콜백 메서드부분")
                 .data(dto)  // data 안에 access, refresh  두개 다 담겨있다.
                 .build();
         return response.responseAccessRefresh(dto);

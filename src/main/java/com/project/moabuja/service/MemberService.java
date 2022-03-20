@@ -60,7 +60,7 @@ public class MemberService {
                 .build();
 
         // 회원가입, 로그인 처리
-        register(dto);
+        String nickname = register(dto);
 
         // access, refresh 둘다 만들어줌
         String access = jwtTokenProvider.createAccessToken(kakaoUserInfoDto.getEmail());
@@ -73,6 +73,7 @@ public class MemberService {
         return TokenDto.builder()
                 .access(access)
                 .refresh(refresh)
+                .nickname(nickname)
                 .build();
     }
 
@@ -134,18 +135,25 @@ public class MemberService {
         return new KakaoUserInfoDto(kakaoId, email);
     }
 
-    public ResponseEntity register(RegisterRequestDto dto){
+    public String register(RegisterRequestDto dto){
         Member member = new Member();
-        
+
         // 기존회원이 아니면 회원가입 완료
         if(!memberRepository.existsByEmail(dto.getEmail())){
+            System.out.println("-------------1111-----------");
             String password = String.valueOf(UUID.randomUUID());
             memberRepository.save(member.fromDto(dto, password));
-            return new ResponseEntity("회원가입 완료", null, HttpStatus.OK);
+            return null;
             // 회원가입한 회원은 온보딩 화면을 보여주도록 한다.
         }
+        // todo : ptional --> 예외처리 할까?
+        Optional<Member> byEmail = Optional
+                .ofNullable(memberRepository.findByEmails(dto.getEmail()))
+                .orElseThrow(() -> new UsernameNotFoundException("해당 유저 없음"));
+
+         String nickname = byEmail.get().getNickname();
         // 기존 회원이면 그냥 로그인완료 메세지
-        return new ResponseEntity("로그인 완료", HttpStatus.OK);
+        return nickname;
     }
 
     @Transactional

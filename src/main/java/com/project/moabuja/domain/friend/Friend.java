@@ -17,13 +17,20 @@ public class Friend {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "current_user")
     private Member member;
 
-    private Long friend;
+    @ManyToOne
+    @JoinColumn(name = "friend_user")
+    private Member friend;
 
     //테스트용 생성자입니다.
-    public Friend(Member member, Long friend) {
+    public Friend(Member member, Member friend) {
+        this.member = member;
+        this.friend = friend;
+    }
+
+    public void changeUser(Member member, Member friend) {
         this.member = member;
         this.friend = friend;
     }
