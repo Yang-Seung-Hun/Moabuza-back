@@ -9,7 +9,5 @@ import lombok.Getter;
 @Builder
 public class RegisterRequestDto {
     private Long kakaoId;
-    private String nickname;
     private String email;
-
 }

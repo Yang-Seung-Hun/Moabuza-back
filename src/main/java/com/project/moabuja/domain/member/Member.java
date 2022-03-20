@@ -4,6 +4,7 @@ import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.DoneGoal;
 import com.project.moabuja.domain.goal.GroupGoal;
+import com.project.moabuja.dto.KakaoUserInfoDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.RegisterRequestDto;
 import lombok.Builder;
@@ -71,7 +72,7 @@ public class Member {
                 .build();
     }
 
-    public Member fromDto(RegisterRequestDto dto, String password) {
+    public Member fromDto(KakaoUserInfoDto dto, String password) {
         return new Member().builder()
                 .password(password)
                 .kakaoId(dto.getKakaoId())
