@@ -61,7 +61,6 @@ public class Member {
     public Member updateInfo(MemberUpdateRequestDto dto){
         this.nickname = dto.getNickname();
         this.hero = dto.getHero();
-        System.out.println("서비스--------------------" + hero);
         return Member.builder()
                 .password(this.getPassword())
                 .email(this.getEmail())

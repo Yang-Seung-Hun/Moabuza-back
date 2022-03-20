@@ -17,7 +17,7 @@ public class Friend {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "current_user")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne
