@@ -199,7 +199,6 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public ResponseEntity logout(HttpServletRequest request) {
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
-
         // 1. Access Token 검증
         if (!jwtTokenProvider.validateToken(access)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 요청");
