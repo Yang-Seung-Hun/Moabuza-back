@@ -31,4 +31,5 @@ public interface MemberService {
     public ResponseEntity logout(HttpServletRequest request);
 
     public HomeResponseDto getHomeInfo(Member current);
+
 }
