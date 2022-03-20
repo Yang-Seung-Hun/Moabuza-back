@@ -12,6 +12,7 @@ import com.project.moabuja.dto.response.record.DayListResponseDto;
 import com.project.moabuja.dto.response.record.DayRecordResponseDto;
 import com.project.moabuja.dto.response.record.RecordResponseDto;
 import com.project.moabuja.repository.DoneGoalRepository;
+import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,10 +33,14 @@ public class RecordServiceImpl implements RecordService{
 
     private final RecordRepository recordRepository;
     private final DoneGoalRepository doneGoalRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     @Override
-    public RecordResponseDto save(RecordRequestDto recordRequestDto, Member currentMember) {
+    public RecordResponseDto save(RecordRequestDto recordRequestDto, Member current) {
+
+        Optional<Member> byId = memberRepository.findById(current.getId());
+        Member currentMember = byId.get();
 
         RecordResponseDto recordResponseDto = new RecordResponseDto(false);
 
