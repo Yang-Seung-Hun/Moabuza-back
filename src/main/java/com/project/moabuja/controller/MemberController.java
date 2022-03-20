@@ -6,19 +6,17 @@ import com.project.moabuja.dto.TokenDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
+import com.project.moabuja.dto.response.member.ReissueDto;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.MemberService;
 import com.project.moabuja.util.CustomResponseEntity;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.Charset;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,9 +57,9 @@ public class MemberController {
     // access 토큰 만료 시 재발급 api : access, refresh 모두 재발급
     @GetMapping("/api/reissue")
     public ResponseEntity reissue(HttpServletRequest request){
-        TokenDto tokenDto = memberService.reissue(request);
+        ReissueDto dto = memberService.reissue(request);
         CustomResponseEntity response = CustomResponseEntity.builder()
-                .data(tokenDto)
+                .data(dto)
                 .message("Redis 저장 성공")
                 .code(HttpStatus.OK)
                 .build();

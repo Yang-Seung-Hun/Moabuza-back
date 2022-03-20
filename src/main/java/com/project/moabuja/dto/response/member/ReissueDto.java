@@ -1,16 +1,16 @@
-package com.project.moabuja.dto;
+package com.project.moabuja.dto.response.member;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
-@Getter
 @Builder
+@Getter
 @AllArgsConstructor
-@Setter
-public class TokenDto {
+@NoArgsConstructor
+public class ReissueDto {
     private String access;
     private String refresh;
-    private String nickname;
 }
