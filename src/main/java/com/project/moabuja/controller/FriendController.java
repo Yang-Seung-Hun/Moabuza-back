@@ -30,4 +30,5 @@ public class FriendController {
         friendService.deleteFriend(friendInvitationDelete, currentUser);
         return ResponseEntity.ok().body("친구 삭제 완료");
     }
+
 }
