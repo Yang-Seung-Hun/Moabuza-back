@@ -27,12 +27,9 @@ public class FriendServiceImpl implements FriendService{
         Member currentUser = currentUserTemp.get();
         Member friend = memberRepository.findMemberByNickname(friendRequestDto.getNickname()).get();
 
-        Friend saveFriend = new Friend();
-        saveFriend.changeUser(currentUser, friend);
-        friendRepository.save(saveFriend);
-        Friend eachFriend = new Friend();
-        eachFriend.changeUser(friend, currentUser);
-        friendRepository.save(eachFriend);
+//        Friend saveFriend = new Friend(currentUser, friend);
+        friendRepository.save(new Friend(currentUser, friend));
+        friendRepository.save(new Friend(friend, currentUser));
     }
 
     @Transactional
@@ -42,9 +39,8 @@ public class FriendServiceImpl implements FriendService{
         Member currentUser = currentUserTemp.get();
         Member friend = memberRepository.findMemberByNickname(friendDelete.getNickname()).get();
 
-        Friend deleteFriend = friendRepository.findByMemberAndFriend(currentUser, friend);
-        friendRepository.delete(deleteFriend);
-        Friend deleteEachFriend = friendRepository.findByMemberAndFriend(friend, currentUser);
-        friendRepository.delete(deleteEachFriend);
+//        Friend deleteFriend = friendRepository.findByMemberAndFriend(currentUser, friend);
+        friendRepository.delete(friendRepository.findByMemberAndFriend(currentUser, friend));
+        friendRepository.delete(friendRepository.findByMemberAndFriend(friend, currentUser));
     }
 }
