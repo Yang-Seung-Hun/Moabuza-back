@@ -137,14 +137,14 @@ public class RecordServiceImpl implements RecordService{
 
     @Override
     @Transactional
-    public ResponseEntity deleteRecord(Long id, Member currentMember) {
+    public void deleteRecord(Long id, Member currentMember) {
         Optional<Record> selectRecord = recordRepository.findRecordById(id);
         Long selectId = selectRecord.get().getMember().getId();
         if (selectId.equals(currentMember.getId())) {
             recordRepository.deleteRecordById(id);
-            return ResponseEntity.ok().body("내역 삭제 완료");
+        } else {
+            throw new IllegalArgumentException("게시물을 등록한 사용자가 아닙니다.");
         }
-        return ResponseEntity.badRequest().body("내역을 등록한 사용자가 아닙니다.");
     }
 
     public int countCurrentChallenge(Member member){

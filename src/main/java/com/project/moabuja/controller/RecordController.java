@@ -25,24 +25,32 @@ public class RecordController {
 
 
     @PostMapping("/money/addRecord/post")
-    public RecordResponseDto addRecord(@RequestBody  RecordRequestDto recordRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity addRecord(@RequestBody  RecordRequestDto recordRequestDto,
+                                    @AuthenticationPrincipal UserDetailsImpl userDetails){
 
         Member currentUser = userDetails.getMember();
-        return recordService.save(recordRequestDto, currentUser);
+        RecordResponseDto recordResponseDto = recordService.save(recordRequestDto, currentUser);
+
+        return ResponseEntity.ok().body(recordResponseDto);
     }
 
     @PostMapping("/money/dayList")
-    public DayListResponseDto getDay(@RequestBody DayListRequestDto dayListRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity getDay(@RequestBody DayListRequestDto dayListRequestDto,
+                                 @AuthenticationPrincipal UserDetailsImpl userDetails){
 
         Member currentUser = userDetails.getMember();
-        return recordService.getDayList(dayListRequestDto,currentUser);
+        DayListResponseDto dayListResponseDto = recordService.getDayList(dayListRequestDto,currentUser);
+
+        return ResponseEntity.ok().body(dayListResponseDto);
     }
 
     @DeleteMapping("/money/dayList/delete/{id}")
     public ResponseEntity DeleteDay(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails){
 
         Member currentUser = userDetails.getMember();
-        return recordService.deleteRecord(id, currentUser);
+        recordService.deleteRecord(id, currentUser);
+
+        return ResponseEntity.ok().body("내역 삭제 완료");
     }
 
 }
