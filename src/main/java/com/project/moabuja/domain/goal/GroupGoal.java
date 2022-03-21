@@ -1,6 +1,7 @@
 package com.project.moabuja.domain.goal;
 
 import com.project.moabuja.domain.member.Member;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +30,7 @@ public class GroupGoal {
     @OneToMany(mappedBy = "groupGoal",cascade = CascadeType.ALL)
     private List<Member> members = new ArrayList<>();
 
+    @Builder
     public GroupGoal(String groupGoalName, int groupGoalAmount, int groupCurrentAmount, boolean isAcceptedGroup) {
         this.groupGoalName = groupGoalName;
         this.groupGoalAmount = groupGoalAmount;
