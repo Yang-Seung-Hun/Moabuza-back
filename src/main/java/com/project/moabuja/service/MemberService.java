@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface MemberService {
 
-    public TokenDto kakaoLogin(String code) throws JsonProcessingException;
+    public ResponseEntity kakaoLogin(String code) throws JsonProcessingException;
 
     public String getAccessToken(String code) throws JsonProcessingException;
 
@@ -26,7 +26,7 @@ public interface MemberService {
 
     public ResponseEntity updateMemberInfo(MemberUpdateRequestDto dto, String email);
 
-    public ReissueDto reissue(HttpServletRequest request);
+    public ResponseEntity reissue(HttpServletRequest request);
 
     public ResponseEntity logout(HttpServletRequest request);
 

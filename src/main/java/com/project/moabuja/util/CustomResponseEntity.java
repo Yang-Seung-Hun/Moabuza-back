@@ -17,11 +17,9 @@ public class CustomResponseEntity {
     private HttpStatus code;
     private String message;
     private Object data;
-    private String authorization;
 
     @Builder
-    public CustomResponseEntity(String authorization, HttpStatus code, String message, Object data) {
-        this.authorization = authorization;
+    public CustomResponseEntity( HttpStatus code, String message, Object data) {
         this.code = code;
         this.message = message;
         this.data = data;
@@ -38,7 +36,6 @@ public class CustomResponseEntity {
                 .code(this.code)
                 .message(this.message)
                 .data(this.data)
-                .authorization(this.authorization)
                 .build();
         return new ResponseEntity(response, headers, this.code);
     }
@@ -51,7 +48,6 @@ public class CustomResponseEntity {
                 .code(this.code)
                 .message(this.message)
                 .data(this.data)
-                .authorization(this.authorization)
                 .build();
         return new ResponseEntity(response, headers, this.code);
     }

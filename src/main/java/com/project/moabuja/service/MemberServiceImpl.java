@@ -18,6 +18,7 @@ import com.project.moabuja.dto.response.member.ReissueDto;
 import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
 import com.project.moabuja.security.filter.JwtTokenProvider;
+import com.project.moabuja.util.CustomResponseEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
@@ -46,7 +47,7 @@ public class MemberServiceImpl implements MemberService{
     private final RecordRepository recordRepository;
 
     @Override
-    public TokenDto kakaoLogin(String code) throws JsonProcessingException {
+    public ResponseEntity kakaoLogin(String code) throws JsonProcessingException {
         String accessToken = getAccessToken(code);
         KakaoUserInfoDto kakaoUserInfoDto = getKakaoUserInfo(accessToken);
         TokenDto dto = TokenDto.builder()
@@ -58,7 +59,12 @@ public class MemberServiceImpl implements MemberService{
         redisTemplate.opsForValue()
                 .set("RT:" + kakaoUserInfoDto.getEmail(), dto.getRefresh(), jwtTokenProvider.getExpiration(dto.getRefresh()), TimeUnit.MILLISECONDS);
 
-        return dto;
+         CustomResponseEntity response = CustomResponseEntity.builder()
+                .code(HttpStatus.OK)
+                .message("카카오 로그인 콜백 메서드부분")
+                .data(dto)
+                .build();
+         return response.responseAll();
     }
 
     @Override
@@ -163,7 +169,7 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public ReissueDto reissue(HttpServletRequest request) {
+    public ResponseEntity reissue(HttpServletRequest request) {
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         String refresh = request.getHeader("R-AUTH-TOKEN").substring(7);
 
@@ -182,10 +188,18 @@ public class MemberServiceImpl implements MemberService{
                 .refresh(jwtTokenProvider.createRefreshToken(authentication.getName()))
                 .access(jwtTokenProvider.createAccessToken(authentication.getName()))
                 .build();
+
         redisTemplate.opsForValue()
                 .set("RT:" + authentication.getName(), dto.getRefresh(),
                         jwtTokenProvider.getExpiration(dto.getRefresh()), TimeUnit.MILLISECONDS);
-        return dto;
+
+        CustomResponseEntity response = CustomResponseEntity.builder()
+                .data(dto)
+                .message("Redis 저장 성공")
+                .code(HttpStatus.OK)
+                .build();
+
+        return response.responseAll();
     }
 
     @Override
