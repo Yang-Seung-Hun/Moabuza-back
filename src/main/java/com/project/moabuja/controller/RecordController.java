@@ -26,8 +26,8 @@ public class RecordController {
 
     @ApiOperation(value = "레코드 생성")
     @PostMapping("/money/addRecord/post")
-    public ResponseEntity<RecordResponseDto> addRecord(@RequestBody  RecordRequestDto recordRequestDto,
-                                    @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<RecordResponseDto> addRecord(@RequestBody RecordRequestDto recordRequestDto,
+                                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentUser = userDetails.getMember();
         return recordService.save(recordRequestDto, currentUser);
     }
@@ -35,7 +35,7 @@ public class RecordController {
     @ApiOperation(value = "하루부자 내역 불러오기")
     @PostMapping("/money/dayList")
     public ResponseEntity<DayListResponseDto> getDay(@RequestBody DayListRequestDto dayListRequestDto,
-                                 @AuthenticationPrincipal UserDetailsImpl userDetails){
+                                                     @AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentUser = userDetails.getMember();
         return recordService.getDayList(dayListRequestDto,currentUser);
     }
