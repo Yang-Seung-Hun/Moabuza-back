@@ -6,6 +6,7 @@ import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
 import com.project.moabuja.dto.response.goal.CreateChallengeResponseDto;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.ChallengeGoalService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,40 +18,32 @@ public class ChallengeController {
 
     private final ChallengeGoalService challengeGoalService;
 
+    @ApiOperation(value = "도전해부자 페이지")
     @GetMapping("/money/challenge")
-    public ResponseEntity getMoneyChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails){
-
+    public ResponseEntity<ChallengeResponseDto> getMoneyChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentUser = userDetails.getMember();
-        ChallengeResponseDto challengeResponseDto = challengeGoalService.getChallengeInfo(currentUser);
-
-        return ResponseEntity.ok().body(challengeResponseDto);
+        return challengeGoalService.getChallengeInfo(currentUser);
     }
 
+    @ApiOperation(value = "도전해부자 생성 페이지")
     @GetMapping("/money/challenge/createChallenge")
-    public ResponseEntity getCreateChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails){
-
+    public ResponseEntity<CreateChallengeResponseDto> getCreateChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentUser = userDetails.getMember();
-        CreateChallengeResponseDto createChallengeResponseDto = challengeGoalService.getChallengeMemberCandidates(currentUser);
-
-        return ResponseEntity.ok().body(createChallengeResponseDto);
+        return challengeGoalService.getChallengeMemberCandidates(currentUser);
     }
 
+    @ApiOperation(value = "도전해부자 생성")
     @PostMapping("/money/challenge/createChallenge")
-    public ResponseEntity postCreateChallenge(@RequestBody CreateChallengeRequestDto createChallengeRequestDto,
+    public ResponseEntity<String> postCreateChallenge(@RequestBody CreateChallengeRequestDto createChallengeRequestDto,
                                               @AuthenticationPrincipal UserDetailsImpl userDetails){
-
         Member currentUser = userDetails.getMember();
-        challengeGoalService.save(createChallengeRequestDto, currentUser);
-
-        return ResponseEntity.ok().body("도전해부자 생성 완료");
+        return challengeGoalService.save(createChallengeRequestDto, currentUser);
     }
 
+    @ApiOperation(value = "도전해부자 삭제")
     @DeleteMapping("/money/challenge/exitchallenge/{id}")
-    public ResponseEntity exitChallenge(@PathVariable Long id){
-
-        challengeGoalService.exitChallenge(id);
-
-        return ResponseEntity.ok().body("도전해부자 나가기 완료");
+    public ResponseEntity<String> exitChallenge(@PathVariable Long id){
+        return challengeGoalService.exitChallenge(id);
     }
 
 }

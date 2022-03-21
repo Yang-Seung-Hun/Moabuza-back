@@ -14,6 +14,7 @@ import com.project.moabuja.repository.GroupGoalRepository;
 import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +34,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Override
     @Transactional
-    public GroupGoal save(CreateGroupRequestDto groupRequestDto, Member current) {
+    public ResponseEntity<String> save(CreateGroupRequestDto groupRequestDto, Member current) {
 
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
         Member currentUser = currentUserTmp.get();
@@ -57,11 +58,11 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
             goal.get().addMember(memberByNickname.get());
         }
-        return savedGoal;
+        return ResponseEntity.ok().body("같이해부자 생성 완료");
     }
 
     @Override
-    public GroupResponseDto getGroupInfo(Member current) {
+    public ResponseEntity<GroupResponseDto> getGroupInfo(Member current) {
 
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
         Member currentUser = currentUserTmp.get();
@@ -98,29 +99,33 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                 int leftAmount = groupGoal.get().getGroupGoalAmount() - currentAmount;
                 int percent = (int) (((double) currentAmount / (double) (groupGoal.get().getGroupGoalAmount())) * 100);
 
-                return new GroupResponseDto(groupGoal.get().getId(),goalStatus,groupMembers,groupGoal.get().getGroupGoalName(),leftAmount,percent,groupDoneGoalNames,groupList);
+                GroupResponseDto haveGoal = new GroupResponseDto(groupGoal.get().getId(),goalStatus,groupMembers,groupGoal.get().getGroupGoalName(),leftAmount,percent,groupDoneGoalNames,groupList);
+                return ResponseEntity.ok().body(haveGoal);
 
             }
             else{//수락대기중
                 String goalStatus = "waiting";
-                return new GroupResponseDto(groupGoal.get().getId(),goalStatus,null,null,0,0,groupDoneGoalNames,null);
+                GroupResponseDto waiting = new GroupResponseDto(groupGoal.get().getId(),goalStatus,null,null,0,0,groupDoneGoalNames,null);
+                return ResponseEntity.ok().body(waiting);
             }
         }
         //challengeGoal 없을때
         else{
             String goalStatus = "noGoal";
-            return new GroupResponseDto(null,goalStatus,null,null,0,0,groupDoneGoalNames,null);
+            GroupResponseDto noGoal = new GroupResponseDto(null,goalStatus,null,null,0,0,groupDoneGoalNames,null);
+            return ResponseEntity.ok().body(noGoal);
         }
     }
 
     @Override
-    public CreateGroupResponseDto getGroupMemberCandidates(Member currentUser) {
+    public ResponseEntity<CreateGroupResponseDto> getGroupMemberCandidates(Member currentUser) {
 
         List<Friend> friends = friendRepository.findFriendsByMember(currentUser);
         List<CreateGroupMemberDto> groupMembers = new ArrayList<>();
 
         if (friends.size() == 0){
-            return new CreateGroupResponseDto(groupMembers);
+            CreateGroupResponseDto createGroupResponseDto = new CreateGroupResponseDto(groupMembers);
+            return ResponseEntity.ok().body(createGroupResponseDto);
         }
 
         for(Friend friend : friends){
@@ -149,12 +154,13 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             }
         }
 
-        return new CreateGroupResponseDto(groupMembers);
+        CreateGroupResponseDto groupResponseDto = new CreateGroupResponseDto(groupMembers);
+        return ResponseEntity.ok().body(groupResponseDto);
     }
 
     @Override
     @Transactional
-    public void exitChallenge(Long id) {
+    public ResponseEntity<String> exitChallenge(Long id) {
 
         Optional<GroupGoal> groupGoal = groupGoalRepository.findById(id);
         if(groupGoal.isPresent() && !groupGoal.get().isAcceptedGroup()){
@@ -165,5 +171,6 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             }
             groupGoalRepository.deleteGroupGoalById(id);
         }
+        return ResponseEntity.ok().body("같이해부자 나가기 완료");
     }
 }
