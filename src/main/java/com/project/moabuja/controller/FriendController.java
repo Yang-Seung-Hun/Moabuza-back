@@ -6,6 +6,7 @@ import com.project.moabuja.dto.request.friend.FriendInvitationRequestDto;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.FriendService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,22 +18,20 @@ public class FriendController {
 
     private final FriendService friendService;
 
+    @ApiOperation(value = "친구 수락")
     @PostMapping("/friends")
-    public ResponseEntity postCreateFriend(@RequestBody FriendInvitationRequestDto friendInvitationRequestDto,
+    public ResponseEntity<String> postCreateFriend(@RequestBody FriendInvitationRequestDto friendInvitationRequestDto,
                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member currentUser = userDetails.getMember();
-        friendService.save(friendInvitationRequestDto, currentUser);
-
-        return ResponseEntity.ok().body("친구 추가 완료");
+        return friendService.save(friendInvitationRequestDto, currentUser);
     }
 
+    @ApiOperation(value = "친구 삭제")
     @DeleteMapping("/friends")
-    public ResponseEntity deleteFriend(@RequestBody FriendInvitationDelete friendInvitationDelete,
+    public ResponseEntity<String> deleteFriend(@RequestBody FriendInvitationDelete friendInvitationDelete,
                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member currentUser = userDetails.getMember();
-        friendService.deleteFriend(friendInvitationDelete, currentUser);
-
-        return ResponseEntity.ok().body("친구 삭제 완료");
+        return friendService.deleteFriend(friendInvitationDelete, currentUser);
     }
 
 }

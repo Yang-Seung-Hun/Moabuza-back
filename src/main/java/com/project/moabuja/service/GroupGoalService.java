@@ -9,15 +9,16 @@ import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
 import com.project.moabuja.dto.response.goal.CreateChallengeResponseDto;
 import com.project.moabuja.dto.response.goal.CreateGroupResponseDto;
 import com.project.moabuja.dto.response.goal.GroupResponseDto;
+import org.springframework.http.ResponseEntity;
 
 public interface GroupGoalService {
 
-    public GroupGoal save(CreateGroupRequestDto groupRequestDto, Member currentUser);
+    public ResponseEntity<String> save(CreateGroupRequestDto groupRequestDto, Member currentUser);
 
-    public GroupResponseDto getGroupInfo(Member currentUser);
+    public ResponseEntity<GroupResponseDto> getGroupInfo(Member currentUser);
 
-    public CreateGroupResponseDto getGroupMemberCandidates(Member currentUser);
+    public ResponseEntity<CreateGroupResponseDto> getGroupMemberCandidates(Member currentUser);
 
-    public void exitChallenge(Long id);
+    public ResponseEntity<String> exitChallenge(Long id);
 
 }

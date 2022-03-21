@@ -8,6 +8,7 @@ import com.project.moabuja.dto.response.record.DayListResponseDto;
 import com.project.moabuja.dto.response.record.RecordResponseDto;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.RecordService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,34 +24,27 @@ public class RecordController {
 
     private final RecordService recordService;
 
-
+    @ApiOperation(value = "레코드 생성")
     @PostMapping("/money/addRecord/post")
-    public ResponseEntity addRecord(@RequestBody  RecordRequestDto recordRequestDto,
+    public ResponseEntity<RecordResponseDto> addRecord(@RequestBody  RecordRequestDto recordRequestDto,
                                     @AuthenticationPrincipal UserDetailsImpl userDetails){
-
         Member currentUser = userDetails.getMember();
-        RecordResponseDto recordResponseDto = recordService.save(recordRequestDto, currentUser);
-
-        return ResponseEntity.ok().body(recordResponseDto);
+        return recordService.save(recordRequestDto, currentUser);
     }
 
+    @ApiOperation(value = "하루부자 내역 불러오기")
     @PostMapping("/money/dayList")
-    public ResponseEntity getDay(@RequestBody DayListRequestDto dayListRequestDto,
+    public ResponseEntity<DayListResponseDto> getDay(@RequestBody DayListRequestDto dayListRequestDto,
                                  @AuthenticationPrincipal UserDetailsImpl userDetails){
-
         Member currentUser = userDetails.getMember();
-        DayListResponseDto dayListResponseDto = recordService.getDayList(dayListRequestDto,currentUser);
-
-        return ResponseEntity.ok().body(dayListResponseDto);
+        return recordService.getDayList(dayListRequestDto,currentUser);
     }
 
+    @ApiOperation(value = "레코드 삭제")
     @DeleteMapping("/money/dayList/delete/{id}")
-    public ResponseEntity DeleteDay(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails){
-
+    public ResponseEntity<String> DeleteDay(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentUser = userDetails.getMember();
-        recordService.deleteRecord(id, currentUser);
-
-        return ResponseEntity.ok().body("내역 삭제 완료");
+        return recordService.deleteRecord(id, currentUser);
     }
 
 }

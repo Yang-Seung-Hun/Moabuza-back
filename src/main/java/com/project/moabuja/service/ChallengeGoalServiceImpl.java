@@ -14,6 +14,7 @@ import com.project.moabuja.repository.FriendRepository;
 import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
     @Transactional
     @Override
-    public ChallengeGoal save(CreateChallengeRequestDto createChallengeRequestDto, Member current) {
+    public ResponseEntity<String> save(CreateChallengeRequestDto createChallengeRequestDto, Member current) {
 
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
         Member currentUser = currentUserTmp.get();
@@ -54,11 +55,11 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         //member랑 challengegoal 연관관계 맺음
         ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
         savedGoal.addMember(currentUser);
-        return savedGoal;
+        return ResponseEntity.ok().body("도전해부자 생성 완료");
     }
 
     @Override
-    public ChallengeResponseDto getChallengeInfo(Member current) {
+    public ResponseEntity<ChallengeResponseDto> getChallengeInfo(Member current) {
 
         //여기는 프록시 생명주기 문제 땜에 필요
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
@@ -93,30 +94,36 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                     return new ChallengeListDto(record.getRecordDate(), record.getMemo(), record.getRecordAmount());
                 }).collect(Collectors.toList());
 
-                return new ChallengeResponseDto(challengeGoal.get().getId(),goalStatus,challengeMembers,challengeGoal.get().getChallengeGoalName(),challengeDoneGoalNames, challengeLists);
+                ChallengeResponseDto goalResponseDto = new ChallengeResponseDto(challengeGoal.get().getId(),goalStatus,challengeMembers,challengeGoal.get().getChallengeGoalName(),challengeDoneGoalNames, challengeLists);
+
+                return ResponseEntity.ok().body(goalResponseDto);
 
             }
             else{//수락대기중
                 String goalStatus = "waiting";
-                return new ChallengeResponseDto(challengeGoal.get().getId(), goalStatus,null,null,challengeDoneGoalNames,null);
+                ChallengeResponseDto waitingResponseDto = new ChallengeResponseDto(challengeGoal.get().getId(), goalStatus,null,null,challengeDoneGoalNames,null);
+
+                return ResponseEntity.ok().body(waitingResponseDto);
             }
         }
         //challengeGoal 없을때
         else{
             String goalStatus = "noGoal";
-            return new ChallengeResponseDto(null,goalStatus,null,null,challengeDoneGoalNames,null);
-        }
+            ChallengeResponseDto noGoalResponseDto = new ChallengeResponseDto(null,goalStatus,null,null,challengeDoneGoalNames,null);
 
+            return ResponseEntity.ok().body(noGoalResponseDto);
+        }
     }
 
     @Override
-    public CreateChallengeResponseDto getChallengeMemberCandidates(Member currentUser) {
+    public ResponseEntity<CreateChallengeResponseDto> getChallengeMemberCandidates(Member currentUser) {
 
         List<Friend> friends = friendRepository.findFriendsByMember(currentUser);
         List<CreateChallengeMemberDto> challengeMembers = new ArrayList<>();
 
         if (friends.size() == 0){
-            return new CreateChallengeResponseDto(challengeMembers);
+            CreateChallengeResponseDto createChallengeResponseDto = new CreateChallengeResponseDto(challengeMembers);
+            return ResponseEntity.ok().body(createChallengeResponseDto);
         }
 
         for(Friend friend : friends){
@@ -145,12 +152,13 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             }
         }
 
-        return new CreateChallengeResponseDto(challengeMembers);
+        CreateChallengeResponseDto challengeResponseDto = new CreateChallengeResponseDto(challengeMembers);
+        return ResponseEntity.ok().body(challengeResponseDto);
     }
 
     @Override
     @Transactional
-    public void exitChallenge(Long id) {
+    public ResponseEntity<String> exitChallenge(Long id) {
 
         Optional<ChallengeGoal> challengeGoal = challengeGoalRepository.findById(id);
         if(challengeGoal.isPresent() && !challengeGoal.get().isAcceptedChallenge()){
@@ -161,5 +169,6 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             }
             challengeGoalRepository.deleteChallengeGoalById(id);
         }
+        return ResponseEntity.ok().body("도전해부자 취소 완료");
     }
 }

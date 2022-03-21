@@ -6,6 +6,7 @@ import com.project.moabuja.dto.response.goal.CreateGroupResponseDto;
 import com.project.moabuja.dto.response.goal.GroupResponseDto;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.GroupGoalService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,40 +18,32 @@ public class GroupGoalController {
 
     private final GroupGoalService groupGoalService;
 
+    @ApiOperation(value = "같이해부자 페이지")
     @GetMapping("/money/group")
-    public ResponseEntity getMoneyGroup(@AuthenticationPrincipal UserDetailsImpl userDetails){
-
+    public ResponseEntity<GroupResponseDto> getMoneyGroup(@AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentUser = userDetails.getMember();
-        GroupResponseDto groupResponseDto = groupGoalService.getGroupInfo(currentUser);
-
-        return ResponseEntity.ok().body(groupResponseDto);
+        return groupGoalService.getGroupInfo(currentUser);
     }
 
+    @ApiOperation(value = "같이해부자 생성 페이지")
     @GetMapping("/money/group/creategroup")
-    public ResponseEntity getCreateGroup(@AuthenticationPrincipal UserDetailsImpl userDetails){
-
+    public ResponseEntity<CreateGroupResponseDto> getCreateGroup(@AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentUser = userDetails.getMember();
-        CreateGroupResponseDto createGroupResponseDto = groupGoalService.getGroupMemberCandidates(currentUser);
-
-        return ResponseEntity.ok().body(createGroupResponseDto);
+        return groupGoalService.getGroupMemberCandidates(currentUser);
     }
 
+    @ApiOperation(value = "같이해부자 생성")
     @PostMapping("/money/group/creategroup")
-    public ResponseEntity postCreateGroup(@RequestBody CreateGroupRequestDto createGroupRequestDto,
+    public ResponseEntity<String> postCreateGroup(@RequestBody CreateGroupRequestDto createGroupRequestDto,
                                           @AuthenticationPrincipal UserDetailsImpl userDetails){
-
         Member currentUser = userDetails.getMember();
-        groupGoalService.save(createGroupRequestDto,currentUser);
-
-        return ResponseEntity.ok().body("같이해부자 생성 완료");
+        return groupGoalService.save(createGroupRequestDto,currentUser);
     }
 
+    @ApiOperation(value = "같이해부자 삭제")
     @DeleteMapping("/money/group/exitgroup/{id}")
-    public ResponseEntity exitGroup(@PathVariable Long id){
-
-        groupGoalService.exitChallenge(id);
-
-        return ResponseEntity.ok().body("같이해부자 나가기 완료");
+    public ResponseEntity<String> exitGroup(@PathVariable Long id){
+        return groupGoalService.exitChallenge(id);
     }
 
 }

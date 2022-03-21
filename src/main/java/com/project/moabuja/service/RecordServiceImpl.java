@@ -37,7 +37,7 @@ public class RecordServiceImpl implements RecordService{
 
     @Transactional
     @Override
-    public RecordResponseDto save(RecordRequestDto recordRequestDto, Member current) {
+    public ResponseEntity<RecordResponseDto> save(RecordRequestDto recordRequestDto, Member current) {
 
         Optional<Member> byId = memberRepository.findById(current.getId());
         Member currentMember = byId.get();
@@ -100,11 +100,11 @@ public class RecordServiceImpl implements RecordService{
             }
         }
 
-        return recordResponseDto;
+        return ResponseEntity.ok().body(recordResponseDto);
     }
 
     @Override//wallet, totalAmount 보류
-    public DayListResponseDto getDayList(DayListRequestDto dayListRequestDto, Member currentUser) {
+    public ResponseEntity<DayListResponseDto> getDayList(DayListRequestDto dayListRequestDto, Member currentUser) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
@@ -132,12 +132,13 @@ public class RecordServiceImpl implements RecordService{
                 dayGroupAmount += dayRecordResponseDto.getRecordAmount();
             }
         }
-        return new DayListResponseDto(dayRecordList,dayIncomeAmount,dayExpenseAmount,dayChallengeAmount,dayGroupAmount);
+        DayListResponseDto dayListResponseDto = new DayListResponseDto(dayRecordList,dayIncomeAmount,dayExpenseAmount,dayChallengeAmount,dayGroupAmount);
+        return ResponseEntity.ok().body(dayListResponseDto);
     }
 
     @Override
     @Transactional
-    public void deleteRecord(Long id, Member currentMember) {
+    public ResponseEntity<String> deleteRecord(Long id, Member currentMember) {
         Optional<Record> selectRecord = recordRepository.findRecordById(id);
         Long selectId = selectRecord.get().getMember().getId();
         if (selectId.equals(currentMember.getId())) {
@@ -145,6 +146,7 @@ public class RecordServiceImpl implements RecordService{
         } else {
             throw new IllegalArgumentException("게시물을 등록한 사용자가 아닙니다.");
         }
+        return ResponseEntity.ok().body("내역 삭제 완료");
     }
 
     public int countCurrentChallenge(Member member){
