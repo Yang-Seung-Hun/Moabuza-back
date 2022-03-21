@@ -45,7 +45,7 @@ public class GroupGoalController {
         return ResponseEntity.ok().body("같이해부자 생성 완료");
     }
 
-    @GetMapping("/money/group/exitgroup/{id}")
+    @DeleteMapping("/money/group/exitgroup/{id}")
     public ResponseEntity exitGroup(@PathVariable Long id){
 
         groupGoalService.exitChallenge(id);
