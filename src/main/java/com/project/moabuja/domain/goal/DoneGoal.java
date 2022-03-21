@@ -1,6 +1,7 @@
 package com.project.moabuja.domain.goal;
 
 import com.project.moabuja.domain.member.Member;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,6 +32,7 @@ public class DoneGoal {
         this.member = member;
     }
 
+    @Builder
     public DoneGoal(String doneGoalName, int doneGoalAmount, Member member, DoneGoalType doneGoalType) {
         this.doneGoalName = doneGoalName;
         this.doneGoalAmount = doneGoalAmount;
