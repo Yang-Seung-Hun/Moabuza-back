@@ -35,7 +35,7 @@ public class GroupGoalController {
     @ApiOperation(value = "같이해부자 생성")
     @PostMapping("/money/group/creategroup")
     public ResponseEntity<String> postCreateGroup(@RequestBody CreateGroupRequestDto createGroupRequestDto,
-                                          @AuthenticationPrincipal UserDetailsImpl userDetails){
+                                                  @AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentUser = userDetails.getMember();
         return groupGoalService.save(createGroupRequestDto,currentUser);
     }

@@ -35,7 +35,7 @@ public class ChallengeController {
     @ApiOperation(value = "도전해부자 생성")
     @PostMapping("/money/challenge/createChallenge")
     public ResponseEntity<String> postCreateChallenge(@RequestBody CreateChallengeRequestDto createChallengeRequestDto,
-                                              @AuthenticationPrincipal UserDetailsImpl userDetails){
+                                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentUser = userDetails.getMember();
         return challengeGoalService.save(createChallengeRequestDto, currentUser);
     }

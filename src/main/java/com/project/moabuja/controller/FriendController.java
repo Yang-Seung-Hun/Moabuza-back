@@ -21,7 +21,7 @@ public class FriendController {
     @ApiOperation(value = "친구 수락")
     @PostMapping("/friends")
     public ResponseEntity<String> postCreateFriend(@RequestBody FriendInvitationRequestDto friendInvitationRequestDto,
-                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member currentUser = userDetails.getMember();
         return friendService.save(friendInvitationRequestDto, currentUser);
     }
@@ -29,7 +29,7 @@ public class FriendController {
     @ApiOperation(value = "친구 삭제")
     @DeleteMapping("/friends")
     public ResponseEntity<String> deleteFriend(@RequestBody FriendInvitationDelete friendInvitationDelete,
-                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member currentUser = userDetails.getMember();
         return friendService.deleteFriend(friendInvitationDelete, currentUser);
     }
