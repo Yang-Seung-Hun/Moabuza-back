@@ -18,16 +18,20 @@ public class FriendController {
     private final FriendService friendService;
 
     @PostMapping("/friends")
-    public ResponseEntity PostCreateFriend(@RequestBody FriendInvitationRequestDto friendInvitationRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity postCreateFriend(@RequestBody FriendInvitationRequestDto friendInvitationRequestDto,
+                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member currentUser = userDetails.getMember();
         friendService.save(friendInvitationRequestDto, currentUser);
+
         return ResponseEntity.ok().body("친구 추가 완료");
     }
 
     @DeleteMapping("/friends")
-    public ResponseEntity DeleteFriend(@RequestBody FriendInvitationDelete friendInvitationDelete, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity deleteFriend(@RequestBody FriendInvitationDelete friendInvitationDelete,
+                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member currentUser = userDetails.getMember();
         friendService.deleteFriend(friendInvitationDelete, currentUser);
+
         return ResponseEntity.ok().body("친구 삭제 완료");
     }
 

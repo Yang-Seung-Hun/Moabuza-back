@@ -13,5 +13,5 @@ public interface RecordService {
 
     public DayListResponseDto getDayList(DayListRequestDto dayListRequestDto, Member currentMember);
 
-    public ResponseEntity deleteRecord(Long id, Member currentMember);
+    public void deleteRecord(Long id, Member currentMember);
 }
