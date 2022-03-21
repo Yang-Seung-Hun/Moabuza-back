@@ -12,7 +12,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
 public class ChallengeGoal {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +46,8 @@ public class ChallengeGoal {
         this.members.remove(member);
         member.changeChallengeGoal(null);
     }
+
+    protected ChallengeGoal () {}
 
     //테스트용 setter입니다.
     public void setIsAcceptedChallenge(Boolean bool){

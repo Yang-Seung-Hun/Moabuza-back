@@ -11,7 +11,6 @@ import java.util.List;
 
 @Getter
 @Entity
-@NoArgsConstructor
 public class GroupGoal {
 
     @Id
@@ -47,6 +46,8 @@ public class GroupGoal {
         this.members.remove(member);
         member.changeGroupGoal(null);
     }
+
+    protected GroupGoal () {}
 
     //테스트용 setter입니다.
     public void setIsAcceptedGroup(Boolean bool){

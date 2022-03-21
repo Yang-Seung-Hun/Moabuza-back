@@ -13,7 +13,6 @@ import java.time.format.DateTimeFormatter;
 
 @Entity
 @Getter
-@NoArgsConstructor
 public class Record extends Timestamped {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,5 +41,7 @@ public class Record extends Timestamped {
         this.recordAmount = recordRequestDto.getRecordAmount();
         this.member = currentMember;
     }
+
+    protected Record () {}
 
 }

@@ -9,7 +9,6 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
 public class DoneGoal {
 
     @Id
@@ -39,4 +38,6 @@ public class DoneGoal {
         this.member = member;
         this.doneGoalType = doneGoalType;
     }
+
+    protected DoneGoal () {}
 }

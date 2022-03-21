@@ -18,7 +18,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -111,4 +110,6 @@ public class Member {
         this.doneGaols.add(doneGoal);
         doneGoal.changeMember(this);
     }
+
+    protected Member () {}
 }
