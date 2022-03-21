@@ -17,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,7 +42,7 @@ public class MemberController {
 
     // 닉네임, 캐릭터 선택 api
     @PutMapping("/member/info")
-    public ResponseEntity update(@RequestBody MemberUpdateRequestDto dto,
+    public ResponseEntity update(@Valid @RequestBody MemberUpdateRequestDto dto,
                                  @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
         String email = userDetails.getUsername();
         // 회원이 캐릭터랑 닉네임 설정한 경우
@@ -50,7 +51,7 @@ public class MemberController {
 
     // 닉네임 이름 중복체크  api
     @PostMapping("/nickname/validation")
-    public ResponseEntity nicknameValid(@RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
+    public ResponseEntity nicknameValid(@Valid @RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
         return memberService.nicknameValid(nicknameValidationRequestDto);
     }
 
