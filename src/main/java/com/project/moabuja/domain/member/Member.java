@@ -18,6 +18,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,13 +62,14 @@ public class Member {
     public Member updateInfo(MemberUpdateRequestDto dto){
         this.nickname = dto.getNickname();
         this.hero = dto.getHero();
-        return Member.builder()
-                .password(this.getPassword())
-                .email(this.getEmail())
-                .nickname(this.getNickname())
-                .kakaoId(this.getKakaoId())
-                .hero(this.getHero())
-                .build();
+        return this;
+//        return Member.builder()
+//                .password(this.getPassword())
+//                .email(this.getEmail())
+//                .nickname(this.getNickname())
+//                .kakaoId(this.getKakaoId())
+//                .hero(this.getHero())
+//                .build();
     }
 
     public Member fromDto(KakaoUserInfoDto dto, String password) {
@@ -76,18 +78,6 @@ public class Member {
                 .kakaoId(dto.getKakaoId())
                 .email(dto.getEmail())
                 .build();
-    }
-
-    //테스트용 생성자임
-    public Member(String email, String nickname, Hero hero) {
-        this.email = email;
-        this.nickname = nickname;
-        this.hero = hero;
-    }
-    //테스트용 생성자임
-    public Member(String email, String nickname) {
-        this.email = email;
-        this.nickname = nickname;
     }
 
     //반대쪽에서 연관관계편의메소드에서 사용될 setter
@@ -111,5 +101,4 @@ public class Member {
         doneGoal.changeMember(this);
     }
 
-    protected Member () {}
 }
