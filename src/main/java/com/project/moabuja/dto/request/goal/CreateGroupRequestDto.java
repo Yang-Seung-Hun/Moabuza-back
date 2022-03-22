@@ -1,5 +1,6 @@
 package com.project.moabuja.dto.request.goal;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ public class CreateGroupRequestDto {
     private int createGroupAmount;
     private List<String> groupFriends = new ArrayList<>();
 
+    @Builder
     public CreateGroupRequestDto(String createGroupName, int createGroupAmount, List<String> groupFiends) {
         this.createGroupName = createGroupName;
         this.createGroupAmount = createGroupAmount;
