@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface AlarmRepository extends JpaRepository<Alarm,Long> {
 
-    List<Alarm> findAllbyMember(Member member);
+    List<Alarm> findAllByMember(Member member);
 }
