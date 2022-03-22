@@ -11,22 +11,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class FriendServiceImpl implements FriendService{
 
     private final FriendRepository friendRepository;
     private final MemberRepository memberRepository;
 
+    @Override
+    public ResponseEntity<List<Friend>> listFriend(Member current) {
+        List<Friend> friendList = friendRepository.findFriendsByMember(current);
+        return ResponseEntity.ok().body(friendList);
+    }
+
     @Transactional
     @Override
-    public ResponseEntity<String> save(FriendInvitationRequestDto friendRequestDto, Member current) {
+    public ResponseEntity<String> save(String friendNickname, Member current) {
 
         Optional<Member> currentUserTemp = memberRepository.findById(current.getId());
         Member currentUser = currentUserTemp.get();
-        Member friend = memberRepository.findMemberByNickname(friendRequestDto.getNickname()).get();
+        Member friend = memberRepository.findMemberByNickname(friendNickname).get();
 
         friendRepository.save(new Friend(currentUser, friend));
         friendRepository.save(new Friend(friend, currentUser));
@@ -36,10 +44,10 @@ public class FriendServiceImpl implements FriendService{
 
     @Transactional
     @Override
-    public ResponseEntity<String> deleteFriend(FriendInvitationDelete friendDelete, Member current) {
+    public ResponseEntity<String> deleteFriend(String friendNickname, Member current) {
         Optional<Member> currentUserTemp = memberRepository.findById(current.getId());
         Member currentUser = currentUserTemp.get();
-        Member friend = memberRepository.findMemberByNickname(friendDelete.getNickname()).get();
+        Member friend = memberRepository.findMemberByNickname(friendNickname).get();
 
         friendRepository.delete(friendRepository.findByMemberAndFriend(currentUser, friend));
         friendRepository.delete(friendRepository.findByMemberAndFriend(friend, currentUser));

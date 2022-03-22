@@ -6,9 +6,13 @@ import com.project.moabuja.dto.request.friend.FriendInvitationDelete;
 import com.project.moabuja.dto.request.friend.FriendInvitationRequestDto;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 public interface FriendService {
 
-    public ResponseEntity<String> save(FriendInvitationRequestDto friendRequestDto, Member currentUser);
+    public ResponseEntity<List<Friend>> listFriend(Member currentUser);
 
-    public ResponseEntity<String> deleteFriend(FriendInvitationDelete friendDelete, Member currentUser);
+    public ResponseEntity<String> save(String friendNickname, Member currentUser);
+
+    public ResponseEntity<String> deleteFriend(String friendNickname, Member currentUser);
 }
