@@ -3,6 +3,7 @@ package com.project.moabuja.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.GroupGoal;
 import com.project.moabuja.domain.member.Hero;
@@ -15,6 +16,7 @@ import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.dto.response.member.ReissueDto;
+import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
 import com.project.moabuja.security.filter.JwtTokenProvider;
@@ -45,6 +47,7 @@ public class MemberServiceImpl implements MemberService{
     private final MemberRepository memberRepository;
     private final RedisTemplate redisTemplate;
     private final RecordRepository recordRepository;
+    private final AlarmRepository alarmRepository;
 
     @Override
     public ResponseEntity kakaoLogin(String code) throws JsonProcessingException {
@@ -296,8 +299,11 @@ public class MemberServiceImpl implements MemberService{
         }
         totalAmount = wallet + challengeCurrentAmount + groupUserWallet;
 
+        List<Alarm> alarmList = alarmRepository.findAllbyMember(currentUser);
+        int alarmCount = alarmList.size();
+
         return new HomeResponseDto(groupCurrentAmount, groupNeedAmount, groupAmount, groupPercent, groupName,
                 challengeCurrentAmount, challengeNeedAmount, challengeAmount, challengePercent, challengeName,
-                hero, 0, totalAmount, wallet);//heroLevel 일단 0으로
+                hero, 0, totalAmount, wallet, alarmCount);//heroLevel 일단 0으로
     }
 }
