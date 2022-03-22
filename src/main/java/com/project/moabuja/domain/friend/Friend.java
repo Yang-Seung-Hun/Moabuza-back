@@ -22,13 +22,7 @@ public class Friend {
     @JoinColumn(name = "friend_user")
     private Member friend;
 
-    //테스트용 생성자입니다.
     public Friend(Member member, Member friend) {
-        this.member = member;
-        this.friend = friend;
-    }
-
-    public void changeUser(Member member, Member friend) {
         this.member = member;
         this.friend = friend;
     }
