@@ -299,7 +299,7 @@ public class MemberServiceImpl implements MemberService{
         }
         totalAmount = wallet + challengeCurrentAmount + groupUserWallet;
 
-        List<Alarm> alarmList = alarmRepository.findAllbyMember(currentUser);
+        List<Alarm> alarmList = alarmRepository.findAllByMember(currentUser);
         int alarmCount = alarmList.size();
 
         return new HomeResponseDto(groupCurrentAmount, groupNeedAmount, groupAmount, groupPercent, groupName,
