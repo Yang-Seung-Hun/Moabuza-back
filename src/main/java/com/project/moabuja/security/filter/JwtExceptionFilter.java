@@ -24,27 +24,11 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
         try {
             chain.doFilter(req, res); // go to 'JwtAuthenticationFilter'
-        } catch (HomeMemberNotFoundException ex) {
-            homeMemberNotFoundErrorResponse(HttpStatus.UNAUTHORIZED, res, ex);
         } catch (ExpiredJwtException | IOException ex) {
             expiredJwtErrorResponse(HttpStatus.UNAUTHORIZED, res, ex);
         } catch (LogoutJwtUseException ex){
             logoutJwtErrorResponse(HttpStatus.UNAUTHORIZED, res, ex);
         }
-    }
-
-    public void homeMemberNotFoundErrorResponse(HttpStatus status, HttpServletResponse res, Throwable ex) throws IOException {
-        res.setStatus(status.value());
-        res.setContentType("application/json; charset=UTF-8");
-        PrintWriter out = res.getWriter();
-
-        //create Json Object
-        JSONObject json = new JSONObject();
-        // put some value pairs into the JSON object .
-        json.put("code", HttpStatus.UNAUTHORIZED);
-        json.put("message", "Move to Login Page");
-        // finally output the json string
-        out.print(json.toString());
     }
 
     public void expiredJwtErrorResponse(HttpStatus status, HttpServletResponse res, Throwable ex) throws IOException {
