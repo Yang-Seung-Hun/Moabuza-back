@@ -37,10 +37,6 @@ public class CustomAuthenticationFilter extends GenericFilterBean {
         String jwtAccess = resolveAccessToken(httpServletRequest);
         String jwtRefresh = resolveRefreshToken(httpServletRequest);
 
-        if (jwtAccess == null) {
-            throw new HomeMemberNotFoundException("Move to Login Page");
-        }
-
         // ACCESS 토큰 먼저 검증
         if(jwtAccess != null){
             jwtProvider.validateToken(jwtAccess);
