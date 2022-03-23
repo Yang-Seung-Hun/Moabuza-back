@@ -68,9 +68,11 @@ public class MemberController {
     @ApiOperation(value = "로그인 후 home 페이지")
     @GetMapping("/home")
     public ResponseEntity getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        if (userDetails == null) {
+            return memberService.guestHome();
+        }
         Member currentUser = userDetails.getMember();
         return memberService.getHomeInfo(currentUser);
     }
-
 
 }
