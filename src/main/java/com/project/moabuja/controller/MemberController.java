@@ -7,6 +7,7 @@ import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.dto.response.member.ReissueDto;
+import com.project.moabuja.exception.exceptionClass.HomeMemberNotFoundException;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.FCMServiceImpl;
 import com.project.moabuja.service.MemberService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -68,11 +70,8 @@ public class MemberController {
     @ApiOperation(value = "로그인 후 home 페이지")
     @GetMapping("/home")
     public ResponseEntity getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
-//        if (userDetails == null) {
-//            return memberService.guestHome();
-//        }
-        Member currentUser = userDetails.getMember();
+        Member currentUser = Optional.ofNullable(userDetails.getMember()).orElseThrow(
+                () -> new HomeMemberNotFoundException("Move to Login Page"));
         return memberService.getHomeInfo(currentUser);
     }
-
 }
