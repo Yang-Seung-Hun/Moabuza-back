@@ -8,6 +8,7 @@ import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.dto.response.member.ReissueDto;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
+import com.project.moabuja.service.FCMServiceImpl;
 import com.project.moabuja.service.MemberService;
 import com.project.moabuja.util.CustomResponseEntity;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +26,7 @@ import javax.validation.Valid;
 public class MemberController {
 
     private final MemberService memberService;
+    private final FCMServiceImpl fcmService;
 
     @ApiOperation(value = "카카오 로그인 api")
     @GetMapping("/user/kakao/callback")
@@ -36,6 +38,7 @@ public class MemberController {
     @PutMapping("/member/info")
     public ResponseEntity update(@Valid @RequestBody MemberUpdateRequestDto dto,
                                  @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
+        fcmService.register(dto.getNickname(), dto.getFcmToken());
         String email = userDetails.getUsername();
         return memberService.updateMemberInfo(dto, email);
     }
@@ -64,4 +67,6 @@ public class MemberController {
         Member currentUser = userDetails.getMember();
         return memberService.getHomeInfo(currentUser);
     }
+
+
 }
