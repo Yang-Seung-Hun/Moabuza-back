@@ -1,5 +1,6 @@
 package com.project.moabuja.security.filter;
 
+import com.project.moabuja.exception.exceptionClass.HomeMemberNotFoundException;
 import com.project.moabuja.exception.exceptionClass.LogoutJwtUseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -104,5 +104,4 @@ public class Member {
         this.doneGaols.add(doneGoal);
         doneGoal.changeMember(this);
     }
-
 }
