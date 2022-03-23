@@ -44,4 +44,6 @@ public class FriendController {
         return friendService.deleteFriend(friendNickname, currentUser);
     }
 
+
+
 }
