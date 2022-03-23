@@ -24,7 +24,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(HomeMemberNotFoundException.class)
     public ResponseEntity<ErrorResponse> homeMemberNotFoundException(HomeMemberNotFoundException e) {
-        return new ResponseEntity<>(ErrorResponse.badRequest(e.getMessage()), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ErrorResponse.badRequest(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
 }
