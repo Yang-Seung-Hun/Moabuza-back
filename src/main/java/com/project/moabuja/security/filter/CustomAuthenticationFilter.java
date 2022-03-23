@@ -1,5 +1,6 @@
 package com.project.moabuja.security.filter;
 
+import com.project.moabuja.exception.exceptionClass.HomeMemberNotFoundException;
 import com.project.moabuja.exception.exceptionClass.LogoutJwtUseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,10 @@ public class CustomAuthenticationFilter extends GenericFilterBean {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         String jwtAccess = resolveAccessToken(httpServletRequest);
         String jwtRefresh = resolveRefreshToken(httpServletRequest);
+
+        if (jwtAccess == null) {
+            throw new HomeMemberNotFoundException("Move to Login Page");
+        }
 
         // ACCESS 토큰 먼저 검증
         if(jwtAccess != null){

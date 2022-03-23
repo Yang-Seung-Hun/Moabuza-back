@@ -70,8 +70,7 @@ public class MemberController {
     @ApiOperation(value = "로그인 후 home 페이지")
     @GetMapping("/home")
     public ResponseEntity getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
-        Member currentUser = Optional.ofNullable(userDetails.getMember()).orElseThrow(
-                () -> new HomeMemberNotFoundException("Move to Login Page"));
+        Member currentUser = userDetails.getMember();
         return memberService.getHomeInfo(currentUser);
     }
 }
