@@ -1,6 +1,6 @@
 package com.project.moabuja.domain.goal;
 
-public enum DoneGoalType {
+public enum GoalType {
 
     GROUP, CHALLENGE
 }

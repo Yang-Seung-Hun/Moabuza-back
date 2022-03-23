@@ -1,7 +1,7 @@
 package com.project.moabuja.service;
 
 import com.project.moabuja.domain.goal.DoneGoal;
-import com.project.moabuja.domain.goal.DoneGoalType;
+import com.project.moabuja.domain.goal.GoalType;
 import com.project.moabuja.domain.goal.GroupGoal;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
@@ -62,7 +62,7 @@ public class RecordServiceImpl implements RecordService{
                 recordRepository.save(plusRecord);
 
                 //완료된 목표 저장
-                DoneGoal doneGoal = new DoneGoal(currentMember.getChallengeGoal().getChallengeGoalName(), currentMember.getChallengeGoal().getChallengeGoalAmount(), currentMember, DoneGoalType.CHALLENGE);
+                DoneGoal doneGoal = new DoneGoal(currentMember.getChallengeGoal().getChallengeGoalName(), currentMember.getChallengeGoal().getChallengeGoalAmount(), currentMember, GoalType.CHALLENGE);
                 doneGoalRepository.save(doneGoal);
                 currentMember.addDoneGoal(doneGoal);
 
@@ -91,7 +91,7 @@ public class RecordServiceImpl implements RecordService{
                     Record minusRecord = new Record(dto, member);
                     recordRepository.save(minusRecord);
 
-                    DoneGoal doneGoal = new DoneGoal(member.getGroupGoal().getGroupGoalName(),member.getGroupGoal().getGroupGoalAmount(),member,DoneGoalType.GROUP);
+                    DoneGoal doneGoal = new DoneGoal(member.getGroupGoal().getGroupGoalName(),member.getGroupGoal().getGroupGoalAmount(),member, GoalType.GROUP);
                     doneGoalRepository.save(doneGoal);
                     member.addDoneGoal(doneGoal);
                     member.getGroupGoal().removeMember(member);

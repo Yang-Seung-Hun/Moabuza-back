@@ -2,7 +2,7 @@ package com.project.moabuja.service;
 
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.goal.DoneGoal;
-import com.project.moabuja.domain.goal.DoneGoalType;
+import com.project.moabuja.domain.goal.GoalType;
 import com.project.moabuja.domain.goal.GroupGoal;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
@@ -70,7 +70,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         Optional<GroupGoal> groupGoal = Optional.ofNullable(currentUser.getGroupGoal());
         List<String> groupDoneGoalNames = new ArrayList<>();
         for(DoneGoal doneGoal:currentUser.getDoneGaols()){
-            if(doneGoal.getDoneGoalType() == DoneGoalType.GROUP){
+            if(doneGoal.getGoalType() == GoalType.GROUP){
                 groupDoneGoalNames.add(doneGoal.getDoneGoalName());
             }
         }

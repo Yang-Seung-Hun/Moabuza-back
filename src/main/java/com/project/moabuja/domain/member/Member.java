@@ -4,6 +4,7 @@ import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.DoneGoal;
 import com.project.moabuja.domain.goal.GroupGoal;
+import com.project.moabuja.domain.goal.MemberWaitingGoal;
 import com.project.moabuja.dto.KakaoUserInfoDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.RegisterRequestDto;
@@ -49,6 +50,9 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private List<Alarm> alarms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<MemberWaitingGoal> waitingGoals = new ArrayList<>();
 
     @Builder
     public Member(String password, Long kakaoId, String nickname, String email, Hero hero) {
