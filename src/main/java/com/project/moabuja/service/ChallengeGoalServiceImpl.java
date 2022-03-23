@@ -3,7 +3,7 @@ package com.project.moabuja.service;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.DoneGoal;
-import com.project.moabuja.domain.goal.DoneGoalType;
+import com.project.moabuja.domain.goal.GoalType;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
@@ -68,7 +68,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         Optional<ChallengeGoal> challengeGoal = Optional.ofNullable(currentUser.getChallengeGoal());
         List<String> challengeDoneGoalNames = new ArrayList<>();
         for(DoneGoal doneGoal:currentUser.getDoneGaols()){
-            if(doneGoal.getDoneGoalType() == DoneGoalType.CHALLENGE){
+            if(doneGoal.getGoalType() == GoalType.CHALLENGE){
                 challengeDoneGoalNames.add(doneGoal.getDoneGoalName());
             }
         }
