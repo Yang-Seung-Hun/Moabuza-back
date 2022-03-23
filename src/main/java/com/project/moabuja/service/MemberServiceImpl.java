@@ -308,13 +308,13 @@ public class MemberServiceImpl implements MemberService{
 
         return ResponseEntity.ok().body(homeResponseDto);
     }
-
-    @Transactional
-    @Override
-    public ResponseEntity guestHome() {
-        HomeResponseDto nullDto = new HomeResponseDto(0, 0, 0, 0, null,
-                0, 0, 0, 0, null,
-                null, 0, 0, 0, 0);
-        return ResponseEntity.ok().body(nullDto);
-    }
+//
+//    @Transactional
+//    @Override
+//    public ResponseEntity guestHome() {
+//        HomeResponseDto nullDto = new HomeResponseDto(0, 0, 0, 0, null,
+//                0, 0, 0, 0, null,
+//                null, 0, 0, 0, 0);
+//        return ResponseEntity.ok().body(nullDto);
+//    }
 }
