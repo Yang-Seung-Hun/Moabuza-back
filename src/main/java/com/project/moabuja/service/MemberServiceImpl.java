@@ -225,11 +225,14 @@ public class MemberServiceImpl implements MemberService{
 
     @Transactional
     @Override
-    public HomeResponseDto getHomeInfo(Member current) {
+    public ResponseEntity getHomeInfo(Member current) {
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
         Member currentUser = currentUserTmp.get();
 
         Hero hero = currentUser.getHero();
+        if (hero == null) {
+            return ResponseEntity.ok().body("로그인 정보 없음");
+        }
 
         int groupCurrentAmount = 0;
         int groupNeedAmount = 0;
@@ -302,8 +305,10 @@ public class MemberServiceImpl implements MemberService{
         List<Alarm> alarmList = alarmRepository.findAllByMember(currentUser);
         int alarmCount = alarmList.size();
 
-        return new HomeResponseDto(groupCurrentAmount, groupNeedAmount, groupAmount, groupPercent, groupName,
+        HomeResponseDto homeResponseDto = new HomeResponseDto(groupCurrentAmount, groupNeedAmount, groupAmount, groupPercent, groupName,
                 challengeCurrentAmount, challengeNeedAmount, challengeAmount, challengePercent, challengeName,
                 hero, 0, totalAmount, wallet, alarmCount);//heroLevel 일단 0으로
+
+        return ResponseEntity.ok().body(homeResponseDto);
     }
 }

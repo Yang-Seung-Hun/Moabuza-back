@@ -11,6 +11,7 @@ import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.FCMServiceImpl;
 import com.project.moabuja.service.MemberService;
 import com.project.moabuja.util.CustomResponseEntity;
+import com.project.moabuja.util.Validation;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final FCMServiceImpl fcmService;
+    private final Validation validation;
 
     @ApiOperation(value = "카카오 로그인 api")
     @GetMapping("/user/kakao/callback")
@@ -39,7 +41,9 @@ public class MemberController {
     public ResponseEntity update(@Valid @RequestBody MemberUpdateRequestDto dto,
                                  @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
         fcmService.register(dto.getNickname(), dto.getFcmToken());
-        String email = userDetails.getUsername();
+        Member currentMember =  validation.memberValidation(userDetails.getMember());
+        String email = currentMember.getEmail();
+
         return memberService.updateMemberInfo(dto, email);
     }
 
@@ -63,7 +67,7 @@ public class MemberController {
 
     @ApiOperation(value = "로그인 후 home 페이지")
     @GetMapping("/home")
-    public HomeResponseDto getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentUser = userDetails.getMember();
         return memberService.getHomeInfo(currentUser);
     }
