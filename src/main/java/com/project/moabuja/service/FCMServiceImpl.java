@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class FCMServiceImpl implements FCMService{
     private final RedisTemplate redisTemplate;
-    private final Map<String, String> tokenMap = new HashMap<>();
+//    private final Map<String, String> tokenMap = new HashMap<>();
     private final Map<String, String> messageMap = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(FCMServiceImpl.class);
     private static final String FIREBASE_CONFIG_PATH = "moabuza-firebase-adminsdk-h9ox1-5af37638bf (1).json";
@@ -34,12 +34,12 @@ public class FCMServiceImpl implements FCMService{
 
     @Override
     public void register(final String nickname, final String token) {
-        tokenMap.put(nickname, token);
+        redisTemplate.opsForValue().set("Nickname:"+nickname, token);
     }
 
     @Override
     public String getToken(String nickname){
-        return tokenMap.get(nickname);
+        return (String) redisTemplate.opsForValue().get("Nickname:"+nickname);
     }
 
     @Override
@@ -70,7 +70,6 @@ public class FCMServiceImpl implements FCMService{
                                         .body(body)
                                         .image(null)
                                         .build()
-
                         ).build()
                 ).validate_only(false)
                 .build();
