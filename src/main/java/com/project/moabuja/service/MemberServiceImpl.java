@@ -226,13 +226,6 @@ public class MemberServiceImpl implements MemberService{
     @Transactional
     @Override
     public ResponseEntity getHomeInfo(Member current) {
-        if (current == null) {
-            HomeResponseDto nullDto = new HomeResponseDto(0, 0, 0, 0, null,
-                    0, 0, 0, 0, null,
-                    null, 0, 0, 0, 0);
-            return ResponseEntity.ok().body(nullDto);
-        }
-
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
         Member currentUser = currentUserTmp.get();
 
@@ -314,5 +307,14 @@ public class MemberServiceImpl implements MemberService{
                 hero, 0, totalAmount, wallet, alarmCount);//heroLevel 일단 0으로
 
         return ResponseEntity.ok().body(homeResponseDto);
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity guestHome() {
+        HomeResponseDto nullDto = new HomeResponseDto(0, 0, 0, 0, null,
+                0, 0, 0, 0, null,
+                null, 0, 0, 0, 0);
+        return ResponseEntity.ok().body(nullDto);
     }
 }

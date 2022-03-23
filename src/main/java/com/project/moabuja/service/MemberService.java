@@ -32,4 +32,6 @@ public interface MemberService {
 
     public ResponseEntity getHomeInfo(Member current);
 
+    public ResponseEntity guestHome();
+
 }
