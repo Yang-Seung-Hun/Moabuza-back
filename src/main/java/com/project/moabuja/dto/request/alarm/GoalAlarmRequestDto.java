@@ -1,7 +1,6 @@
 package com.project.moabuja.dto.request.alarm;
 
-import com.project.moabuja.domain.alarm.AlarmDetailType;
-import com.project.moabuja.domain.alarm.AlarmType;
+import com.project.moabuja.domain.goal.GoalType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,11 +11,14 @@ import java.util.List;
 @NoArgsConstructor
 public class GoalAlarmRequestDto {
 
+    private GoalType goalType;
     private String goalName;
     private int goalAmount;
     private List<String> friendNickname;
 
-    public GoalAlarmRequestDto(String goalName, int goalAmount, List<String> friendNickname) {
+    @Builder
+    public GoalAlarmRequestDto(GoalType goalType, String goalName, int goalAmount, List<String> friendNickname) {
+        this.goalType = goalType;
         this.goalName = goalName;
         this.goalAmount = goalAmount;
         this.friendNickname = friendNickname;
