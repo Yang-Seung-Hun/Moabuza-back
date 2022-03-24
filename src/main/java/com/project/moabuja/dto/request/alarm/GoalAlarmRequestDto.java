@@ -16,7 +16,6 @@ public class GoalAlarmRequestDto {
     private int goalAmount;
     private List<String> friendNickname;
 
-    @Builder
     public GoalAlarmRequestDto(String goalName, int goalAmount, List<String> friendNickname) {
         this.goalName = goalName;
         this.goalAmount = goalAmount;

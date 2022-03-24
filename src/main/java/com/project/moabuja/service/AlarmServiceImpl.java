@@ -2,6 +2,7 @@ package com.project.moabuja.service;
 
 import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.alarm.AlarmDetailType;
+import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.goal.GoalType;
 import com.project.moabuja.domain.goal.MemberWaitingGoal;
@@ -10,6 +11,8 @@ import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
 import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.request.alarm.GoalAlarmSaveDto;
+import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
+import com.project.moabuja.dto.request.goal.CreateGroupRequestDto;
 import com.project.moabuja.dto.request.goal.WaitingGoalSaveDto;
 import com.project.moabuja.dto.response.alarm.FriendAlarmResponseDto;
 import com.project.moabuja.dto.response.alarm.GoalAlarmResponseDto;
@@ -21,12 +24,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.project.moabuja.domain.alarm.AlarmType.FRIEND;
-import static com.project.moabuja.domain.alarm.AlarmType.GROUP;
+import static com.project.moabuja.domain.alarm.AlarmType.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -39,6 +42,8 @@ public class AlarmServiceImpl implements AlarmService {
     private final WaitingGoalRepository waitingGoalRepository;
     private final MemberWaitingGoalRepository memberWaitingGoalRepository;
     private final FriendService friendService;
+    private final GroupGoalService groupGoalService;
+    private final ChallengeGoalService challengeGoalService;
 
     @Override
     public ResponseEntity<List<FriendAlarmResponseDto>> getFriendAlarm(Member currentMember) {
@@ -131,13 +136,65 @@ public class AlarmServiceImpl implements AlarmService {
         MemberWaitingGoal currentMemberWaitingGoal = memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal);
         currentMemberWaitingGoal.changeIsAcceptedGoal(currentMemberWaitingGoal);
 
-        // 전체 수락 전
         List<MemberWaitingGoal> friends = memberWaitingGoalRepository.findMemberWaitingGoalsByWaitingGoal(waitingGoal);
-        for (MemberWaitingGoal memberWaitingGoal : friends) {
-            memberWaitingGoal.isAcceptedGoal();
+
+        // 전체 수락 전
+        if (! checkAccepted(friends)) {
+            alarmRepository.delete(alarm);
+            List<String> friendList = new ArrayList<>();
+            if (waitingGoal.getGoalType() == GoalType.GROUP) {
+                for (MemberWaitingGoal friend : friends) {
+                    friendList.add(friend.getMember().getNickname());
+                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                            waitingGoal.getId(), GROUP, AlarmDetailType.accept, currentMember.getNickname(), friend.getMember()));
+                }
+            } else if (waitingGoal.getGoalType() == GoalType.CHALLENGE) {
+                for (MemberWaitingGoal friend : friends) {
+                    friendList.add(friend.getMember().getNickname());
+                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                            waitingGoal.getId(), CHALLENGE, AlarmDetailType.accept, currentMember.getNickname(), friend.getMember()));
+                }
+            }
+        }
+
+        // 전체 수락 후 마지막 수락
+        if (checkAccepted(friends)) {
+            alarmRepository.delete(alarm);
+            List<String> friendList = new ArrayList<>();
+            if (waitingGoal.getGoalType() == GoalType.GROUP) {
+                for (MemberWaitingGoal friend : friends) {
+                    friendList.add(friend.getMember().getNickname());
+                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                            waitingGoal.getId(), GROUP, AlarmDetailType.create, currentMember.getNickname(), friend.getMember()));
+                }
+                // GroupGoal 생성
+                CreateGroupRequestDto createGroupRequestDto = new CreateGroupRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
+                groupGoalService.save(createGroupRequestDto, currentMember);
+                waitingGoalRepository.delete(waitingGoal);
+            } else if (waitingGoal.getGoalType() == GoalType.CHALLENGE) {
+                for (MemberWaitingGoal friend : friends) {
+                    friendList.add(friend.getMember().getNickname());
+                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                            waitingGoal.getId(), CHALLENGE, AlarmDetailType.create, currentMember.getNickname(), friend.getMember()));
+                }
+                // ChallengeGoal 생성
+                CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
+                challengeGoalService.save(createChallengeRequestDto, currentMember);
+                waitingGoalRepository.delete(waitingGoal);
+            }
         }
 
         return ResponseEntity.ok().body("해부자 수락 완료");
+    }
+
+    public boolean checkAccepted(List<MemberWaitingGoal> memberWaitingGoals) {
+        boolean result = true;
+
+        for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
+            if (! memberWaitingGoal.isAcceptedGoal()) {
+                result = false;
+                break; }}
+        return result;
     }
 
     @Transactional
