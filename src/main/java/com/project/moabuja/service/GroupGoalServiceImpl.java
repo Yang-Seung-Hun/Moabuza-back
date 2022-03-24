@@ -154,7 +154,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Override
     @Transactional
-    public ResponseEntity<String> exitChallenge(Long id) {
+    public ResponseEntity<String> exitGroup(Long id) {
 
         Optional<WaitingGoal> byId = waitingGoalRepository.findById(id);
         if (byId.isPresent()){
