@@ -2,10 +2,9 @@
 REPOSITORY1=/home/ubuntu
 REPOSITORY=/home/ubuntu/app
 PROJECT_NAME=moabuja
+
 echo "> Build 파일 복사"
-
 #cp ./build/libs/*.jar $REPOSITORY/
-
 echo "> 현재 구동중인 애플리케이션 pid 확인"
 
 CURRENT_PID=$(pgrep -fl $PROJECT_NAME | grep java | awk '{print $1}')
