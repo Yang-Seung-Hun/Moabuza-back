@@ -71,7 +71,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                 challengeDoneGoalNames.add(doneGoal.getDoneGoalName());
             }
         }
-        List<MemberWaitingGoal> waitingGoals = currentUser.getMemberWaitingGoals();
+        List<MemberWaitingGoal> memberWaitingGoals = currentUser.getMemberWaitingGoals();
 
         //challengeGoal 있을때
         if (challengeGoal.isPresent()) {
@@ -93,21 +93,27 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                 return new ChallengeListDto(record.getRecordDate(), record.getMemo(), record.getRecordAmount());
             }).collect(Collectors.toList());
 
-            ChallengeResponseDto goalResponseDto = new ChallengeResponseDto(challengeGoal.get().getId(), goalStatus, challengeMembers, challengeGoal.get().getChallengeGoalName(), challengeDoneGoalNames, challengeLists);
+            ChallengeResponseDto goalResponseDto = new ChallengeResponseDto(goalStatus, challengeMembers, challengeGoal.get().getChallengeGoalName(), challengeDoneGoalNames, challengeLists,null);
 
             return ResponseEntity.ok().body(goalResponseDto);
         } else {
             /**
-             * 승훈님 고쳐주세요 ㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜ
+             * 승훈님 고쳐주세요 ㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜ ==> 일단 수정
              */
-            if (! waitingGoals.isEmpty()) { //수락대기중
+            if (! memberWaitingGoals.isEmpty()) { //수락대기중
                 String goalStatus = "waiting";
-                ChallengeResponseDto waitingResponseDto = new ChallengeResponseDto(challengeGoal.get().getId(), goalStatus, null, null, challengeDoneGoalNames, null);
+
+                List<WaitingGoalDto> waitingGoals = new ArrayList<>();
+                for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
+                    waitingGoals.add(new WaitingGoalDto(memberWaitingGoal.getId(),memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
+                }
+
+                ChallengeResponseDto waitingResponseDto = new ChallengeResponseDto(goalStatus, null, null, challengeDoneGoalNames, null, waitingGoals);
 
                 return ResponseEntity.ok().body(waitingResponseDto);
             } else { //challengeGoal 없을때
                 String goalStatus = "noGoal";
-                ChallengeResponseDto noGoalResponseDto = new ChallengeResponseDto(null, goalStatus, null, null, challengeDoneGoalNames, null);
+                ChallengeResponseDto noGoalResponseDto = new ChallengeResponseDto(goalStatus, null, null, challengeDoneGoalNames, null, null);
 
                 return ResponseEntity.ok().body(noGoalResponseDto);
             }
