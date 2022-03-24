@@ -15,10 +15,10 @@ public class ChallengeResponseDto {
     private String challengeName;
     private List<String> challengeDoneGoals;
     private List<ChallengeListDto> challengeLists = new ArrayList<>();
-    private List<WaitingGoalDto> waitingGoals = new ArrayList<>();
+    private List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
 
     @Builder
-    public ChallengeResponseDto(String goalStatus, List<ChallengeMemberDto> challengeMembers, String challengeName, List<String> challengeDoneGoals, List<ChallengeListDto> challengeLists, List<WaitingGoalDto> waitingGoals) {
+    public ChallengeResponseDto(String goalStatus, List<ChallengeMemberDto> challengeMembers, String challengeName, List<String> challengeDoneGoals, List<ChallengeListDto> challengeLists, List<WaitingGoalResponseDto> waitingGoals) {
         this.goalStatus = goalStatus;
         this.challengeMembers = challengeMembers;
         this.challengeName = challengeName;
