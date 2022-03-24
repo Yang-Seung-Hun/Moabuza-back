@@ -156,7 +156,7 @@ public class MemberServiceImpl implements MemberService{
     public ResponseEntity nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
         String nickname = nicknameValidationRequestDto.getNickname();
         if(memberRepository.existsByNickname(nickname)){
-            return ResponseEntity.badRequest().body("이미 사용 중인 닉네임입니다.");
+            return ResponseEntity.ok().body("사용중인 닉네임");
         }
         return ResponseEntity.ok().body("닉네임 사용 가능");
     }
