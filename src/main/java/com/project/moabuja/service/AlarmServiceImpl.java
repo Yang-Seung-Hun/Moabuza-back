@@ -122,7 +122,7 @@ public class AlarmServiceImpl implements AlarmService {
     public ResponseEntity<String> postGoalAlarm(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
         if (goalAlarmRequestDto.getGoalType() == GoalType.GROUP) {
             WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.GROUP));
-            memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, false));
+            memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, true));
 
             for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
                 Optional<Member> member = memberRepository.findMemberByNickname(friendNickname);
@@ -135,7 +135,7 @@ public class AlarmServiceImpl implements AlarmService {
             }
         } else if (goalAlarmRequestDto.getGoalType() == GoalType.CHALLENGE) {
             WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.CHALLENGE));
-            memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, false));
+            memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, true));
 
             for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
                 Optional<Member> member = memberRepository.findMemberByNickname(friendNickname);
@@ -166,15 +166,19 @@ public class AlarmServiceImpl implements AlarmService {
             List<String> friendList = new ArrayList<>();
             if (waitingGoal.getGoalType() == GoalType.GROUP) {
                 for (MemberWaitingGoal friend : friends) {
-                    friendList.add(friend.getMember().getNickname());
-                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.GROUP, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
-                            waitingGoal.getId(), GROUP, AlarmDetailType.accept, currentMember.getNickname(), friend.getMember()));
+                    if (friend.getMember() != currentMember) {
+                        friendList.add(friend.getMember().getNickname());
+                        alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.GROUP, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                                waitingGoal.getId(), GROUP, AlarmDetailType.accept, currentMember.getNickname(), friend.getMember()));
+                    }
                 }
             } else if (waitingGoal.getGoalType() == GoalType.CHALLENGE) {
                 for (MemberWaitingGoal friend : friends) {
-                    friendList.add(friend.getMember().getNickname());
-                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.CHALLENGE, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
-                            waitingGoal.getId(), CHALLENGE, AlarmDetailType.accept, currentMember.getNickname(), friend.getMember()));
+                    if (friend.getMember() != currentMember) {
+                        friendList.add(friend.getMember().getNickname());
+                        alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.CHALLENGE, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                                waitingGoal.getId(), CHALLENGE, AlarmDetailType.accept, currentMember.getNickname(), friend.getMember()));
+                    }
                 }
             }
             alarmRepository.delete(alarm);
@@ -185,9 +189,11 @@ public class AlarmServiceImpl implements AlarmService {
             List<String> friendList = new ArrayList<>();
             if (waitingGoal.getGoalType() == GoalType.GROUP) {
                 for (MemberWaitingGoal friend : friends) {
-                    friendList.add(friend.getMember().getNickname());
-                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.GROUP, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
-                            waitingGoal.getId(), GROUP, AlarmDetailType.create, currentMember.getNickname(), friend.getMember()));
+                    if (friend.getMember() != currentMember) {
+                        friendList.add(friend.getMember().getNickname());
+                        alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.GROUP, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                                waitingGoal.getId(), GROUP, AlarmDetailType.create, currentMember.getNickname(), friend.getMember()));
+                    }
                 }
                 // GroupGoal 생성
                 CreateGroupRequestDto createGroupRequestDto = new CreateGroupRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
@@ -195,9 +201,11 @@ public class AlarmServiceImpl implements AlarmService {
                 waitingGoalRepository.delete(waitingGoal);
             } else if (waitingGoal.getGoalType() == GoalType.CHALLENGE) {
                 for (MemberWaitingGoal friend : friends) {
-                    friendList.add(friend.getMember().getNickname());
-                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.CHALLENGE, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
-                            waitingGoal.getId(), CHALLENGE, AlarmDetailType.create, currentMember.getNickname(), friend.getMember()));
+                    if (friend.getMember() != currentMember) {
+                        friendList.add(friend.getMember().getNickname());
+                        alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.CHALLENGE, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                                waitingGoal.getId(), CHALLENGE, AlarmDetailType.create, currentMember.getNickname(), friend.getMember()));
+                    }
                 }
                 // ChallengeGoal 생성
                 CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
