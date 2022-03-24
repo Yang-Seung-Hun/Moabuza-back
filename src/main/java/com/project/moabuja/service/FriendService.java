@@ -10,9 +10,9 @@ import java.util.List;
 
 public interface FriendService {
 
-    public ResponseEntity<List<Friend>> listFriend(Member currentMember);
+    ResponseEntity<List<Friend>> listFriend(Member currentMember);
 
-    public void save(Member currentMember, String friendNickname);
+    void save(Member currentMember, String friendNickname);
 
-    public ResponseEntity<String> deleteFriend(Member currentMember, String friendNickname);
+    ResponseEntity<String> deleteFriend(Member currentMember, String friendNickname);
 }

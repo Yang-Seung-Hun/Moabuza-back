@@ -9,9 +9,9 @@ import org.springframework.http.ResponseEntity;
 
 public interface RecordService {
 
-    public ResponseEntity<RecordResponseDto> save(RecordRequestDto recordRequestDto, Member currentMember);
+    ResponseEntity<RecordResponseDto> save(RecordRequestDto recordRequestDto, Member currentMember);
 
-    public ResponseEntity<DayListResponseDto> getDayList(DayListRequestDto dayListRequestDto, Member currentMember);
+    ResponseEntity<DayListResponseDto> getDayList(DayListRequestDto dayListRequestDto, Member currentMember);
 
-    public ResponseEntity<String> deleteRecord(Long id, Member currentMember);
+    ResponseEntity<String> deleteRecord(Long id, Member currentMember);
 }
