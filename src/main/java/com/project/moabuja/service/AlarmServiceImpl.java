@@ -106,7 +106,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Transactional
     @Override
     public ResponseEntity<String> postGroupGoalAlarm(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
-        WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), false, GoalType.GROUP));
+        WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.GROUP));
         MemberWaitingGoal currentMemberWaitingGoal = new MemberWaitingGoal(currentMember, waitingGoal, false);
         memberWaitingGoalRepository.save(currentMemberWaitingGoal);
 
@@ -128,9 +128,14 @@ public class AlarmServiceImpl implements AlarmService {
     public ResponseEntity<String> postGoalAcceptAlarm(Member currentMember, Long alarmId) {
         Alarm alarm = alarmRepository.findAlarmById(alarmId);
         WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
+        MemberWaitingGoal currentMemberWaitingGoal = memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal);
+        currentMemberWaitingGoal.changeIsAcceptedGoal(currentMemberWaitingGoal);
 
-
-
+        // 전체 수락 전
+        List<MemberWaitingGoal> friends = memberWaitingGoalRepository.findMemberWaitingGoalsByWaitingGoal(waitingGoal);
+        for (MemberWaitingGoal memberWaitingGoal : friends) {
+            memberWaitingGoal.isAcceptedGoal();
+        }
 
         return ResponseEntity.ok().body("해부자 수락 완료");
     }
