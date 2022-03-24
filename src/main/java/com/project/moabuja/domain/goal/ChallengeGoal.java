@@ -1,10 +1,8 @@
 package com.project.moabuja.domain.goal;
 
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;

@@ -1,20 +1,14 @@
 package com.project.moabuja.service;
 
 import com.project.moabuja.domain.friend.Friend;
-import com.project.moabuja.domain.goal.DoneGoal;
-import com.project.moabuja.domain.goal.GoalType;
-import com.project.moabuja.domain.goal.GroupGoal;
-import com.project.moabuja.domain.goal.MemberWaitingGoal;
+import com.project.moabuja.domain.goal.*;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.request.goal.CreateGroupRequestDto;
 import com.project.moabuja.dto.response.goal.*;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
-import com.project.moabuja.repository.FriendRepository;
-import com.project.moabuja.repository.GroupGoalRepository;
-import com.project.moabuja.repository.MemberRepository;
-import com.project.moabuja.repository.RecordRepository;
+import com.project.moabuja.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -33,6 +27,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     private final GroupGoalRepository groupGoalRepository;
     private final RecordRepository recordRepository;
     private final FriendRepository friendRepository;
+    private final WaitingGoalRepository waitingGoalRepository;
 
     @Override
     @Transactional
@@ -45,15 +40,9 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         //member랑 groupGoal 연관관계 맺음
         GroupGoal savedGoal = groupGoalRepository.save(groupGoal);
-        /**
-         * 여기
-         */
-        System.out.println(savedGoal.getId());
+
         Optional<GroupGoal> goal = groupGoalRepository.findById(savedGoal.getId());
-        /**
-         * 여기
-         */
-        System.out.println(currentUser.getId());
+
         goal.get().addMember(currentUser);
 
         for(String name :groupRequestDto.getGroupFriends()){
@@ -67,7 +56,10 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     public ResponseEntity<GroupResponseDto> getGroupInfo(Member current) {
 
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
-        Member currentUser = currentUserTmp.get();
+        Member currentUser = null;
+        if(currentUserTmp.isPresent()){
+            currentUser = currentUserTmp.get();
+        }
 
         Optional<GroupGoal> groupGoal = Optional.ofNullable(currentUser.getGroupGoal());
         List<String> groupDoneGoalNames = new ArrayList<>();
@@ -76,7 +68,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                 groupDoneGoalNames.add(doneGoal.getDoneGoalName());
             }
         }
-        List<MemberWaitingGoal> waitingGoals = currentUser.getMemberWaitingGoals();
+        List<MemberWaitingGoal> memberWaitingGoals = currentUser.getMemberWaitingGoals();
 
         //GroupGoal 있을때
         if (groupGoal.isPresent()){
@@ -100,22 +92,28 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             int leftAmount = groupGoal.get().getGroupGoalAmount() - currentAmount;
             int percent = (int) (((double) currentAmount / (double) (groupGoal.get().getGroupGoalAmount())) * 100);
 
-            GroupResponseDto haveGoal = new GroupResponseDto(groupGoal.get().getId(),goalStatus,groupMembers,groupGoal.get().getGroupGoalName(),leftAmount,percent,groupDoneGoalNames,groupList);
+            GroupResponseDto haveGoal = new GroupResponseDto(goalStatus,groupMembers,groupGoal.get().getGroupGoalName(),leftAmount,percent,groupDoneGoalNames,groupList,null);
             return ResponseEntity.ok().body(haveGoal);
 
         } else {
             /**
-             * 승훈님 여기도 고쳐주세요 ㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜ
+             * 승훈님 여기도 고쳐주세요 ㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜ OOO
              */
 
-            if (!waitingGoals.isEmpty()) { // 수락대기중
+            if (!memberWaitingGoals.isEmpty()) { // 수락대기중
                 String goalStatus = "waiting";
-                GroupResponseDto waiting = new GroupResponseDto(groupGoal.get().getId(), goalStatus, null, null, 0, 0, groupDoneGoalNames, null);
+
+                List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
+                for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
+                    waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getId(),memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
+                }
+
+                GroupResponseDto waiting = new GroupResponseDto(goalStatus, null, null, 0, 0, groupDoneGoalNames, null, waitingGoals);
 
                 return ResponseEntity.ok().body(waiting);
             } else { //challengeGoal 없을때
                 String goalStatus = "noGoal";
-                GroupResponseDto noGoal = new GroupResponseDto(null, goalStatus, null, null, 0, 0, groupDoneGoalNames, null);
+                GroupResponseDto noGoal = new GroupResponseDto(goalStatus, null, null, 0, 0, groupDoneGoalNames, null, null);
 
                 return ResponseEntity.ok().body(noGoal);
             }
@@ -158,15 +156,13 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     @Transactional
     public ResponseEntity<String> exitChallenge(Long id) {
 
-        Optional<GroupGoal> groupGoal = groupGoalRepository.findById(id);
-        if(groupGoal.isPresent()){
-
-            List<Member> members = groupGoal.get().getMembers();
-            while (members.size() > 0){
-                groupGoal.get().removeMember(members.get(0));
-            }
-            groupGoalRepository.deleteGroupGoalById(id);
+        Optional<WaitingGoal> byId = waitingGoalRepository.findById(id);
+        if (byId.isPresent()){
+            waitingGoalRepository.delete(byId.get());
+        }else{
+            throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다.");
         }
-        return ResponseEntity.ok().body("같이해부자 나가기 완료");
+
+        return ResponseEntity.ok().body("도전해부자 취소 완료");
     }
 }

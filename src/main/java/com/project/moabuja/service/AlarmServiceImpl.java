@@ -106,7 +106,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Transactional
     @Override
     public ResponseEntity<String> postGroupGoalAlarm(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
-        WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), false, GoalType.GROUP));
+        WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.GROUP));
         MemberWaitingGoal currentMemberWaitingGoal = new MemberWaitingGoal(currentMember, waitingGoal, false);
         memberWaitingGoalRepository.save(currentMemberWaitingGoal);
 

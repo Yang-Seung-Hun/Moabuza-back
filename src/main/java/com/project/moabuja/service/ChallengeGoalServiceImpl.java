@@ -44,29 +44,20 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다.");
         }
 
+        ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(), createChallengeRequestDto.getCreateChallengeAmount(), 0);
 
-        WaitingGoal waitingGoal = new WaitingGoal(createChallengeRequestDto.getCreateChallengeName(),createChallengeRequestDto.getCreateChallengeAmount(),GoalType.CHALLENGE);
-        WaitingGoal savedWaitingGoal = waitingGoalRepository.save(waitingGoal);
+        for(String name :createChallengeRequestDto.getChallengeFriends()){
+            Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
+            if (memberByNickname.isPresent()) {
+                challengeGoal.addMember(memberByNickname.get());
+            } else {
+                throw new IllegalArgumentException("선택하신 친구 중 존재하지 않는 사용자가 있습니다.");
+            }
+        }
 
-        MemberWaitingGoal memberWaitingGoal = new MemberWaitingGoal(currentUser,savedWaitingGoal, false);
-        memberWaitingGoalRepository.save(memberWaitingGoal);
-
-
-//        ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(), createChallengeRequestDto.getCreateChallengeAmount(), 0);
-//
-//        for(String name :createChallengeRequestDto.getChallengeFriends()){
-//            Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
-//            if (memberByNickname.isPresent()) {
-//                challengeGoal.addMember(memberByNickname.get());
-//            } else {
-//                throw new IllegalArgumentException("선택하신 친구 중 존재하지 않는 사용자가 있습니다.");
-//            }
-//        }
-
-//        //member랑 challengegoal 연관관계 맺음
-//        ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
-//        savedGoal.addMember(currentUser);
-
+        //member랑 challengegoal 연관관계 맺음
+        ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
+        savedGoal.addMember(currentUser);
         return ResponseEntity.ok().body("도전해부자 생성 완료");
     }
 
