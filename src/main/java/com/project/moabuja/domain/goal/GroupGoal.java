@@ -24,17 +24,14 @@ public class GroupGoal {
 
     private int currentAmount;
 
-    private boolean isAcceptedGroup;
-
     @OneToMany(mappedBy = "groupGoal",cascade = CascadeType.ALL)
     private List<Member> members = new ArrayList<>();
 
     @Builder
-    public GroupGoal(String groupGoalName, int groupGoalAmount, int groupCurrentAmount, boolean isAcceptedGroup) {
+    public GroupGoal(String groupGoalName, int groupGoalAmount, int groupCurrentAmount) {
         this.groupGoalName = groupGoalName;
         this.groupGoalAmount = groupGoalAmount;
         this.currentAmount = groupCurrentAmount;
-        this.isAcceptedGroup = isAcceptedGroup;
     }
 
     public void addMember(Member member){
@@ -48,9 +45,4 @@ public class GroupGoal {
     }
 
     protected GroupGoal () {}
-
-    //테스트용 setter입니다.
-    public void setIsAcceptedGroup(Boolean bool){
-        this.isAcceptedGroup = bool;
-    }
 }

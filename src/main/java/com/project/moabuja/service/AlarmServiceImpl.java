@@ -8,9 +8,11 @@ import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
 import com.project.moabuja.dto.request.alarm.AlarmGoalRequestDto;
 import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
+import com.project.moabuja.dto.request.alarm.GoalAlarmSaveDto;
 import com.project.moabuja.dto.response.alarm.FriendAlarmResponseDto;
 import com.project.moabuja.dto.response.alarm.GoalAlarmResponseDto;
 import com.project.moabuja.exception.exceptionClass.AlarmErrorException;
+import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.FriendRepository;
 import com.project.moabuja.repository.MemberRepository;
@@ -97,7 +99,17 @@ public class AlarmServiceImpl implements AlarmService {
     @Transactional
     @Override
     public ResponseEntity<String> postGroupGoalAlarm(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
+        for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
+            Optional<Member> member = Optional.ofNullable(memberRepository.findMemberByNickname(friendNickname).orElseThrow(
+                    () -> new MemberNotFoundException("존재하지 않는 사용자입니다.")
+            ));
 
+            /**
+             * 여기 작업 중
+             */
+
+            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(goalAlarmRequestDto, GROUP, AlarmDetailType.invite, currentMember.getNickname(), member.get()));
+        }
 
         return ResponseEntity.ok().body("같이해부자 요청 완료");
     }

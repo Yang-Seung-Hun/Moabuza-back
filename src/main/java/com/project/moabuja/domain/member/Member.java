@@ -52,7 +52,7 @@ public class Member {
     private List<Alarm> alarms = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<MemberWaitingGoal> waitingGoals = new ArrayList<>();
+    private List<MemberWaitingGoal> memberWaitingGoals = new ArrayList<>();
 
     @Builder
     public Member(String password, Long kakaoId, String nickname, String email, Hero hero) {

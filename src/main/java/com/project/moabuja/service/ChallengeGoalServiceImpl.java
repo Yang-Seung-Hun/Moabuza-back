@@ -1,14 +1,13 @@
 package com.project.moabuja.service;
 
 import com.project.moabuja.domain.friend.Friend;
-import com.project.moabuja.domain.goal.ChallengeGoal;
-import com.project.moabuja.domain.goal.DoneGoal;
-import com.project.moabuja.domain.goal.GoalType;
+import com.project.moabuja.domain.goal.*;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import com.project.moabuja.dto.response.goal.*;
+import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.repository.ChallengeGoalRepository;
 import com.project.moabuja.repository.FriendRepository;
 import com.project.moabuja.repository.MemberRepository;
@@ -41,7 +40,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
         Member currentUser = currentUserTmp.get();
 
-        ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(), createChallengeRequestDto.getCreateChallengeAmount(), 0, false);
+        ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(), createChallengeRequestDto.getCreateChallengeAmount(), 0);
 
         for(String name :createChallengeRequestDto.getChallengeFriends()){
             Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
@@ -67,51 +66,51 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         Optional<ChallengeGoal> challengeGoal = Optional.ofNullable(currentUser.getChallengeGoal());
         List<String> challengeDoneGoalNames = new ArrayList<>();
-        for(DoneGoal doneGoal:currentUser.getDoneGaols()){
-            if(doneGoal.getGoalType() == GoalType.CHALLENGE){
+        for (DoneGoal doneGoal : currentUser.getDoneGaols()) {
+            if (doneGoal.getGoalType() == GoalType.CHALLENGE) {
                 challengeDoneGoalNames.add(doneGoal.getDoneGoalName());
             }
         }
+        List<MemberWaitingGoal> waitingGoals = currentUser.getMemberWaitingGoals();
 
         //challengeGoal 있을때
-        if (challengeGoal.isPresent()){
-            if(challengeGoal.get().isAcceptedChallenge()){
-                String goalStatus = "goal";
-                List<ChallengeMemberDto> challengeMembers = new ArrayList<>();
-                for(Member user: challengeGoal.get().getMembers()){
-                    int currentAmount = 0;
-                    List<Record> records = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, user);
-                    for (Record record:records){
-                        currentAmount += record.getRecordAmount();
-                    }
-                    int leftAmount = challengeGoal.get().getChallengeGoalAmount() - currentAmount;
-                    int percent = (int)(((double)currentAmount/(double)(challengeGoal.get().getChallengeGoalAmount())) * 100);
-                    challengeMembers.add(new ChallengeMemberDto(user.getNickname(),user.getHero(),leftAmount,percent));
+        if (challengeGoal.isPresent()) {
+            String goalStatus = "goal";
+            List<ChallengeMemberDto> challengeMembers = new ArrayList<>();
+            for (Member user : challengeGoal.get().getMembers()) {
+                int currentAmount = 0;
+                List<Record> records = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, user);
+                for (Record record : records) {
+                    currentAmount += record.getRecordAmount();
                 }
-
-                List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentUser);
-                List<ChallengeListDto> challengeLists = challengeRecords.stream().map(record -> {
-                    return new ChallengeListDto(record.getRecordDate(), record.getMemo(), record.getRecordAmount());
-                }).collect(Collectors.toList());
-
-                ChallengeResponseDto goalResponseDto = new ChallengeResponseDto(challengeGoal.get().getId(),goalStatus,challengeMembers,challengeGoal.get().getChallengeGoalName(),challengeDoneGoalNames, challengeLists);
-
-                return ResponseEntity.ok().body(goalResponseDto);
-
+                int leftAmount = challengeGoal.get().getChallengeGoalAmount() - currentAmount;
+                int percent = (int) (((double) currentAmount / (double) (challengeGoal.get().getChallengeGoalAmount())) * 100);
+                challengeMembers.add(new ChallengeMemberDto(user.getNickname(), user.getHero(), leftAmount, percent));
             }
-            else{//수락대기중
+
+            List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentUser);
+            List<ChallengeListDto> challengeLists = challengeRecords.stream().map(record -> {
+                return new ChallengeListDto(record.getRecordDate(), record.getMemo(), record.getRecordAmount());
+            }).collect(Collectors.toList());
+
+            ChallengeResponseDto goalResponseDto = new ChallengeResponseDto(challengeGoal.get().getId(), goalStatus, challengeMembers, challengeGoal.get().getChallengeGoalName(), challengeDoneGoalNames, challengeLists);
+
+            return ResponseEntity.ok().body(goalResponseDto);
+        } else {
+            /**
+             * 승훈님 고쳐주세요 ㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜ
+             */
+            if (! waitingGoals.isEmpty()) { //수락대기중
                 String goalStatus = "waiting";
-                ChallengeResponseDto waitingResponseDto = new ChallengeResponseDto(challengeGoal.get().getId(), goalStatus,null,null,challengeDoneGoalNames,null);
+                ChallengeResponseDto waitingResponseDto = new ChallengeResponseDto(challengeGoal.get().getId(), goalStatus, null, null, challengeDoneGoalNames, null);
 
                 return ResponseEntity.ok().body(waitingResponseDto);
-            }
-        }
-        //challengeGoal 없을때
-        else{
-            String goalStatus = "noGoal";
-            ChallengeResponseDto noGoalResponseDto = new ChallengeResponseDto(null,goalStatus,null,null,challengeDoneGoalNames,null);
+            } else { //challengeGoal 없을때
+                String goalStatus = "noGoal";
+                ChallengeResponseDto noGoalResponseDto = new ChallengeResponseDto(null, goalStatus, null, null, challengeDoneGoalNames, null);
 
-            return ResponseEntity.ok().body(noGoalResponseDto);
+                return ResponseEntity.ok().body(noGoalResponseDto);
+            }
         }
     }
 
@@ -131,24 +130,15 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             Optional<Member> friendById = memberRepository.findById(friend.getFriend().getId());
             Optional<ChallengeGoal> friendChallengeGoal = Optional.ofNullable(friendById.get().getChallengeGoal());
 
-            if(friendChallengeGoal.isPresent()){
-                //이미 진행중인 챌린지 있음
-                if(friendChallengeGoal.get().isAcceptedChallenge()){
-                    if (friendById.isPresent()){
-                        challengeMembers.add(new CreateChallengeMemberDto(friendById.get().getNickname(),false));
-                    }
-                }
-                //진행중인 챌린지 없고, 대기만 있음
-                else{
-                    if(friendById.isPresent()){
-                        challengeMembers.add(new CreateChallengeMemberDto(friendById.get().getNickname(),true));
-                    }
-                }
-            }
-            else{//초대받은 챌린지 없고 진행중인것도 없을때
+            //이미 진행중인 챌린지 있음
+            if(friendChallengeGoal.isPresent()) {
+                if (friendById.isPresent()) {
+                    challengeMembers.add(new CreateChallengeMemberDto(friendById.get().getNickname(), false));
+                } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
+            } else { // 진행 중인 챌린지 없음
                 if (friendById.isPresent()){
                     challengeMembers.add(new CreateChallengeMemberDto(friendById.get().getNickname(),true));
-                }
+                } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
             }
         }
 
@@ -161,7 +151,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     public ResponseEntity<String> exitChallenge(Long id) {
 
         Optional<ChallengeGoal> challengeGoal = challengeGoalRepository.findById(id);
-        if(challengeGoal.isPresent() && !challengeGoal.get().isAcceptedChallenge()){
+        if(challengeGoal.isPresent()){
 
             List<Member> members = challengeGoal.get().getMembers();
             while (members.size() > 0){
