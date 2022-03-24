@@ -16,7 +16,7 @@ public class CreateChallengeRequestDto {
     private List<String> challengeFriends = new ArrayList<>();
 
     @Builder
-    public CreateChallengeRequestDto(String createChallengeName, int createChallengeAmount, List<String> challengeFiends) {
+    public CreateChallengeRequestDto(String createChallengeName, int createChallengeAmount, List<String> challengeFriends) {
         this.createChallengeName = createChallengeName;
         this.createChallengeAmount = createChallengeAmount;
         this.challengeFriends = challengeFriends;

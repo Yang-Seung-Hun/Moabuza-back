@@ -43,7 +43,7 @@ public class GroupGoalController {
     @ApiOperation(value = "같이해부자 삭제")
     @DeleteMapping("/money/group/exitgroup/{id}")
     public ResponseEntity<String> exitGroup(@PathVariable Long id){
-        return groupGoalService.exitChallenge(id);
+        return groupGoalService.exitGroup(id);
     }
 
 }
