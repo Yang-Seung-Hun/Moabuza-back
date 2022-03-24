@@ -7,10 +7,10 @@ import java.util.concurrent.ExecutionException;
 
 public interface FCMService {
 
-    public void register(final String nickname, final String token);
+    void register(final String nickname, final String token);
 
-    public String getToken(String nickname);
+    String getToken(String nickname);
 
-    public void sendMessageTo(String nickname, String title, String body) throws ExecutionException, InterruptedException, JsonProcessingException;
+    void sendMessageTo(String nickname, String title, String body) throws ExecutionException, InterruptedException, JsonProcessingException;
 
 }

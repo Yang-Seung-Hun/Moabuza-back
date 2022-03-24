@@ -51,7 +51,7 @@ public class MemberServiceImpl implements MemberService{
     private final AlarmRepository alarmRepository;
 
     @Override
-    public ResponseEntity kakaoLogin(String code) throws JsonProcessingException {
+    public ResponseEntity<CustomResponseEntity> kakaoLogin(String code) throws JsonProcessingException {
         String accessToken = getAccessToken(code);
         KakaoUserInfoDto kakaoUserInfoDto = getKakaoUserInfo(accessToken);
         TokenDto dto = TokenDto.builder()
@@ -146,14 +146,12 @@ public class MemberServiceImpl implements MemberService{
                 .ofNullable(memberRepository.findByEmails(dto.getEmail()))
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저 없음"));
 
-        String nickname = byEmail.get().getNickname();
-
-        return nickname;
+        return byEmail.get().getNickname();
     }
 
     @Transactional
     @Override
-    public ResponseEntity nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
+    public ResponseEntity<String> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
         String nickname = nicknameValidationRequestDto.getNickname();
         if(memberRepository.existsByNickname(nickname)){
             return ResponseEntity.ok().body("사용중인 닉네임");
@@ -163,17 +161,17 @@ public class MemberServiceImpl implements MemberService{
 
     @Transactional
     @Override
-    public ResponseEntity updateMemberInfo(MemberUpdateRequestDto dto, String email) {
+    public ResponseEntity<String> updateMemberInfo(MemberUpdateRequestDto dto, String email) {
         Member byEmail = memberRepository.findByEmail(email);
         if(byEmail == null){
             throw new UsernameNotFoundException("유저를 찾을 수 없습니다.");
         }
-        Member updateInfo = byEmail.updateInfo(dto);
+        byEmail.updateInfo(dto);
         return ResponseEntity.ok().body("캐릭터, 닉네임 설정 완료");
     }
 
     @Override
-    public ResponseEntity reissue(HttpServletRequest request) {
+    public ResponseEntity<CustomResponseEntity> reissue(HttpServletRequest request) {
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         String refresh = request.getHeader("R-AUTH-TOKEN").substring(7);
 
@@ -207,7 +205,7 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public ResponseEntity logout(HttpServletRequest request) {
+    public ResponseEntity<String> logout(HttpServletRequest request) {
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         if (!jwtTokenProvider.validateToken(access)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 요청");
@@ -226,7 +224,7 @@ public class MemberServiceImpl implements MemberService{
 
     @Transactional
     @Override
-    public ResponseEntity getHomeInfo(Member current) {
+    public ResponseEntity<HomeResponseDto> getHomeInfo(Member current) {
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
 //        Member currentUser = currentUserTmp.get();
         Member currentUser = null;

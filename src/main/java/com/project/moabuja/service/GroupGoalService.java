@@ -13,12 +13,12 @@ import org.springframework.http.ResponseEntity;
 
 public interface GroupGoalService {
 
-    public ResponseEntity<String> save(CreateGroupRequestDto groupRequestDto, Member currentUser);
+    ResponseEntity<String> save(CreateGroupRequestDto groupRequestDto, Member currentUser);
 
-    public ResponseEntity<GroupResponseDto> getGroupInfo(Member currentUser);
+    ResponseEntity<GroupResponseDto> getGroupInfo(Member currentUser);
 
-    public ResponseEntity<CreateGroupResponseDto> getGroupMemberCandidates(Member currentUser);
+    ResponseEntity<CreateGroupResponseDto> getGroupMemberCandidates(Member currentUser);
 
-    public ResponseEntity<String> exitChallenge(Long id);
+    ResponseEntity<String> exitChallenge(Long id);
 
 }
