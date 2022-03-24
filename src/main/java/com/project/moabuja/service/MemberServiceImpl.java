@@ -255,7 +255,7 @@ public class MemberServiceImpl implements MemberService{
         int wallet = 0;
 
         GroupGoal groupGoal = currentUser.getGroupGoal();
-        if (groupGoal != null && groupGoal.isAcceptedGroup()) {
+        if (groupGoal != null) { //  && groupGoal.isAcceptedGroup()
 
             List<Member> members = groupGoal.getMembers();
             int currentGroupAmount = 0;
@@ -271,7 +271,7 @@ public class MemberServiceImpl implements MemberService{
         }
 
         ChallengeGoal challengeGoal = currentUser.getChallengeGoal();
-        if (challengeGoal != null && challengeGoal.isAcceptedChallenge()) {
+        if (challengeGoal != null) { //  && challengeGoal.isAcceptedChallenge()
 
             List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentUser);
             for (Record challengeRecord : challengeRecords) {

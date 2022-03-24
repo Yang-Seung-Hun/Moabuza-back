@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 public class AlarmGoalRequestDto {
 
     private AlarmType alarmType;
-    private String alarmContents;
     private String friendNickname;
     private Member member;
 
@@ -23,9 +22,8 @@ public class AlarmGoalRequestDto {
     }
 
     @Builder
-    public AlarmGoalRequestDto(AlarmType alarmType, String alarmContents, String friendNickname, Member member) {
+    public AlarmGoalRequestDto(AlarmType alarmType, String friendNickname, Member member) {
         this.alarmType = alarmType;
-        this.alarmContents =alarmContents;
         this.friendNickname = friendNickname;
         this.member = member;
     }
@@ -33,7 +31,6 @@ public class AlarmGoalRequestDto {
     public static Alarm goalToEntity(AlarmGoalRequestDto requestDto, String friendNickname) {
         return Alarm.builder()
                 .alarmType(requestDto.getAlarmType())
-                .alarmContents(requestDto.getAlarmContents())
                 .friendNickname(friendNickname)
                 .member(requestDto.getMember())
                 .build();
