@@ -21,9 +21,13 @@ public interface AlarmService {
 
     ResponseEntity<List<GoalAlarmResponseDto>> getGroupGoalAlarm(Member currentMember);
 
-    ResponseEntity<String> postGroupGoalAlarm(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto);
+    ResponseEntity<List<GoalAlarmResponseDto>> getChallengeGoalAlarm(Member currentMember);
+
+    ResponseEntity<String> postGoalAlarm(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto);
 
     ResponseEntity<String> postGoalAcceptAlarm(Member currentMember, Long alarmId);
+
+    ResponseEntity<String> postGoalRefuseAlarm(Member currentMember, Long alarmId);
 
     ResponseEntity<String> deleteAlarm(Member currentMember, Long alarmId);
 }
