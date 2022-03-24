@@ -10,25 +10,31 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class FriendAlarmDto {
+public class GoalAlarmSaveDto {
 
     private AlarmType alarmType;
     private AlarmDetailType alarmDetailType;
+    private String goalName;
+    private int goalAmount;
     private String friendNickname;
     private Member member;
 
     @Builder
-    public FriendAlarmDto(AlarmDetailType alarmDetailType, String friendNickname, Member member) {
-        this.alarmType = AlarmType.FRIEND;
+    public GoalAlarmSaveDto(AlarmType alarmType, AlarmDetailType alarmDetailType, String goalName, int goalAmount, String friendNickname, Member member) {
+        this.alarmType = alarmType;
         this.alarmDetailType = alarmDetailType;
+        this.goalName = goalName;
+        this.goalAmount = goalAmount;
         this.friendNickname = friendNickname;
         this.member = member;
     }
 
-    public static Alarm friendToEntity(AlarmDetailType alarmDetailType, Member member, String friendNickname) {
+    public static Alarm goalToEntity(GoalAlarmRequestDto requestDto, AlarmType alarmType, AlarmDetailType alarmDetailType, String friendNickname, Member member) {
         return Alarm.builder()
-                .alarmType(AlarmType.FRIEND)
+                .alarmType(alarmType)
                 .alarmDetailType(alarmDetailType)
+                .goalName(requestDto.getGoalName())
+                .goalAmount(requestDto.getGoalAmount())
                 .friendNickname(friendNickname)
                 .member(member)
                 .build();
