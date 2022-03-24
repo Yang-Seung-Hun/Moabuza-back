@@ -2,20 +2,21 @@ package com.project.moabuja.service;
 
 import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.alarm.AlarmDetailType;
-import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.friend.Friend;
+import com.project.moabuja.domain.goal.GoalType;
+import com.project.moabuja.domain.goal.MemberWaitingGoal;
+import com.project.moabuja.domain.goal.WaitingGoal;
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
 import com.project.moabuja.dto.request.alarm.AlarmGoalRequestDto;
+import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
 import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.request.alarm.GoalAlarmSaveDto;
+import com.project.moabuja.dto.request.goal.WaitingGoalSaveDto;
 import com.project.moabuja.dto.response.alarm.FriendAlarmResponseDto;
 import com.project.moabuja.dto.response.alarm.GoalAlarmResponseDto;
 import com.project.moabuja.exception.exceptionClass.AlarmErrorException;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
-import com.project.moabuja.repository.AlarmRepository;
-import com.project.moabuja.repository.FriendRepository;
-import com.project.moabuja.repository.MemberRepository;
+import com.project.moabuja.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,6 +38,8 @@ public class AlarmServiceImpl implements AlarmService {
     private final AlarmRepository alarmRepository;
     private final MemberRepository memberRepository;
     private final FriendRepository friendRepository;
+    private final WaitingGoalRepository waitingGoalRepository;
+    private final MemberWaitingGoalRepository memberWaitingGoalRepository;
     private final FriendService friendService;
 
     @Override
@@ -99,16 +102,16 @@ public class AlarmServiceImpl implements AlarmService {
     @Transactional
     @Override
     public ResponseEntity<String> postGroupGoalAlarm(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
+        WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), false, GoalType.GROUP));
+
         for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
-            Optional<Member> member = Optional.ofNullable(memberRepository.findMemberByNickname(friendNickname).orElseThrow(
-                    () -> new MemberNotFoundException("존재하지 않는 사용자입니다.")
-            ));
+            Optional<Member> member = memberRepository.findMemberByNickname(friendNickname);
+            if (member.isPresent()) {
+                MemberWaitingGoal memberWaitingGoal = new MemberWaitingGoal(member.get(), waitingGoal);
+                memberWaitingGoalRepository.save(memberWaitingGoal);
 
-            /**
-             * 여기 작업 중
-             */
-
-            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(goalAlarmRequestDto, GROUP, AlarmDetailType.invite, currentMember.getNickname(), member.get()));
+                alarmRepository.save(GoalAlarmSaveDto.goalToEntity(goalAlarmRequestDto, GROUP, AlarmDetailType.invite, currentMember.getNickname(), member.get()));
+            } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
         }
 
         return ResponseEntity.ok().body("같이해부자 요청 완료");
