@@ -22,7 +22,9 @@ public class Alarm extends Timestamped {
     @Enumerated(EnumType.STRING)
     private AlarmDetailType alarmDetailType;
 
-    private String alarmContents;
+    private String goalName;
+
+    private int goalAmount;
 
     private String friendNickname;
 
@@ -31,10 +33,11 @@ public class Alarm extends Timestamped {
     private Member member;
 
     @Builder
-    public Alarm(AlarmType alarmType, AlarmDetailType alarmDetailType, String alarmContents, String friendNickname, Member member) {
+    public Alarm(AlarmType alarmType, AlarmDetailType alarmDetailType, String goalName, int goalAmount, String friendNickname, Member member) {
         this.alarmType = alarmType;
         this.alarmDetailType = alarmDetailType;
-        this.alarmContents = alarmContents;
+        this.goalName = goalName;
+        this.goalAmount = goalAmount;
         this.friendNickname = friendNickname;
         this.member = member;
     }

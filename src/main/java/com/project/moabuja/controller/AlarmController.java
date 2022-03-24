@@ -2,7 +2,9 @@ package com.project.moabuja.controller;
 
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
+import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.response.alarm.FriendAlarmResponseDto;
+import com.project.moabuja.dto.response.alarm.GoalAlarmResponseDto;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.AlarmService;
 import io.swagger.annotations.ApiOperation;
@@ -19,19 +21,19 @@ public class AlarmController {
 
     private final AlarmService alarmService;
 
+    @ApiOperation(value = "친구 알람 페이지")
+    @GetMapping("/alarm/friend")
+    public ResponseEntity<List<FriendAlarmResponseDto>> getFriendAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Member currentMember = userDetails.getMember();
+        return alarmService.getFriendAlarm(currentMember);
+    }
+
     @ApiOperation(value = "친구 요청")
     @PostMapping("/alarm/friend")
     public ResponseEntity<String> postFriendAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                           @RequestBody FriendAlarmDto friendAlarmDto) {
         Member currentMember = userDetails.getMember();
         return alarmService.postFriendAlarm(friendAlarmDto, currentMember);
-    }
-
-    @ApiOperation(value = "친구 알람 페이지")
-    @GetMapping("/alarm/friend")
-    public ResponseEntity<List<FriendAlarmResponseDto>> getFriendAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Member currentMember = userDetails.getMember();
-        return alarmService.getFriendAlarm(currentMember);
     }
 
     @ApiOperation(value = "친구 수락 알람")
@@ -49,6 +51,22 @@ public class AlarmController {
         Member currentMember = userDetails.getMember();
         return alarmService.postFriendRefuseAlarm(currentMember, friendNickname);
     }
+
+    @ApiOperation(value = "같이해부자 알람 페이지")
+    @GetMapping("/alarm/group")
+    public ResponseEntity<List<GoalAlarmResponseDto>> getGroupGoalAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Member currentMember = userDetails.getMember();
+        return alarmService.getGroupGoalAlarm(currentMember);
+    }
+
+    @ApiOperation(value = "같이해부자 요청")
+    @PostMapping("/alarm/")
+    public ResponseEntity<String> postGroupGoalAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                     @RequestBody GoalAlarmRequestDto goalAlarmRequestDto) {
+        Member currentMember = userDetails.getMember();
+        return alarmService.postGroupGoalAlarm(currentMember, goalAlarmRequestDto);
+    }
+
 
     @ApiOperation(value = "알람 삭제")
     @DeleteMapping("/alarm/delete/{id}")

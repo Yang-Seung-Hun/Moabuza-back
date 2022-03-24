@@ -2,11 +2,14 @@ package com.project.moabuja.service;
 
 import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.alarm.AlarmDetailType;
+import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
 import com.project.moabuja.dto.request.alarm.AlarmGoalRequestDto;
+import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.response.alarm.FriendAlarmResponseDto;
+import com.project.moabuja.dto.response.alarm.GoalAlarmResponseDto;
 import com.project.moabuja.exception.exceptionClass.AlarmErrorException;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.FriendRepository;
@@ -22,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.project.moabuja.domain.alarm.AlarmType.FRIEND;
+import static com.project.moabuja.domain.alarm.AlarmType.GROUP;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,6 +37,16 @@ public class AlarmServiceImpl implements AlarmService {
     private final FriendRepository friendRepository;
     private final FriendService friendService;
 
+    @Override
+    public ResponseEntity<List<FriendAlarmResponseDto>> getFriendAlarm(Member currentMember) {
+        List<Alarm> alarms = alarmRepository.findAlarmsByMemberAndAlarmTypeOrderByCreatedAtDesc(currentMember, FRIEND);
+        List<FriendAlarmResponseDto> friendAlarmList = alarms.stream()
+                .map(FriendAlarmResponseDto::of)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(friendAlarmList);
+    }
+
     @Transactional
     @Override
     public ResponseEntity<String> postFriendAlarm(FriendAlarmDto friendAlarmDto, Member currentMember) {
@@ -41,19 +55,9 @@ public class AlarmServiceImpl implements AlarmService {
         ));
         Optional<Friend> isFriend = Optional.ofNullable(friendRepository.findByMemberAndFriend(currentMember, friend.get()));
         if (isFriend.isPresent()) {throw new IllegalArgumentException("해당 닉네임의 사용자와 친구 상태입니다.");}
-        alarmRepository.save(FriendAlarmDto.toEntity(AlarmDetailType.request, friend.get(), currentMember.getNickname()));
+        alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, friend.get(), currentMember.getNickname()));
 
         return ResponseEntity.ok().body("친구 요청 알람 보내기 완료");
-    }
-
-    @Override
-    public ResponseEntity<List<FriendAlarmResponseDto>> getFriendAlarm(Member currentMember) {
-        List<Alarm> alarms = alarmRepository.findAlarmsByMemberAndAlarmTypeOrderByCreatedAtDesc(currentMember, FRIEND);
-        List<FriendAlarmResponseDto> friendAlarmList = alarms.stream().map(alarm -> {
-            return new FriendAlarmResponseDto(alarm.getId(), alarm.getAlarmDetailType(), alarm.getFriendNickname());
-        }).collect(Collectors.toList());
-
-        return ResponseEntity.ok().body(friendAlarmList);
     }
 
     @Transactional
@@ -62,7 +66,7 @@ public class AlarmServiceImpl implements AlarmService {
         friendService.save(currentMember, friendNickname);
 
         Optional<Member> toFriend = memberRepository.findMemberByNickname(friendNickname);
-        alarmRepository.save(FriendAlarmDto.toEntity(AlarmDetailType.accept, toFriend.get(), currentMember.getNickname()));
+        alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.accept, toFriend.get(), currentMember.getNickname()));
         Alarm alarm = alarmRepository.findByMemberAndFriendNickname(currentMember, friendNickname);
         alarmRepository.delete(alarm);
 
@@ -73,11 +77,29 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public ResponseEntity<String> postFriendRefuseAlarm(Member currentMember, String friendNickname) {
         Optional<Member> toFriend = memberRepository.findMemberByNickname(friendNickname);
-        alarmRepository.save(FriendAlarmDto.toEntity(AlarmDetailType.refuse, toFriend.get(), currentMember.getNickname()));
+        alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.refuse, toFriend.get(), currentMember.getNickname()));
         Alarm alarm = alarmRepository.findByMemberAndFriendNickname(currentMember, friendNickname);
         alarmRepository.delete(alarm);
 
         return ResponseEntity.ok().body("친구 요청을 거절하였습니다.");
+    }
+
+    @Override
+    public ResponseEntity<List<GoalAlarmResponseDto>> getGroupGoalAlarm(Member currentMember) {
+        List<Alarm> alarms = alarmRepository.findAlarmsByMemberAndAlarmTypeOrderByCreatedAtDesc(currentMember, GROUP);
+        List<GoalAlarmResponseDto> groupAlarmList = alarms.stream()
+                .map(GoalAlarmResponseDto::of)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(groupAlarmList);
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<String> postGroupGoalAlarm(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
+
+
+        return ResponseEntity.ok().body("같이해부자 요청 완료");
     }
 
     @Transactional
