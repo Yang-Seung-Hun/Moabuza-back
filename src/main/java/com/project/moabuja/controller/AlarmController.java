@@ -59,20 +59,35 @@ public class AlarmController {
         return alarmService.getGroupGoalAlarm(currentMember);
     }
 
-    @ApiOperation(value = "같이해부자 요청")
-    @PostMapping("/alarm/group")
-    public ResponseEntity<String> postGroupGoalAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                     @RequestBody GoalAlarmRequestDto goalAlarmRequestDto) {
+    @ApiOperation(value = "도전해부자 알람 페이지")
+    @GetMapping("/alarm/challenge")
+    public ResponseEntity<List<GoalAlarmResponseDto>> getChallengeGoalAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member currentMember = userDetails.getMember();
-        return alarmService.postGroupGoalAlarm(currentMember, goalAlarmRequestDto);
+        return alarmService.getChallengeGoalAlarm(currentMember);
     }
 
-    @ApiOperation(value = "같이해부자 수락")
+    @ApiOperation(value = "해부자 요청")
+    @PostMapping("/alarm/goal")
+    public ResponseEntity<String> postGoalAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                     @RequestBody GoalAlarmRequestDto goalAlarmRequestDto) {
+        Member currentMember = userDetails.getMember();
+        return alarmService.postGoalAlarm(currentMember, goalAlarmRequestDto);
+    }
+
+    @ApiOperation(value = "해부자 수락")
     @PostMapping("/alarm/goal/accept/{alarmId}")
     public ResponseEntity<String> postGoalAcceptAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                       @RequestParam Long alarmId) {
         Member currentMember = userDetails.getMember();
         return alarmService.postGoalAcceptAlarm(currentMember, alarmId);
+    }
+
+    @ApiOperation(value = "해부자 거절")
+    @PostMapping("/alarm/goal/refuse/{alarmId}")
+    public ResponseEntity<String> postGoalRefuseAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                      @RequestParam Long alarmId) {
+        Member currentMember = userDetails.getMember();
+        return alarmService.postGoalRefuseAlarm(currentMember, alarmId);
     }
 
     @ApiOperation(value = "알람 삭제")
