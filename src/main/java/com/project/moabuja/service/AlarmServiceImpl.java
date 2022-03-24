@@ -107,14 +107,16 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public ResponseEntity<String> postGroupGoalAlarm(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
         WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), false, GoalType.GROUP));
+        MemberWaitingGoal currentMemberWaitingGoal = new MemberWaitingGoal(currentMember, waitingGoal, false);
+        memberWaitingGoalRepository.save(currentMemberWaitingGoal);
 
         for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
             Optional<Member> member = memberRepository.findMemberByNickname(friendNickname);
             if (member.isPresent()) {
-                MemberWaitingGoal memberWaitingGoal = new MemberWaitingGoal(member.get(), waitingGoal);
+                MemberWaitingGoal memberWaitingGoal = new MemberWaitingGoal(member.get(), waitingGoal, false);
                 memberWaitingGoalRepository.save(memberWaitingGoal);
 
-                alarmRepository.save(GoalAlarmSaveDto.goalToEntity(goalAlarmRequestDto, GROUP, AlarmDetailType.invite, currentMember.getNickname(), member.get()));
+                alarmRepository.save(GoalAlarmSaveDto.goalToEntity(goalAlarmRequestDto, waitingGoal.getId(), GROUP, AlarmDetailType.invite, currentMember.getNickname(), member.get()));
             } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
         }
 
@@ -123,7 +125,12 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Transactional
     @Override
-    public ResponseEntity<String> postGoalAcceptAlarm(Member currentMember, String friendNickname) {
+    public ResponseEntity<String> postGoalAcceptAlarm(Member currentMember, Long alarmId) {
+        Alarm alarm = alarmRepository.findAlarmById(alarmId);
+        WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
+
+
+
 
         return ResponseEntity.ok().body("해부자 수락 완료");
     }

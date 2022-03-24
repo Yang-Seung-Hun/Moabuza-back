@@ -14,6 +14,8 @@ public class MemberWaitingGoal {
     @Column(name = "member_waiting_goal_id")
     private Long id;
 
+    private boolean isAcceptedGoal;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -22,9 +24,13 @@ public class MemberWaitingGoal {
     @JoinColumn(name = "waiting_goal_id")
     private WaitingGoal waitingGoal;
 
-    public MemberWaitingGoal(Member member, WaitingGoal waitingGoal) {
+    public MemberWaitingGoal(Member member, WaitingGoal waitingGoal, boolean isAcceptedGoal) {
         this.member = member;
         this.waitingGoal = waitingGoal;
+        this.isAcceptedGoal = isAcceptedGoal;
+    }
+    public void changeIsAcceptedGoal(MemberWaitingGoal memberWaitingGoal) {
+        memberWaitingGoal.isAcceptedGoal = true;
     }
 
     protected MemberWaitingGoal () {}

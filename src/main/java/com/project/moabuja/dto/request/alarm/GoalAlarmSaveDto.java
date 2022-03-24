@@ -16,25 +16,28 @@ public class GoalAlarmSaveDto {
     private AlarmDetailType alarmDetailType;
     private String goalName;
     private int goalAmount;
+    private Long waitingGoalId;
     private String friendNickname;
     private Member member;
 
     @Builder
-    public GoalAlarmSaveDto(AlarmType alarmType, AlarmDetailType alarmDetailType, String goalName, int goalAmount, String friendNickname, Member member) {
+    public GoalAlarmSaveDto(AlarmType alarmType, AlarmDetailType alarmDetailType, String goalName, int goalAmount, Long waitingGoalId, String friendNickname, Member member) {
         this.alarmType = alarmType;
         this.alarmDetailType = alarmDetailType;
         this.goalName = goalName;
         this.goalAmount = goalAmount;
+        this.waitingGoalId = waitingGoalId;
         this.friendNickname = friendNickname;
         this.member = member;
     }
 
-    public static Alarm goalToEntity(GoalAlarmRequestDto requestDto, AlarmType alarmType, AlarmDetailType alarmDetailType, String friendNickname, Member member) {
+    public static Alarm goalToEntity(GoalAlarmRequestDto requestDto, Long waitingGoalId, AlarmType alarmType, AlarmDetailType alarmDetailType, String friendNickname, Member member) {
         return Alarm.builder()
                 .alarmType(alarmType)
                 .alarmDetailType(alarmDetailType)
                 .goalName(requestDto.getGoalName())
                 .goalAmount(requestDto.getGoalAmount())
+                .waitingGoalId(waitingGoalId)
                 .friendNickname(friendNickname)
                 .member(member)
                 .build();

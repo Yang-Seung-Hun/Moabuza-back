@@ -2,7 +2,6 @@ package com.project.moabuja.dto.response.alarm;
 
 import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.alarm.AlarmDetailType;
-import com.project.moabuja.domain.alarm.AlarmType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

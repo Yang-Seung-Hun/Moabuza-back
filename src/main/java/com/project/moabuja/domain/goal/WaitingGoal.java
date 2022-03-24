@@ -21,20 +21,17 @@ public class WaitingGoal {
 
     private int waitingGoalAmount;
 
-    private boolean isAcceptedGoal;
-
     @Enumerated(EnumType.STRING)
     private GoalType goalType;
 
     @OneToMany(mappedBy = "waitingGoal", cascade = CascadeType.ALL)
-    private List<MemberWaitingGoal> memberWaitingGoals = new ArrayList<>();
+    private final List<MemberWaitingGoal> memberWaitingGoals = new ArrayList<>();
 
     @Builder
-    public WaitingGoal(String waitingGoalName, int waitingGoalAmount, GoalType goalType, boolean isAcceptedGoal) {
+    public WaitingGoal(String waitingGoalName, int waitingGoalAmount, GoalType goalType) {
         this.waitingGoalName = waitingGoalName;
         this.waitingGoalAmount = waitingGoalAmount;
         this.goalType = goalType;
-        this.isAcceptedGoal = isAcceptedGoal;
     }
 
     protected WaitingGoal () {}
