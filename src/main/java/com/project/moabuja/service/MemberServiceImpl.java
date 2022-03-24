@@ -227,7 +227,14 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public ResponseEntity getHomeInfo(Member current) {
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
-        Member currentUser = currentUserTmp.get();
+//        Member currentUser = currentUserTmp.get();
+        Member currentUser = null;
+
+        if(currentUserTmp.isPresent()){
+            currentUser = currentUserTmp.get();
+        } else {
+            throw new NullPointerException("Move to Login Page");
+        }
 
         Hero hero = currentUser.getHero();
 
