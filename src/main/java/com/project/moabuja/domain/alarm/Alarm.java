@@ -19,19 +19,23 @@ public class Alarm extends Timestamped {
     @Enumerated(EnumType.STRING)
     private AlarmType alarmType;
 
+    @Enumerated(EnumType.STRING)
+    private AlarmDetailType alarmDetailType;
+
     private String alarmContents;
 
-    private String fromNickname;
+    private String friendNickname;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
     @Builder
-    public Alarm(AlarmType alarmType, String alarmContents, String fromNickname, Member member) {
+    public Alarm(AlarmType alarmType, AlarmDetailType alarmDetailType, String alarmContents, String friendNickname, Member member) {
         this.alarmType = alarmType;
+        this.alarmDetailType = alarmDetailType;
         this.alarmContents = alarmContents;
-        this.fromNickname = fromNickname;
+        this.friendNickname = friendNickname;
         this.member = member;
     }
 
