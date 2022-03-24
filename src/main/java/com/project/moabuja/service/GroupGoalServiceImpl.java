@@ -4,11 +4,13 @@ import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.goal.DoneGoal;
 import com.project.moabuja.domain.goal.GoalType;
 import com.project.moabuja.domain.goal.GroupGoal;
+import com.project.moabuja.domain.goal.MemberWaitingGoal;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.request.goal.CreateGroupRequestDto;
 import com.project.moabuja.dto.response.goal.*;
+import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.repository.FriendRepository;
 import com.project.moabuja.repository.GroupGoalRepository;
 import com.project.moabuja.repository.MemberRepository;
@@ -39,7 +41,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
         Member currentUser = currentUserTmp.get();
 
-        GroupGoal groupGoal = new GroupGoal(groupRequestDto.getCreateGroupName(), groupRequestDto.getCreateGroupAmount(), 0, false);
+        GroupGoal groupGoal = new GroupGoal(groupRequestDto.getCreateGroupName(), groupRequestDto.getCreateGroupAmount(), 0);
 
         //member랑 groupGoal 연관관계 맺음
         GroupGoal savedGoal = groupGoalRepository.save(groupGoal);
@@ -74,46 +76,49 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                 groupDoneGoalNames.add(doneGoal.getDoneGoalName());
             }
         }
+        List<MemberWaitingGoal> waitingGoals = currentUser.getMemberWaitingGoals();
 
         //GroupGoal 있을때
         if (groupGoal.isPresent()){
-            if(groupGoal.get().isAcceptedGroup()){
+            String goalStatus = "goal";
 
-                String goalStatus = "goal";
+            List<GroupMemberDto> groupMembers = new ArrayList<>();
+            List<GroupListDto> groupList = new ArrayList<>();
+            List<Member> members = groupGoal.get().getMembers();
+            int currentAmount = 0;
+            for (Member member : members) {
+                groupMembers.add(new GroupMemberDto(member.getNickname(), member.getHero()));
 
-                List<GroupMemberDto> groupMembers = new ArrayList<>();
-                List<GroupListDto> groupList = new ArrayList<>();
-                List<Member> members = groupGoal.get().getMembers();
-                int currentAmount = 0;
-                for (Member member : members) {
-                    groupMembers.add(new GroupMemberDto(member.getNickname(), member.getHero()));
-
-                    List<Record> memberGroupRecord = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
-                    int tmpAmount = 0;
-                    for (Record record : memberGroupRecord) {
-                        groupList.add(new GroupListDto(record.getRecordDate(), member.getHero(), member.getNickname(),record.getMemo(),record.getRecordAmount()));
-                        tmpAmount = tmpAmount+record.getRecordAmount();
-                    }
-                    currentAmount += tmpAmount;
+                List<Record> memberGroupRecord = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
+                int tmpAmount = 0;
+                for (Record record : memberGroupRecord) {
+                    groupList.add(new GroupListDto(record.getRecordDate(), member.getHero(), member.getNickname(),record.getMemo(),record.getRecordAmount()));
+                    tmpAmount = tmpAmount+record.getRecordAmount();
                 }
-                int leftAmount = groupGoal.get().getGroupGoalAmount() - currentAmount;
-                int percent = (int) (((double) currentAmount / (double) (groupGoal.get().getGroupGoalAmount())) * 100);
-
-                GroupResponseDto haveGoal = new GroupResponseDto(groupGoal.get().getId(),goalStatus,groupMembers,groupGoal.get().getGroupGoalName(),leftAmount,percent,groupDoneGoalNames,groupList);
-                return ResponseEntity.ok().body(haveGoal);
-
+                currentAmount += tmpAmount;
             }
-            else{//수락대기중
+            int leftAmount = groupGoal.get().getGroupGoalAmount() - currentAmount;
+            int percent = (int) (((double) currentAmount / (double) (groupGoal.get().getGroupGoalAmount())) * 100);
+
+            GroupResponseDto haveGoal = new GroupResponseDto(groupGoal.get().getId(),goalStatus,groupMembers,groupGoal.get().getGroupGoalName(),leftAmount,percent,groupDoneGoalNames,groupList);
+            return ResponseEntity.ok().body(haveGoal);
+
+        } else {
+            /**
+             * 승훈님 여기도 고쳐주세요 ㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜ
+             */
+
+            if (!waitingGoals.isEmpty()) { // 수락대기중
                 String goalStatus = "waiting";
-                GroupResponseDto waiting = new GroupResponseDto(groupGoal.get().getId(),goalStatus,null,null,0,0,groupDoneGoalNames,null);
+                GroupResponseDto waiting = new GroupResponseDto(groupGoal.get().getId(), goalStatus, null, null, 0, 0, groupDoneGoalNames, null);
+
                 return ResponseEntity.ok().body(waiting);
+            } else { //challengeGoal 없을때
+                String goalStatus = "noGoal";
+                GroupResponseDto noGoal = new GroupResponseDto(null, goalStatus, null, null, 0, 0, groupDoneGoalNames, null);
+
+                return ResponseEntity.ok().body(noGoal);
             }
-        }
-        //challengeGoal 없을때
-        else{
-            String goalStatus = "noGoal";
-            GroupResponseDto noGoal = new GroupResponseDto(null,goalStatus,null,null,0,0,groupDoneGoalNames,null);
-            return ResponseEntity.ok().body(noGoal);
         }
     }
 
@@ -133,24 +138,15 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             Optional<Member> friendById = memberRepository.findById(friend.getFriend().getId());
             Optional<GroupGoal> friendGroupGoal = Optional.ofNullable(friendById.get().getGroupGoal());
 
+            //이미 진행중인 챌린지 있음
             if(friendGroupGoal.isPresent()){
-                //이미 진행중인 챌린지 있음
-                if(friendGroupGoal.get().isAcceptedGroup()){
-                    if (friendById.isPresent()){
-                        groupMembers.add(new CreateGroupMemberDto(friendById.get().getNickname(),false));
-                    }
-                }
-                //진행중인 챌린지 없고, 대기만 있음
-                else{
-                    if(friendById.isPresent()){
-                        groupMembers.add(new CreateGroupMemberDto(friendById.get().getNickname(),true));
-                    }
-                }
-            }
-            else{//초대받은 챌린지 없고 진행중인것도 없을때
                 if (friendById.isPresent()){
+                    groupMembers.add(new CreateGroupMemberDto(friendById.get().getNickname(),false));
+                } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
+            } else{ //진행중인 챌린지 없고, 대기만 있음
+                if(friendById.isPresent()){
                     groupMembers.add(new CreateGroupMemberDto(friendById.get().getNickname(),true));
-                }
+                } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
             }
         }
 
@@ -163,7 +159,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     public ResponseEntity<String> exitChallenge(Long id) {
 
         Optional<GroupGoal> groupGoal = groupGoalRepository.findById(id);
-        if(groupGoal.isPresent() && !groupGoal.get().isAcceptedGroup()){
+        if(groupGoal.isPresent()){
 
             List<Member> members = groupGoal.get().getMembers();
             while (members.size() > 0){

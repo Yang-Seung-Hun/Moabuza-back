@@ -24,17 +24,14 @@ public class ChallengeGoal {
 
     private int currentAmount;
 
-    private boolean isAcceptedChallenge;
-
     @OneToMany(mappedBy = "challengeGoal",cascade = CascadeType.ALL)
     private List<Member> members = new ArrayList<>();
 
     @Builder
-    public ChallengeGoal(String challengeGoalName, int challengeGoalAmount, int currentAmount, boolean isAcceptedChallenge) {
+    public ChallengeGoal(String challengeGoalName, int challengeGoalAmount, int currentAmount) {
         this.challengeGoalName = challengeGoalName;
         this.challengeGoalAmount = challengeGoalAmount;
         this.currentAmount = currentAmount;
-        this.isAcceptedChallenge = isAcceptedChallenge;
     }
 
     public void addMember(Member member){
@@ -48,9 +45,4 @@ public class ChallengeGoal {
     }
 
     protected ChallengeGoal () {}
-
-    //테스트용 setter입니다.
-    public void setIsAcceptedChallenge(Boolean bool){
-        this.isAcceptedChallenge = bool;
-    }
 }
