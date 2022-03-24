@@ -5,12 +5,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class WaitingGoalDto {
+public class WaitingGoalResponseDto {
 
     private Long id;
     private String waitingGoalName;
 
-    public WaitingGoalDto(Long id, String waitingGoalName) {
+    public WaitingGoalResponseDto(Long id, String waitingGoalName) {
         this.id = id;
         this.waitingGoalName = waitingGoalName;
     }

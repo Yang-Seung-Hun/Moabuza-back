@@ -5,6 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface WaitingGoalRepository extends JpaRepository<WaitingGoal,Long> {
 
-    WaitingGoal findWaitingGoalById(Long Id);
 
 }
