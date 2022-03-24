@@ -26,6 +26,8 @@ public class Alarm extends Timestamped {
 
     private int goalAmount;
 
+    private Long waitingGoalId;
+
     private String friendNickname;
 
     @ManyToOne
@@ -33,11 +35,12 @@ public class Alarm extends Timestamped {
     private Member member;
 
     @Builder
-    public Alarm(AlarmType alarmType, AlarmDetailType alarmDetailType, String goalName, int goalAmount, String friendNickname, Member member) {
+    public Alarm(AlarmType alarmType, AlarmDetailType alarmDetailType, String goalName, int goalAmount, Long waitingGoalId, String friendNickname, Member member) {
         this.alarmType = alarmType;
         this.alarmDetailType = alarmDetailType;
         this.goalName = goalName;
         this.goalAmount = goalAmount;
+        this.waitingGoalId = waitingGoalId;
         this.friendNickname = friendNickname;
         this.member = member;
     }

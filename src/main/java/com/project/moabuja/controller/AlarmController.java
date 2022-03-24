@@ -68,15 +68,15 @@ public class AlarmController {
     }
 
     @ApiOperation(value = "같이해부자 수락")
-    @PostMapping("/alarm/goal/accept/{friendNickname}")
+    @PostMapping("/alarm/goal/accept/{alarmId}")
     public ResponseEntity<String> postGoalAcceptAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                      @RequestParam String friendNickname) {
+                                                      @RequestParam Long alarmId) {
         Member currentMember = userDetails.getMember();
-        return alarmService.postGoalAcceptAlarm(currentMember, friendNickname);
+        return alarmService.postGoalAcceptAlarm(currentMember, alarmId);
     }
 
     @ApiOperation(value = "알람 삭제")
-    @DeleteMapping("/alarm/delete/{id}")
+    @DeleteMapping("/alarm/delete/{alarmId}")
     public ResponseEntity<String> deleteAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                               @RequestParam Long alarmId) {
         Member currentMember = userDetails.getMember();

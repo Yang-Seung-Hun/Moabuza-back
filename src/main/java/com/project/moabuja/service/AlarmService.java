@@ -23,7 +23,7 @@ public interface AlarmService {
 
     ResponseEntity<String> postGroupGoalAlarm(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto);
 
-    ResponseEntity<String> postGoalAcceptAlarm(Member currentMember, String friendNickname);
+    ResponseEntity<String> postGoalAcceptAlarm(Member currentMember, Long alarmId);
 
     ResponseEntity<String> deleteAlarm(Member currentMember, Long alarmId);
 }
