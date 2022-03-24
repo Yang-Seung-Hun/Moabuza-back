@@ -50,4 +50,11 @@ public class AlarmController {
         return alarmService.postFriendRefuseAlarm(currentMember, friendNickname);
     }
 
+    @ApiOperation(value = "알람 삭제")
+    @DeleteMapping("/alarm/delete/{id}")
+    public ResponseEntity<String> deleteAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                              @RequestParam Long alarmId) {
+        Member currentMember = userDetails.getMember();
+        return alarmService.deleteAlarm(currentMember, alarmId);
+    }
 }

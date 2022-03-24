@@ -2,27 +2,21 @@ package com.project.moabuja.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.TokenDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
-import com.project.moabuja.dto.response.member.HomeResponseDto;
-import com.project.moabuja.dto.response.member.ReissueDto;
-import com.project.moabuja.exception.exceptionClass.HomeMemberNotFoundException;
+import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.FCMServiceImpl;
 import com.project.moabuja.service.MemberService;
-import com.project.moabuja.util.CustomResponseEntity;
 import com.project.moabuja.util.Validation;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -71,7 +65,7 @@ public class MemberController {
     @GetMapping("/home")
     public ResponseEntity getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
         if(userDetails == null){
-            throw  new HomeMemberNotFoundException("컨트롤러 Move to Login Page");
+            throw  new MemberNotFoundException("컨트롤러 Move to Login Page");
         }
         Member currentUser = userDetails.getMember();
 

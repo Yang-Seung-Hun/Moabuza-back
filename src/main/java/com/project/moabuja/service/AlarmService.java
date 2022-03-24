@@ -19,4 +19,6 @@ public interface AlarmService {
     public ResponseEntity<String> postFriendRefuseAlarm(Member currentMember, String friendNickname);
 
     public ResponseEntity<String> postAlarmGoal(AlarmGoalRequestDto alarmGoalRequestDto, Member currentMember);
+
+    public ResponseEntity<String> deleteAlarm(Member currentMember, Long alarmId);
 }

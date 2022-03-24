@@ -15,27 +15,27 @@ public class AlarmGoalRequestDto {
 
     private AlarmType alarmType;
     private String alarmContents;
-    private String fromNickname;
-    private Member toFriend;
+    private String friendNickname;
+    private Member member;
 
-    public void insertMember(Member toFriend) {
-        this.toFriend = toFriend;
+    public void insertMember(Member member) {
+        this.member = member;
     }
 
     @Builder
-    public AlarmGoalRequestDto(AlarmType alarmType, String alarmContents, String fromNickname, Member toFriend) {
+    public AlarmGoalRequestDto(AlarmType alarmType, String alarmContents, String friendNickname, Member member) {
         this.alarmType = alarmType;
         this.alarmContents =alarmContents;
-        this.fromNickname = fromNickname;
-        this.toFriend = toFriend;
+        this.friendNickname = friendNickname;
+        this.member = member;
     }
 
-    public static Alarm goalToEntity(AlarmGoalRequestDto requestDto, String fromNickname) {
+    public static Alarm goalToEntity(AlarmGoalRequestDto requestDto, String friendNickname) {
         return Alarm.builder()
                 .alarmType(requestDto.getAlarmType())
                 .alarmContents(requestDto.getAlarmContents())
-                .fromNickname(fromNickname)
-                .member(requestDto.getToFriend())
+                .friendNickname(friendNickname)
+                .member(requestDto.getMember())
                 .build();
     }
 }

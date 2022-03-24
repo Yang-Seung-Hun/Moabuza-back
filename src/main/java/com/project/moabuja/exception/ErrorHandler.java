@@ -1,6 +1,7 @@
 package com.project.moabuja.exception;
 
-import com.project.moabuja.exception.exceptionClass.HomeMemberNotFoundException;
+import com.project.moabuja.exception.exceptionClass.AlarmErrorException;
+import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.exception.exceptionClass.LogoutJwtUseException;
 import com.project.moabuja.exception.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,13 @@ public class ErrorHandler {
         return new ResponseEntity<>(ErrorResponse.badRequest(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(HomeMemberNotFoundException.class)
-    public ResponseEntity<ErrorResponse> homeMemberNotFoundException(HomeMemberNotFoundException e) {
+    @ExceptionHandler(MemberNotFoundException.class)
+    public ResponseEntity<ErrorResponse> memberNotFoundException(MemberNotFoundException e) {
+        return new ResponseEntity<>(ErrorResponse.badRequest(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AlarmErrorException.class)
+    public ResponseEntity<ErrorResponse> alarmErrorException(AlarmErrorException e) {
         return new ResponseEntity<>(ErrorResponse.badRequest(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 

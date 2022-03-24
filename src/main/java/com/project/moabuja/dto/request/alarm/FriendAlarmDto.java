@@ -17,24 +17,20 @@ public class FriendAlarmDto {
     private String friendNickname;
     private Member member;
 
-    public void insertMember(Member member) {
-        this.member = member;
-    }
-
     @Builder
-    public FriendAlarmDto(AlarmType alarmType, String friendNickname, Member member) {
+    public FriendAlarmDto(AlarmDetailType alarmDetailType, String friendNickname, Member member) {
         this.alarmType = AlarmType.FRIEND;
-        this.alarmDetailType = AlarmDetailType.request;
+        this.alarmDetailType = alarmDetailType;
         this.friendNickname = friendNickname;
         this.member = member;
     }
 
-    public static Alarm friendToEntity(FriendAlarmDto friendAlarmDto, String friendNickname) {
+    public static Alarm toEntity(AlarmDetailType alarmDetailType, Member member, String friendNickname) {
         return Alarm.builder()
                 .alarmType(AlarmType.FRIEND)
-                .alarmDetailType(AlarmDetailType.request)
+                .alarmDetailType(alarmDetailType)
                 .friendNickname(friendNickname)
-                .member(friendAlarmDto.getMember())
+                .member(member)
                 .build();
     }
 }

@@ -16,7 +16,7 @@ import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.dto.response.member.ReissueDto;
-import com.project.moabuja.exception.exceptionClass.HomeMemberNotFoundException;
+import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
@@ -234,7 +234,7 @@ public class MemberServiceImpl implements MemberService{
         if(currentUserTmp.isPresent()){
             currentUser = currentUserTmp.get();
         } else {
-            throw new HomeMemberNotFoundException("서비스단 Move to Login Page");
+            throw new MemberNotFoundException("서비스단 Move to Login Page");
         }
 
         Hero hero = currentUser.getHero();
