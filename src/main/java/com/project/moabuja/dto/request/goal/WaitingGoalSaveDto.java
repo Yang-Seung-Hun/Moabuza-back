@@ -23,11 +23,10 @@ public class WaitingGoalSaveDto {
         this.goalType = goalType;
     }
 
-    public static WaitingGoal toEntity(String waitingGoalName, int waitingGoalAmount, boolean isAcceptedGoal, GoalType goalType) {
+    public static WaitingGoal toEntity(String waitingGoalName, int waitingGoalAmount, GoalType goalType) {
         return WaitingGoal.builder()
                 .waitingGoalName(waitingGoalName)
                 .waitingGoalAmount(waitingGoalAmount)
-                .isAcceptedGoal(isAcceptedGoal)
                 .goalType(goalType)
                 .build();
     }
