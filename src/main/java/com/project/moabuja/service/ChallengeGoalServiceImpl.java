@@ -36,6 +36,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Override
     public ResponseEntity<String> save(CreateChallengeRequestDto createChallengeRequestDto, Member current) {
 
+
         Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
         Member currentUser = null;
         if(currentUserTmp.isPresent()){

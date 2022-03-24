@@ -181,7 +181,7 @@ public class AlarmServiceImpl implements AlarmService {
         }
 
         // 전체 수락 후 마지막 수락
-        if (checkAccepted(friends)) {
+        else {
             List<String> friendList = new ArrayList<>();
             if (waitingGoal.getGoalType() == GoalType.GROUP) {
                 for (MemberWaitingGoal friend : friends) {
