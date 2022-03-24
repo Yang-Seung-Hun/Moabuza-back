@@ -28,20 +28,20 @@ public class FriendController {
         return friendService.listFriend(currentUser);
     }
 
-    @ApiOperation(value = "친구 수락")
-    @PostMapping("/friends")
-    public ResponseEntity<String> postCreateFriend(@RequestParam String friendNickname,
-                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Member currentUser = userDetails.getMember();
-        return friendService.save(friendNickname, currentUser);
-    }
+//    @ApiOperation(value = "친구 수락")
+//    @PostMapping("/friends")
+//    public ResponseEntity<String> postCreateFriend(@RequestParam String friendNickname,
+//                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        Member currentUser = userDetails.getMember();
+//        return friendService.save(friendNickname, currentUser);
+//    }
 
     @ApiOperation(value = "친구 삭제")
     @DeleteMapping("/friends")
     public ResponseEntity<String> deleteFriend(@RequestParam String friendNickname,
                                                @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member currentUser = userDetails.getMember();
-        return friendService.deleteFriend(friendNickname, currentUser);
+        return friendService.deleteFriend(currentUser, friendNickname);
     }
 
 

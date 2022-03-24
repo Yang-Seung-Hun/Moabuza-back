@@ -23,34 +23,27 @@ public class FriendServiceImpl implements FriendService{
     private final MemberRepository memberRepository;
 
     @Override
-    public ResponseEntity<List<Friend>> listFriend(Member current) {
-        List<Friend> friendList = friendRepository.findFriendsByMember(current);
+    public ResponseEntity<List<Friend>> listFriend(Member currentMember) {
+        List<Friend> friendList = friendRepository.findFriendsByMember(currentMember);
         return ResponseEntity.ok().body(friendList);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<String> save(String friendNickname, Member current) {
-
-        Optional<Member> currentUserTemp = memberRepository.findById(current.getId());
-        Member currentUser = currentUserTemp.get();
+    public void save(Member currentMember, String friendNickname) {
         Member friend = memberRepository.findMemberByNickname(friendNickname).get();
 
-        friendRepository.save(new Friend(currentUser, friend));
-        friendRepository.save(new Friend(friend, currentUser));
-
-        return ResponseEntity.ok().body("친구 추가 완료");
+        friendRepository.save(new Friend(currentMember, friend));
+        friendRepository.save(new Friend(friend, currentMember));
     }
 
     @Transactional
     @Override
-    public ResponseEntity<String> deleteFriend(String friendNickname, Member current) {
-        Optional<Member> currentUserTemp = memberRepository.findById(current.getId());
-        Member currentUser = currentUserTemp.get();
+    public ResponseEntity<String> deleteFriend(Member currentMember, String friendNickname) {
         Member friend = memberRepository.findMemberByNickname(friendNickname).get();
 
-        friendRepository.delete(friendRepository.findByMemberAndFriend(currentUser, friend));
-        friendRepository.delete(friendRepository.findByMemberAndFriend(friend, currentUser));
+        friendRepository.delete(friendRepository.findByMemberAndFriend(currentMember, friend));
+        friendRepository.delete(friendRepository.findByMemberAndFriend(friend, currentMember));
 
         return ResponseEntity.ok().body("친구 삭제 완료");
     }
