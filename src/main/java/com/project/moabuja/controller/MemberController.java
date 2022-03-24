@@ -73,7 +73,7 @@ public class MemberController {
 //        Member currentUser = Optional.ofNullable(userDetails.getMember()).orElseThrow(
 //                () -> new NullPointerException("Move to Login Page"));
         if(userDetails == null){
-            throw  new NullPointerException("Move to Login Page");
+            throw  new HomeMemberNotFoundException("컨트롤러 Move to Login Page");
         }
         Member currentUser = userDetails.getMember();
 
