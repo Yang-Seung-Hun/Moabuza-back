@@ -23,6 +23,7 @@ fi
 echo "> 새 어플리케이션 배포"
 JAR_NAME=$(ls -tr $REPOSITORY/*.jar | tail -n 1)
 
+
 echo "> JAR Name: $JAR_NAME"
 
 echo "> $JAR_NAME에 실행권한 추가"
@@ -32,4 +33,5 @@ echo "> $JAR_NAME 실행"
 #nohup java -jar $JAR_NAME > /dev/null 2>&1 &
 #nohup java -jar $JAR_NAME > /dev/null 2>&1 &
 nohup java -jar $JAR_NAME > $REPOSITORY1/nohup.out 2>&1 &
+#nohup java -jar $JAR_NAME  1 > moabuja.out 2 > moabuja_err.err &
 #nohup java -jar $JAR_NAME > /dev/null 2> /dev/null < /dev/null &
