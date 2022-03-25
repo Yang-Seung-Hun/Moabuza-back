@@ -21,29 +21,30 @@ public class ChallengeController {
     @ApiOperation(value = "도전해부자 페이지")
     @GetMapping("/money/challenge")
     public ResponseEntity<ChallengeResponseDto> getMoneyChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails){
-        Member currentUser = userDetails.getMember();
-        return challengeGoalService.getChallengeInfo(currentUser);
+        Member currentMember = userDetails.getMember();
+        return challengeGoalService.getChallengeInfo(currentMember);
     }
 
     @ApiOperation(value = "도전해부자 생성 페이지")
     @GetMapping("/money/challenge/createChallenge")
     public ResponseEntity<CreateChallengeResponseDto> getCreateChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails){
-        Member currentUser = userDetails.getMember();
-        return challengeGoalService.getChallengeMemberCandidates(currentUser);
+        Member currentMember = userDetails.getMember();
+        return challengeGoalService.getChallengeMemberCandidates(currentMember);
     }
 
     @ApiOperation(value = "도전해부자 생성")
     @PostMapping("/money/challenge/createChallenge")
     public ResponseEntity<String> postCreateChallenge(@RequestBody CreateChallengeRequestDto createChallengeRequestDto,
                                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
-        Member currentUser = userDetails.getMember();
-        return challengeGoalService.save(createChallengeRequestDto, currentUser);
+        Member currentMember = userDetails.getMember();
+        return challengeGoalService.save(createChallengeRequestDto, currentMember);
     }
 
-    @ApiOperation(value = "도전해부자 삭제")
+    @ApiOperation(value = "도전해부자 나가기")
     @DeleteMapping("/money/challenge/exitchallenge/{id}")
-    public ResponseEntity<String> exitChallenge(@PathVariable Long id){
-        return challengeGoalService.exitChallenge(id);
+    public ResponseEntity<String> exitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
+        Member currentMember = userDetails.getMember();
+        return challengeGoalService.exitChallenge(currentMember, id);
     }
 
 }
