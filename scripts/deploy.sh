@@ -33,6 +33,6 @@ echo "> $JAR_NAME 실행"
 
 #nohup java -jar $JAR_NAME > $REPOSITORY1/nohup.out 2>&1 &
 # shellcheck disable=SC2261
-nohup java -jar $JAR_NAME  1 > stdout.out 2 > stderr.out &
+nohup java -jar $JAR_NAME  1 > $REPOSITORY1/stdout.out 2 > $REPOSITORY1/stderr.out &
 #nohup java -jar $JAR_NAME > /dev/null 2> /dev/null < /dev/null &
 #nohup java -jar $JAR_NAME > /dev/null 2>&1 &
