@@ -29,8 +29,8 @@ public class MemberWaitingGoal {
         this.waitingGoal = waitingGoal;
         this.isAcceptedGoal = isAcceptedGoal;
     }
-    public void changeIsAcceptedGoal(MemberWaitingGoal memberWaitingGoal) {
-        memberWaitingGoal.isAcceptedGoal = true;
+    public void changeIsAcceptedGoal() {
+        this.isAcceptedGoal = true;
     }
 
     protected MemberWaitingGoal () {}
