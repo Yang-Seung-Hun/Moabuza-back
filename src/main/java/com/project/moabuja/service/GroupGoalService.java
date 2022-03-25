@@ -19,6 +19,6 @@ public interface GroupGoalService {
 
     ResponseEntity<CreateGroupResponseDto> getGroupMemberCandidates(Member currentUser);
 
-    ResponseEntity<String> exitGroup(Long id);
+    ResponseEntity<String> exitGroup(Member currentMember, Long id);
 
 }

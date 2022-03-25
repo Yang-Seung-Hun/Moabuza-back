@@ -9,11 +9,11 @@ import org.springframework.http.ResponseEntity;
 
 public interface ChallengeGoalService {
 
-    ResponseEntity<String> save(CreateChallengeRequestDto challengeRequestDto, Member currentUser);
+    ResponseEntity<String> save(CreateChallengeRequestDto challengeRequestDto, Member currentMember);
 
-    ResponseEntity<ChallengeResponseDto> getChallengeInfo(Member currentUser);
+    ResponseEntity<ChallengeResponseDto> getChallengeInfo(Member currentMember);
 
-    ResponseEntity<CreateChallengeResponseDto> getChallengeMemberCandidates(Member currentUser);
+    ResponseEntity<CreateChallengeResponseDto> getChallengeMemberCandidates(Member currentMember);
 
-    ResponseEntity<String> exitChallenge(Long id);
+    ResponseEntity<String> exitChallenge(Member currentMember, Long id);
 }
