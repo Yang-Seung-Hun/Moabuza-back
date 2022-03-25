@@ -20,13 +20,12 @@ public class MemberUpdateRequestDto {
     // fcm 토큰 받아오기
     private String fcmToken;
 
-    @Size(max = 8, message = "8자 이하 입력가능")
-    @Pattern(regexp = "^[a-zA-Z0-9ㄱ-ㅎ가-힣]*$")
+//    @Size(max = 8, message = "8자 이하 입력가능")
+//    @Pattern(regexp = "^[a-zA-Z0-9ㄱ-ㅎ가-힣]*$")
     @NotNull
     private String nickname;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
     private Hero hero;
     
     

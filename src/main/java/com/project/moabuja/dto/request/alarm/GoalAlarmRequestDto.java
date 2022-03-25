@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @Getter
@@ -13,6 +14,7 @@ public class GoalAlarmRequestDto {
 
     private GoalType goalType;
     private String goalName;
+    @Positive
     private int goalAmount;
     private List<String> friendNickname;
 
