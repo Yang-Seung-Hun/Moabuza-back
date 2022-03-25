@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,6 +15,7 @@ public class RecordRequestDto {
     private RecordType recordType;
     private String recordDate;
     private String memos;
+    @Positive
     private int recordAmount;
 
     @Builder

@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Positive;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
 public class CreateChallengeRequestDto {
 
     private String createChallengeName;
+    @Positive
     private int createChallengeAmount;
     private List<String> challengeFriends = new ArrayList<>();
 

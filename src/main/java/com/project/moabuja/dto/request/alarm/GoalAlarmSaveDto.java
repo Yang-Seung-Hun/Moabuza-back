@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Positive;
+
 @Getter
 @NoArgsConstructor
 public class GoalAlarmSaveDto {
@@ -15,6 +17,7 @@ public class GoalAlarmSaveDto {
     private AlarmType alarmType;
     private AlarmDetailType alarmDetailType;
     private String goalName;
+    @Positive
     private int goalAmount;
     private Long waitingGoalId;
     private String friendNickname;

@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Positive;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class CreateGroupRequestDto {
     private String createGroupName;
+    @Positive
     private int createGroupAmount;
     private List<String> groupFriends = new ArrayList<>();
 

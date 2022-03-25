@@ -6,11 +6,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Positive;
+
 @Getter
 @NoArgsConstructor
 public class WaitingGoalSaveDto {
 
     private String waitingGoalName;
+    @Positive
     private int waitingGoalAmount;
     private boolean isAcceptedGoal;
     private GoalType goalType;
