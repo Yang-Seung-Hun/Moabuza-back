@@ -139,11 +139,11 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             //이미 진행중인 챌린지 있음
             if(friendChallengeGoal.isPresent()) {
                 if (friendById.isPresent()) {
-                    challengeMembers.add(new CreateChallengeMemberDto(friendById.get().getNickname(), false));
+                    challengeMembers.add(new CreateChallengeMemberDto(friendById.get().getNickname(), false, friendById.get().getHero()));
                 } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
             } else { // 진행 중인 챌린지 없음
                 if (friendById.isPresent()){
-                    challengeMembers.add(new CreateChallengeMemberDto(friendById.get().getNickname(),true));
+                    challengeMembers.add(new CreateChallengeMemberDto(friendById.get().getNickname(),true,friendById.get().getHero()));
                 } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
             }
         }
