@@ -73,7 +73,7 @@ public class RecordServiceImpl implements RecordService{
             List<Member> members = currentMember.getChallengeGoal().getMembers();
             for (Member member : members) {
                 Alarm alarm = new Alarm(AlarmType.CHALLENGE, AlarmDetailType.record, currentMember.getChallengeGoal().getChallengeGoalName(),
-                        currentMember.getChallengeGoal().getChallengeGoalAmount(), null, currentMember.getNickname(), member);
+                        recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
                 alarmRepository.save(alarm);
             }
 
@@ -84,7 +84,7 @@ public class RecordServiceImpl implements RecordService{
 
                 for (Member member : members) {
                     Alarm alarm = new Alarm(AlarmType.CHALLENGE, AlarmDetailType.success, currentMember.getChallengeGoal().getChallengeGoalName(),
-                            currentMember.getChallengeGoal().getChallengeGoalAmount(), null, currentMember.getNickname(), member);
+                            recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
                     alarmRepository.save(alarm);
                 }
 
@@ -118,7 +118,7 @@ public class RecordServiceImpl implements RecordService{
             List<Member> members = currentMember.getGroupGoal().getMembers();
             for (Member member : members) {
                 Alarm alarm = new Alarm(AlarmType.GROUP, AlarmDetailType.record, currentMember.getGroupGoal().getGroupGoalName(),
-                        currentMember.getGroupGoal().getGroupGoalAmount(), null, currentMember.getNickname(), member);
+                        recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
                 alarmRepository.save(alarm);
             }
 
@@ -136,7 +136,7 @@ public class RecordServiceImpl implements RecordService{
 
                 for (Member member : members) {
                     Alarm alarm = new Alarm(AlarmType.GROUP, AlarmDetailType.success, currentMember.getGroupGoal().getGroupGoalName(),
-                            currentMember.getGroupGoal().getGroupGoalAmount(), null, currentMember.getNickname(), member);
+                            recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
                     alarmRepository.save(alarm);
                 }
 
