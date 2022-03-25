@@ -135,11 +135,11 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             //이미 진행중인 챌린지 있음
             if(friendGroupGoal.isPresent()){
                 if (friendById.isPresent()){
-                    groupMembers.add(new CreateGroupMemberDto(friendById.get().getNickname(),false));
+                    groupMembers.add(new CreateGroupMemberDto(friendById.get().getNickname(),false,friendById.get().getHero()));
                 } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
             } else{ //진행중인 챌린지 없고, 대기만 있음
                 if(friendById.isPresent()){
-                    groupMembers.add(new CreateGroupMemberDto(friendById.get().getNickname(),true));
+                    groupMembers.add(new CreateGroupMemberDto(friendById.get().getNickname(),true,friendById.get().getHero()));
                 } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
             }
         }
