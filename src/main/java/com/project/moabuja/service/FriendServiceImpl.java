@@ -6,6 +6,7 @@ import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.response.friend.FriendListDto;
 import com.project.moabuja.dto.response.friend.FriendListResponseDto;
+import com.project.moabuja.dto.response.friend.FriendSearchResponseDto;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.FriendRepository;
 import com.project.moabuja.repository.MemberRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,6 +52,18 @@ public class FriendServiceImpl implements FriendService{
 
         friendRepository.save(new Friend(currentMember, friend));
         friendRepository.save(new Friend(friend, currentMember));
+    }
+
+    @Override
+    public ResponseEntity<FriendSearchResponseDto> searchFriend(String friendNickname) {
+        Optional<Member> friend = memberRepository.findMemberByNickname(friendNickname);
+        if (friend.isPresent()) {
+            FriendSearchResponseDto friendSearchResponseDto = new FriendSearchResponseDto(true, friend.get().getNickname());
+            return ResponseEntity.ok().body(friendSearchResponseDto);
+        } else {
+            FriendSearchResponseDto friendSearchResponseDto = new FriendSearchResponseDto(false, null);
+            return ResponseEntity.ok().body(friendSearchResponseDto);
+        }
     }
 
     @Transactional

@@ -37,7 +37,7 @@ public class AlarmController {
     }
 
     @ApiOperation(value = "친구 수락 알람")
-    @PostMapping("/alarm/friend/accept/{friendNickname}")
+    @PostMapping("/alarm/friend/accept")
     public ResponseEntity<String> postFriendAcceptAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                         @RequestParam String friendNickname) {
         Member currentMember = userDetails.getMember();
@@ -45,7 +45,7 @@ public class AlarmController {
     }
 
     @ApiOperation(value = "친구 거절 알람")
-    @PostMapping("/alarm/friend/refuse/{friendNickname}")
+    @PostMapping("/alarm/friend/refuse")
     public ResponseEntity<String> postFriendRefuseAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                         @RequestParam String friendNickname) {
         Member currentMember = userDetails.getMember();

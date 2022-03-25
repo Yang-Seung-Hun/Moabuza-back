@@ -7,6 +7,7 @@ import com.project.moabuja.dto.request.friend.FriendInvitationRequestDto;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import com.project.moabuja.dto.response.friend.FriendListDto;
 import com.project.moabuja.dto.response.friend.FriendListResponseDto;
+import com.project.moabuja.dto.response.friend.FriendSearchResponseDto;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.FriendService;
 import io.swagger.annotations.ApiOperation;
@@ -37,6 +38,13 @@ public class FriendController {
 //        Member currentUser = userDetails.getMember();
 //        return friendService.save(friendNickname, currentUser);
 //    }
+
+    @ApiOperation(value = "친구 검색")
+    @PostMapping("/friend/search")
+    public ResponseEntity<FriendSearchResponseDto> searchFriend(@RequestParam String friendNickname) {
+        return friendService.searchFriend(friendNickname);
+    }
+
 
     @ApiOperation(value = "친구 삭제")
     @DeleteMapping("/friends")
