@@ -30,14 +30,13 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     private final RecordRepository recordRepository;
     private final FriendRepository friendRepository;
     private final WaitingGoalRepository waitingGoalRepository;
-    private final MemberWaitingGoalRepository memberWaitingGoalRepository;
 
     @Transactional
     @Override
-    public ResponseEntity<String> save(CreateChallengeRequestDto createChallengeRequestDto, Member current) {
+    public ResponseEntity<String> save(CreateChallengeRequestDto createChallengeRequestDto, Member currentMember) {
 
 
-        Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
+        Optional<Member> currentUserTmp = memberRepository.findById(currentMember.getId());
         Member currentUser = null;
         if(currentUserTmp.isPresent()){
             currentUser = currentUserTmp.get();
@@ -52,7 +51,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             if (memberByNickname.isPresent()) {
                 challengeGoal.addMember(memberByNickname.get());
             } else {
-                throw new IllegalArgumentException("선택하신 친구 중 존재하지 않는 사용자가 있습니다.");
+                throw new MemberNotFoundException("선택하신 친구 중 존재하지 않는 사용자가 있습니다.");
             }
         }
 
