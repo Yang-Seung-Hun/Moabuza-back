@@ -157,7 +157,7 @@ public class AlarmServiceImpl implements AlarmService {
         Alarm alarm = alarmRepository.findAlarmById(alarmId);
         WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
         MemberWaitingGoal currentMemberWaitingGoal = memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal);
-        currentMemberWaitingGoal.changeIsAcceptedGoal(currentMemberWaitingGoal);
+        currentMemberWaitingGoal.changeIsAcceptedGoal();
 
         List<MemberWaitingGoal> friends = memberWaitingGoalRepository.findMemberWaitingGoalsByWaitingGoal(waitingGoal);
 
