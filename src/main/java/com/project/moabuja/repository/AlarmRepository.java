@@ -13,6 +13,7 @@ public interface AlarmRepository extends JpaRepository<Alarm,Long> {
 
     List<Alarm> findAllByMember(Member member);
     List<Alarm> findAlarmsByMemberAndAlarmTypeOrderByCreatedAtDesc(Member member, AlarmType alarmType);
+    List<Alarm> findAlarmsByFriendNicknameAndAlarmType(String friendNickname, AlarmType alarmType);
 
     Alarm findByMemberAndFriendNickname(Member member, String friendNickname);
     Alarm findAlarmById(Long Id);

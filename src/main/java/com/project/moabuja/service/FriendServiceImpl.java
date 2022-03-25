@@ -1,9 +1,12 @@
 package com.project.moabuja.service;
 
+import com.project.moabuja.domain.alarm.Alarm;
+import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.request.friend.FriendInvitationDelete;
-import com.project.moabuja.dto.request.friend.FriendInvitationRequestDto;
+import com.project.moabuja.dto.response.friend.FriendListDto;
+import com.project.moabuja.dto.response.friend.FriendListResponseDto;
+import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.FriendRepository;
 import com.project.moabuja.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -21,11 +24,23 @@ public class FriendServiceImpl implements FriendService{
 
     private final FriendRepository friendRepository;
     private final MemberRepository memberRepository;
+    private final AlarmRepository alarmRepository;
 
     @Override
-    public ResponseEntity<List<Friend>> listFriend(Member currentMember) {
+    public ResponseEntity<FriendListResponseDto> listFriend(Member currentMember) {
         List<Friend> friendList = friendRepository.findFriendsByMember(currentMember);
-        return ResponseEntity.ok().body(friendList);
+        List<FriendListDto> friendListDto = friendList.stream().map(friend -> {
+            return new FriendListDto(friend.getFriend().getNickname(), friend.getFriend().getHero());
+        }).collect(Collectors.toList());
+
+        List<Alarm> waitingFriendList = alarmRepository.findAlarmsByFriendNicknameAndAlarmType(currentMember.getNickname(), AlarmType.FRIEND);
+        List<FriendListDto> waitingFriendListDto = waitingFriendList.stream().map(friend -> {
+            return new FriendListDto(friend.getMember().getNickname(), friend.getMember().getHero());
+        }).collect(Collectors.toList());
+
+        FriendListResponseDto friendListResponseDto = new FriendListResponseDto(waitingFriendListDto, friendListDto);
+
+        return ResponseEntity.ok().body(friendListResponseDto);
     }
 
     @Transactional
