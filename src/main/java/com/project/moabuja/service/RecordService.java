@@ -11,6 +11,8 @@ public interface RecordService {
 
     ResponseEntity<RecordResponseDto> save(RecordRequestDto recordRequestDto, Member currentMember);
 
+    int walletCheck(Member currentMember);
+
     ResponseEntity<DayListResponseDto> getDayList(DayListRequestDto dayListRequestDto, Member currentMember);
 
     ResponseEntity<String> deleteRecord(Long id, Member currentMember);

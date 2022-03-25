@@ -3,6 +3,7 @@ package com.project.moabuja.exception;
 import com.project.moabuja.exception.exceptionClass.AlarmErrorException;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.exception.exceptionClass.LogoutJwtUseException;
+import com.project.moabuja.exception.exceptionClass.RecordErrorException;
 import com.project.moabuja.exception.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,11 @@ public class ErrorHandler {
 
     @ExceptionHandler(AlarmErrorException.class)
     public ResponseEntity<ErrorResponse> alarmErrorException(AlarmErrorException e) {
+        return new ResponseEntity<>(ErrorResponse.badRequest(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RecordErrorException.class)
+    public ResponseEntity<ErrorResponse> recordErrorException(RecordErrorException e) {
         return new ResponseEntity<>(ErrorResponse.badRequest(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
