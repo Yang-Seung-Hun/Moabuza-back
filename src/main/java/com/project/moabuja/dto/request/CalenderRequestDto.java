@@ -8,6 +8,5 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class CalenderRequestDto {
-
     private LocalDateTime recordMonth;
 }
