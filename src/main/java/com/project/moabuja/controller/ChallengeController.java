@@ -8,10 +8,12 @@ import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.ChallengeGoalService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class ChallengeController {
@@ -36,6 +38,7 @@ public class ChallengeController {
     @PostMapping("/money/challenge/createChallenge")
     public ResponseEntity<String> postCreateChallenge(@RequestBody CreateChallengeRequestDto createChallengeRequestDto,
                                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
+        log.info("============== 도전해부자 생성 나옵니까? ===============");
         Member currentMember = userDetails.getMember();
         return challengeGoalService.save(createChallengeRequestDto, currentMember);
     }

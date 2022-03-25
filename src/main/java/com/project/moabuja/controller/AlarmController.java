@@ -9,12 +9,14 @@ import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.AlarmService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class AlarmController {
@@ -70,6 +72,7 @@ public class AlarmController {
     @PostMapping("/alarm/goal")
     public ResponseEntity<String> postGoalAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                 @RequestBody GoalAlarmRequestDto goalAlarmRequestDto) {
+        log.info("============== 해부자 요청 나옵니까? ===============");
         Member currentMember = userDetails.getMember();
         return alarmService.postGoalAlarm(currentMember, goalAlarmRequestDto);
     }
