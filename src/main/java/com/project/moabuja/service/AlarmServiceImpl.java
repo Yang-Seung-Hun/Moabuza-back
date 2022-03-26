@@ -259,7 +259,8 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public ResponseEntity<String> deleteAlarm(Member currentMember, Long alarmId) {
         if (alarmRepository.findById(alarmId).isEmpty()) { throw new AlarmErrorException("해당 알람이 없습니다."); }
-        if (! alarmRepository.findById(alarmId).get().getFriendNickname().equals(currentMember.getNickname())) { throw new AlarmErrorException("알람에 해당하는 사용자가 아닙니다."); }
+        if (! alarmRepository.findById(alarmId).get().getMember().equals(currentMember)) { throw new AlarmErrorException("알람에 해당하는 사용자가 아닙니다."); }
+
         alarmRepository.deleteById(alarmId);
 
         return ResponseEntity.ok().body("알람이 삭제되었습니다.");
