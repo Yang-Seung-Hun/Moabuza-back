@@ -136,10 +136,11 @@ public class AlarmServiceImpl implements AlarmService {
                 } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
             }
         } else if (goalAlarmRequestDto.getGoalType() == GoalType.CHALLENGE) {
-            log.info(" --------------------------- " + goalAlarmRequestDto.getFriendNickname().size());
-            if (goalAlarmRequestDto.getFriendNickname().size() == 0) {
+            if (Optional.ofNullable(goalAlarmRequestDto.getFriendNickname()).isEmpty()) {
                 CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), null);
                 challengeGoalService.save(createChallengeRequestDto, currentMember);
+
+                return ResponseEntity.ok().body("해부자 요청 완료");
             }
 
             WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.CHALLENGE));
