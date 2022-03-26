@@ -134,6 +134,11 @@ public class AlarmServiceImpl implements AlarmService {
                 } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
             }
         } else if (goalAlarmRequestDto.getGoalType() == GoalType.CHALLENGE) {
+            if (goalAlarmRequestDto.getFriendNickname().size() == 0) {
+                CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), null);
+                challengeGoalService.save(createChallengeRequestDto, currentMember);
+            }
+
             WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.CHALLENGE));
             memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, true));
 
@@ -259,11 +264,15 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public ResponseEntity<String> deleteAlarm(Member currentMember, Long alarmId) {
         if (alarmRepository.findById(alarmId).isEmpty()) { throw new AlarmErrorException("해당 알람이 없습니다."); }
-        if (alarmRepository.findById(alarmId).get().getMember().equals(currentMember)) {
+
+        Member member = alarmRepository.findById(alarmId).get().getMember();
+
+        if (member.getClass().isInstance(currentMember)) {
             alarmRepository.deleteById(alarmId);
 
             return ResponseEntity.ok().body("알람이 삭제되었습니다.");
         }
+
         throw new AlarmErrorException("알람에 해당하는 사용자가 아닙니다.");
     }
 
