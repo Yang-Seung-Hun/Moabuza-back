@@ -37,10 +37,7 @@ public class MemberController {
     public ResponseEntity update(@Valid @RequestBody MemberUpdateRequestDto dto,
                                  @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
         fcmService.register(dto.getNickname(), dto.getFcmToken());
-//        Member currentMember =  validation.memberValidation(userDetails.getMember());
-//        String email = userDetails.getUsername();
         String email = userDetails.getMember().getEmail();
-
         return memberService.updateMemberInfo(dto, email);
     }
 
@@ -69,7 +66,6 @@ public class MemberController {
             throw  new MemberNotFoundException("컨트롤러 Move to Login Page");
         }
         Member currentUser = userDetails.getMember();
-
         return memberService.getHomeInfo(currentUser);
     }
 }
