@@ -18,8 +18,17 @@ spring:
     hibernate:
       ddl-auto: update
 
-#logging.level:
-#  org.hibernate.SQL: debug
+logging:
+  pattern:
+    dateformat: yyyy-MM-dd HH:mm:ss.SSS
+    file: "[%d{HH:mm:ss.SSS}][%-5level][%logger.%method:line%line] - %msg%n"
+  file:
+    name: /log/abc.log
+  level:
+    root: error
+
+
+
 
 jwt:
   secret: abwieineprmdspowejropsadasdasdasdvsddvsdvasd
