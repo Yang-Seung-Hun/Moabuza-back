@@ -19,6 +19,7 @@ import com.project.moabuja.exception.exceptionClass.AlarmErrorException;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static com.project.moabuja.domain.alarm.AlarmType.*;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -134,7 +136,8 @@ public class AlarmServiceImpl implements AlarmService {
                 } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
             }
         } else if (goalAlarmRequestDto.getGoalType() == GoalType.CHALLENGE) {
-            if (goalAlarmRequestDto.getFriendNickname().isEmpty()) {
+            log.info(" --------------------------- " + goalAlarmRequestDto.getFriendNickname().size());
+            if (goalAlarmRequestDto.getFriendNickname().size() == 0) {
                 CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), null);
                 challengeGoalService.save(createChallengeRequestDto, currentMember);
             }
