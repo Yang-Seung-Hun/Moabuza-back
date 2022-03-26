@@ -6,6 +6,7 @@ import com.project.moabuja.dto.KakaoUserInfoDto;
 import com.project.moabuja.dto.TokenDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
+import com.project.moabuja.dto.request.member.RegToLoginDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.dto.response.member.ReissueDto;
 import com.project.moabuja.util.CustomResponseEntity;
@@ -21,7 +22,7 @@ public interface MemberService {
 
     KakaoUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException;
 
-    String register(KakaoUserInfoDto dto);
+    RegToLoginDto register(KakaoUserInfoDto dto);
 
     ResponseEntity<String> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto);
 

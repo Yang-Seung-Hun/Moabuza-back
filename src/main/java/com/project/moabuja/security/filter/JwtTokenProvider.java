@@ -29,20 +29,17 @@ public class JwtTokenProvider {
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
         this.secretKey = secretKey;
     }
-
-
-
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
     // access 토큰 생성
-    public String createAccessToken(String email) {
-        Claims claims = Jwts.claims().setSubject(email);
+    public String createAccessToken(String password) {
+        Claims claims = Jwts.claims().setSubject(password);
         Date now = new Date();
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(password)
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + accessTokenTime))
@@ -51,11 +48,11 @@ public class JwtTokenProvider {
     }
 
     // refresh 토큰 생성
-    public String createRefreshToken(String email) {
-        Claims claims = Jwts.claims().setSubject(email);
+    public String createRefreshToken(String password) {
+        Claims claims = Jwts.claims().setSubject(password);
         Date now = new Date();
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(password)
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + refreshTokenTime))
