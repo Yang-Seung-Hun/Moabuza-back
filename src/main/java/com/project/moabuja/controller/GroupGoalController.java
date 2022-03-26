@@ -32,13 +32,13 @@ public class GroupGoalController {
         return groupGoalService.getGroupMemberCandidates(currentMember);
     }
 
-    @ApiOperation(value = "같이해부자 생성")
-    @PostMapping("/money/group/creategroup")
-    public ResponseEntity<String> postCreateGroup(@RequestBody CreateGroupRequestDto createGroupRequestDto,
-                                                  @AuthenticationPrincipal UserDetailsImpl userDetails){
-        Member currentMember = userDetails.getMember();
-        return groupGoalService.save(createGroupRequestDto,currentMember);
-    }
+//    @ApiOperation(value = "같이해부자 생성")
+//    @PostMapping("/money/group/creategroup")
+//    public ResponseEntity<String> postCreateGroup(@RequestBody CreateGroupRequestDto createGroupRequestDto,
+//                                                  @AuthenticationPrincipal UserDetailsImpl userDetails){
+//        Member currentMember = userDetails.getMember();
+//        return groupGoalService.save(createGroupRequestDto,currentMember);
+//    }
 
     @ApiOperation(value = "같이해부자 나가기")
     @DeleteMapping("/money/group/exitgroup/{id}")

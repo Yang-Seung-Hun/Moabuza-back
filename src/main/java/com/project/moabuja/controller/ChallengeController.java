@@ -34,14 +34,14 @@ public class ChallengeController {
         return challengeGoalService.getChallengeMemberCandidates(currentMember);
     }
 
-    @ApiOperation(value = "도전해부자 생성")
-    @PostMapping("/money/challenge/createChallenge")
-    public ResponseEntity<String> postCreateChallenge(@RequestBody CreateChallengeRequestDto createChallengeRequestDto,
-                                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
-        log.info("============== 도전해부자 생성 나옵니까? ===============");
-        Member currentMember = userDetails.getMember();
-        return challengeGoalService.save(createChallengeRequestDto, currentMember);
-    }
+//    @ApiOperation(value = "도전해부자 생성")
+//    @PostMapping("/money/challenge/createChallenge")
+//    public ResponseEntity<String> postCreateChallenge(@RequestBody CreateChallengeRequestDto createChallengeRequestDto,
+//                                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
+//        log.info("============== 도전해부자 생성 나옵니까? ===============");
+//        Member currentMember = userDetails.getMember();
+//        return challengeGoalService.save(createChallengeRequestDto, currentMember);
+//    }
 
     @ApiOperation(value = "도전해부자 나가기")
     @DeleteMapping("/money/challenge/exitchallenge/{id}")
