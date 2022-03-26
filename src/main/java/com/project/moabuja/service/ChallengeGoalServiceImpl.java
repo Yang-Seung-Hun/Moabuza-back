@@ -10,6 +10,7 @@ import com.project.moabuja.dto.response.goal.*;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -45,6 +47,8 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         }
 
         ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(), createChallengeRequestDto.getCreateChallengeAmount(), 0);
+
+        log.info(" --------------------------- " + createChallengeRequestDto.getChallengeFriends().size());
 
         if (createChallengeRequestDto.getChallengeFriends().isEmpty()) {
             ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
