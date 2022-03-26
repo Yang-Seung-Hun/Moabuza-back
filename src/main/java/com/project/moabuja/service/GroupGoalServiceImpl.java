@@ -27,6 +27,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     private final GroupGoalRepository groupGoalRepository;
     private final RecordRepository recordRepository;
     private final FriendRepository friendRepository;
+    private final WaitingGoalRepository waitingGoalRepository;
 
     @Override
     @Transactional
@@ -166,5 +167,24 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         }
 
         return ResponseEntity.ok().body("도전해부자 취소 완료");
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> exitWaitingGroup(Member current, Long id) {
+
+        Optional<Member> currentMemberTmp = memberRepository.findById(current.getId());
+        Member currentMember = null;
+
+        if(currentMemberTmp.isPresent()){
+            currentMember = currentMemberTmp.get();
+        } else{
+            throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다.");
+        }
+
+        WaitingGoal waitingGoalById = waitingGoalRepository.findWaitingGoalById(id);
+        waitingGoalRepository.delete(waitingGoalById);
+
+        return ResponseEntity.ok().body("도전해부자 나가기 완료");
     }
 }

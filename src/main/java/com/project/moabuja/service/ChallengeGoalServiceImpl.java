@@ -29,6 +29,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     private final ChallengeGoalRepository challengeGoalRepository;
     private final RecordRepository recordRepository;
     private final FriendRepository friendRepository;
+    private final WaitingGoalRepository waitingGoalRepository;
 
     @Transactional
     @Override
@@ -105,7 +106,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
                 List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
                 for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
-                    waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getId(),memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
+                    waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(),memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
                 }
 
                 ChallengeResponseDto waitingResponseDto = new ChallengeResponseDto(goalStatus, null, null, challengeDoneGoalNames, null, waitingGoals);
@@ -171,4 +172,25 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         return ResponseEntity.ok().body("도전해부자 나가기 완료");
     }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> exitWaitingChallenge(Member current, Long id) {
+
+        Optional<Member> currentMemberTmp = memberRepository.findById(current.getId());
+        Member currentMember = null;
+
+        if(currentMemberTmp.isPresent()){
+            currentMember = currentMemberTmp.get();
+        } else{
+            throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다.");
+        }
+
+        WaitingGoal waitingGoalById = waitingGoalRepository.findWaitingGoalById(id);
+        waitingGoalRepository.delete(waitingGoalById);
+
+        return ResponseEntity.ok().body("도전해부자 나가기 완료");
+    }
+
+
 }
