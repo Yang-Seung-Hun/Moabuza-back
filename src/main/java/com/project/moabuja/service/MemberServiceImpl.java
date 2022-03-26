@@ -14,6 +14,7 @@ import com.project.moabuja.dto.KakaoUserInfoDto;
 import com.project.moabuja.dto.TokenDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
+import com.project.moabuja.dto.request.member.RegToLoginDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.dto.response.member.ReissueDto;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
@@ -52,12 +53,12 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     public ResponseEntity<CustomResponseEntity> kakaoLogin(String code) throws JsonProcessingException {
-        String accessToken = getAccessToken(code);
-        KakaoUserInfoDto kakaoUserInfoDto = getKakaoUserInfo(accessToken);
+        KakaoUserInfoDto kakaoUserInfoDto = getKakaoUserInfo(getAccessToken(code));
+        RegToLoginDto regToLoginDto = register(kakaoUserInfoDto);
         TokenDto dto = TokenDto.builder()
-                .nickname(register(kakaoUserInfoDto))
-                .access(jwtTokenProvider.createAccessToken(kakaoUserInfoDto.getEmail()))
-                .refresh(jwtTokenProvider.createRefreshToken(kakaoUserInfoDto.getEmail()))
+                .nickname(regToLoginDto.getNickname())
+                .access(jwtTokenProvider.createAccessToken(regToLoginDto.getPassword()))
+                .refresh(jwtTokenProvider.createRefreshToken(regToLoginDto.getPassword()))
                 .build();
 
         redisTemplate.opsForValue()
@@ -133,20 +134,26 @@ public class MemberServiceImpl implements MemberService{
 
     @Transactional
     @Override
-    public String register(KakaoUserInfoDto dto) {
+    public RegToLoginDto register(KakaoUserInfoDto dto) {
         Member member = new Member();
+        RegToLoginDto regToLoginDto = null;
 
         // 기존회원이 아니면 회원가입 완료
         if(!memberRepository.existsByEmail(dto.getEmail())){
-            String password = String.valueOf(UUID.randomUUID());
+            String password = UUID.randomUUID().toString().substring(0,8);
             memberRepository.save(member.fromDto(dto, password));
-            return null;
+            regToLoginDto.setPassword(password);
+            regToLoginDto.setNickname(null);
+            return regToLoginDto;
         }
+
         Optional<Member> byEmail = Optional
                 .ofNullable(memberRepository.findByEmails(dto.getEmail()))
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저 없음"));
 
-        return byEmail.get().getNickname();
+        regToLoginDto.setNickname(byEmail.get().getNickname());
+        regToLoginDto.setPassword(byEmail.get().getPassword());
+        return regToLoginDto;
     }
 
     @Transactional
