@@ -47,4 +47,11 @@ public class GroupGoalController {
         return groupGoalService.exitGroup(currentMember, id);
     }
 
+    @ApiOperation(value = "대기중인 같이해부자 나가기")
+    @DeleteMapping("/money/group/exitWaitingGroup/{id}")
+    public ResponseEntity<String> exitWaitGroup(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
+        Member currentMember = userDetails.getMember();
+        return groupGoalService.exitWaitingGroup(currentMember, id);
+    }
+
 }

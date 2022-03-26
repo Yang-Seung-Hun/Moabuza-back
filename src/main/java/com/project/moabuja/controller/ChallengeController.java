@@ -50,7 +50,7 @@ public class ChallengeController {
         return challengeGoalService.exitChallenge(currentMember, id);
     }
 
-    @ApiOperation(value = "도전해부자 나가기")
+    @ApiOperation(value = "대기중인 도전해부자 나가기")
     @DeleteMapping("/money/challenge/exitWaitingChallenge/{id}")
     public ResponseEntity<String> exitWaitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
         Member currentMember = userDetails.getMember();

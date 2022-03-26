@@ -21,4 +21,7 @@ public interface GroupGoalService {
 
     ResponseEntity<String> exitGroup(Member currentMember, Long id);
 
+    ResponseEntity<String> exitWaitingGroup(Member currentMember, Long id);
+
+
 }
