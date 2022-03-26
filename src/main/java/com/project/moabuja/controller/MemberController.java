@@ -39,7 +39,8 @@ public class MemberController {
         System.out.println("fcmToken : " + dto.getFcmToken());
         fcmService.register(dto.getNickname(), dto.getFcmToken());
 //        Member currentMember =  validation.memberValidation(userDetails.getMember());
-        String email = userDetails.getUsername();
+//        String email = userDetails.getUsername();
+        String email = userDetails.getMember().getEmail();
 
         return memberService.updateMemberInfo(dto, email);
     }
