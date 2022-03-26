@@ -134,7 +134,7 @@ public class AlarmServiceImpl implements AlarmService {
                 } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
             }
         } else if (goalAlarmRequestDto.getGoalType() == GoalType.CHALLENGE) {
-            if (goalAlarmRequestDto.getFriendNickname().isEmpty()) {
+            if (goalAlarmRequestDto.getFriendNickname().size() == 0) {
                 CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), null);
                 challengeGoalService.save(createChallengeRequestDto, currentMember);
             }
