@@ -38,11 +38,11 @@ public class JwtTokenProvider {
     }
 
     // access 토큰 생성
-    public String createAccessToken(String password) {
-        Claims claims = Jwts.claims().setSubject(password);
+    public String createAccessToken(String email) {
+        Claims claims = Jwts.claims().setSubject(email);
         Date now = new Date();
         return Jwts.builder()
-                .setSubject(password)
+                .setSubject(email)
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + accessTokenTime))
@@ -51,11 +51,11 @@ public class JwtTokenProvider {
     }
 
     // refresh 토큰 생성
-    public String createRefreshToken(String password) {
-        Claims claims = Jwts.claims().setSubject(password);
+    public String createRefreshToken(String email) {
+        Claims claims = Jwts.claims().setSubject(email);
         Date now = new Date();
         return Jwts.builder()
-                .setSubject(password)
+                .setSubject(email)
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + refreshTokenTime))

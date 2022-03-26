@@ -17,10 +17,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final MemberRepository memberRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String password) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         Member member = Optional
-                .ofNullable(memberRepository.findByPassword(password))
+                .ofNullable(memberRepository.findByPassword(email))
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저 없음"));
 
         return new UserDetailsImpl(member);
