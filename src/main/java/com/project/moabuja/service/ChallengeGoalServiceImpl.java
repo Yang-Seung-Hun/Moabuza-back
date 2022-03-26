@@ -46,7 +46,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(), createChallengeRequestDto.getCreateChallengeAmount(), 0);
 
-        if (createChallengeRequestDto.getChallengeFriends().size() == 0) {
+        if (createChallengeRequestDto.getChallengeFriends().isEmpty()) {
             ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
             savedGoal.addMember(currentMember);
             return ResponseEntity.ok().body("도전해부자 생성 완료");
