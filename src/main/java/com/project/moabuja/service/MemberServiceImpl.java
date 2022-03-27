@@ -85,7 +85,6 @@ public class MemberServiceImpl implements MemberService{
         body.add("redirect_uri", "https://moabuza.com/user/kakao/callback");
         body.add("code", code);
         body.add("client_secret", "X8m672khDWbTiYJlRBNwNGtH8K3k7HVE");
-
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
                 new HttpEntity<>(body, headers);
