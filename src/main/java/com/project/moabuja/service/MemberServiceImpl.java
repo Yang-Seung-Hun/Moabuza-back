@@ -64,6 +64,7 @@ public class MemberServiceImpl implements MemberService{
                 .build();
         redisTemplate.opsForValue()
                 .set("RT:" + kakaoUserInfoDto.getEmail(), dto.getRefresh(), jwtTokenProvider.getExpiration(dto.getRefresh()), TimeUnit.MILLISECONDS);
+
          CustomResponseEntity response = CustomResponseEntity.builder()
                 .code(HttpStatus.OK)
                 .message("카카오 로그인 콜백 메서드부분")
