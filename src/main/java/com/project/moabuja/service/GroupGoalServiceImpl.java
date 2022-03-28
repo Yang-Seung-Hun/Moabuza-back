@@ -1,11 +1,17 @@
 package com.project.moabuja.service;
 
+import com.project.moabuja.domain.alarm.Alarm;
+import com.project.moabuja.domain.alarm.AlarmDetailType;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.goal.*;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
+import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
+import com.project.moabuja.dto.request.alarm.GoalAlarmSaveDto;
+import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import com.project.moabuja.dto.request.goal.CreateGroupRequestDto;
+import com.project.moabuja.dto.request.goal.WaitingGoalSaveDto;
 import com.project.moabuja.dto.response.goal.*;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.repository.*;
@@ -18,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.project.moabuja.domain.alarm.AlarmType.CHALLENGE;
+import static com.project.moabuja.domain.alarm.AlarmType.GROUP;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -27,7 +36,9 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     private final GroupGoalRepository groupGoalRepository;
     private final RecordRepository recordRepository;
     private final FriendRepository friendRepository;
+    private final AlarmRepository alarmRepository;
     private final WaitingGoalRepository waitingGoalRepository;
+    private final MemberWaitingGoalRepository memberWaitingGoalRepository;
 
     @Override
     @Transactional
@@ -147,6 +158,101 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         CreateGroupResponseDto groupResponseDto = new CreateGroupResponseDto(groupMembers);
         return ResponseEntity.ok().body(groupResponseDto);
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<String> postGroup(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
+        WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.GROUP));
+        memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, true));
+
+        for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
+            Optional<Member> member = memberRepository.findMemberByNickname(friendNickname);
+            if (member.isPresent()) {
+                MemberWaitingGoal memberWaitingGoal = new MemberWaitingGoal(member.get(), waitingGoal, false);
+                memberWaitingGoalRepository.save(memberWaitingGoal);
+
+                alarmRepository.save(GoalAlarmSaveDto.goalToEntity(goalAlarmRequestDto, waitingGoal.getId(), GROUP, AlarmDetailType.invite, currentMember.getNickname(), member.get()));
+            } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
+        }
+
+        return ResponseEntity.ok().body("해부자 요청 완료");
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<String> postGroupAccept(Member currentMember, Long alarmId) {
+        Alarm alarm = alarmRepository.findAlarmById(alarmId);
+        WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
+        MemberWaitingGoal currentMemberWaitingGoal = memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal);
+        currentMemberWaitingGoal.changeIsAcceptedGoal();
+
+        List<MemberWaitingGoal> friends = memberWaitingGoalRepository.findMemberWaitingGoalsByWaitingGoal(waitingGoal);
+
+        // 전체 수락 전
+        if (! checkAccepted(friends)) {
+            List<String> friendList = new ArrayList<>();
+
+            for (MemberWaitingGoal friend : friends) {
+                if (friend.getMember() != currentMember) {
+                    friendList.add(friend.getMember().getNickname());
+                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.GROUP, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                            waitingGoal.getId(), GROUP, AlarmDetailType.accept, currentMember.getNickname(), friend.getMember()));
+                }
+            }
+            alarmRepository.delete(alarm);
+        }
+
+        // 전체 수락 후 마지막 수락
+        else if (checkAccepted(friends)) {
+            List<String> friendList = new ArrayList<>();
+
+            for (MemberWaitingGoal friend : friends) {
+                if (friend.getMember() != currentMember) {
+                    friendList.add(friend.getMember().getNickname());
+                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.GROUP, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                            waitingGoal.getId(), GROUP, AlarmDetailType.create, currentMember.getNickname(), friend.getMember()));
+                }
+            }
+            // GroupGoal 생성
+            CreateGroupRequestDto createGroupRequestDto = new CreateGroupRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
+            save(createGroupRequestDto, currentMember);
+            waitingGoalRepository.delete(waitingGoal);
+
+            alarmRepository.delete(alarm);
+        }
+
+        return ResponseEntity.ok().body("해부자 수락 완료");
+    }
+
+    public boolean checkAccepted(List<MemberWaitingGoal> memberWaitingGoals) {
+        boolean result = true;
+
+        for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
+            if (! memberWaitingGoal.isAcceptedGoal()) {
+                result = false;
+                break; }}
+        return result;
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<String> postGroupRefuse(Member currentMember, Long alarmId) {
+        Alarm alarm = alarmRepository.findAlarmById(alarmId);
+        WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
+        List<MemberWaitingGoal> friends = memberWaitingGoalRepository.findMemberWaitingGoalsByWaitingGoal(waitingGoal);
+
+        List<String> friendList = new ArrayList<>();
+
+        for (MemberWaitingGoal friend : friends) {
+            friendList.add(friend.getMember().getNickname());
+            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.GROUP, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                    waitingGoal.getId(), GROUP, AlarmDetailType.boom, currentMember.getNickname(), friend.getMember()));
+        }
+        alarmRepository.delete(alarm);
+        waitingGoalRepository.delete(waitingGoal);
+
+        return ResponseEntity.ok().body("해부자 거절 완료");
     }
 
     @Override

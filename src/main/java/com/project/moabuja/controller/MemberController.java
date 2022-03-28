@@ -27,8 +27,18 @@ public class MemberController {
     private final MemberService memberService;
     private final FCMServiceImpl fcmService;
 
+    @ApiOperation(value = "로그인 후 home 페이지")
+    @GetMapping("/home")
+    public ResponseEntity<HomeResponseDto> getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        if(userDetails == null){
+            throw  new MemberNotFoundException("컨트롤러 Move to Login Page");
+        }
+        Member currentUser = userDetails.getMember();
+        return memberService.getHomeInfo(currentUser);
+    }
+
     @ApiOperation(value = "카카오 로그인 api")
-    @GetMapping("/user/kakao/callback")
+    @GetMapping("/member/kakao/callback")
     public ResponseEntity<CustomResponseEntity> kakaoLogin(@RequestParam String code) throws JsonProcessingException {
         return memberService.kakaoLogin(code);
     }
@@ -43,30 +53,20 @@ public class MemberController {
     }
 
     @ApiOperation(value = "닉네임 중복체크")
-    @PostMapping("/nickname/validation")
+    @PostMapping("/member/validation")
     public ResponseEntity<String> nicknameValid(@Valid @RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
         return memberService.nicknameValid(nicknameValidationRequestDto);
     }
 
     @ApiOperation(value = "access 토큰 재발급")
-    @GetMapping("/api/reissue")
+    @GetMapping("/member/reissue")
     public ResponseEntity<CustomResponseEntity> reissue(HttpServletRequest request){
         return memberService.reissue(request);
     }
 
     @ApiOperation(value = "로그아웃")
-    @GetMapping("/api/logout")
+    @GetMapping("/member/logout")
     public ResponseEntity<String> logout(HttpServletRequest request){
         return memberService.logout(request);
-    }
-
-    @ApiOperation(value = "로그인 후 home 페이지")
-    @GetMapping("/home")
-    public ResponseEntity<HomeResponseDto> getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
-        if(userDetails == null){
-            throw  new MemberNotFoundException("컨트롤러 Move to Login Page");
-        }
-        Member currentUser = userDetails.getMember();
-        return memberService.getHomeInfo(currentUser);
     }
 }
