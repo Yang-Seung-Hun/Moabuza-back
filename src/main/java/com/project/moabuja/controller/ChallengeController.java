@@ -70,7 +70,7 @@ public class ChallengeController {
     @DeleteMapping("/challenge/{id}/waiting")
     public ResponseEntity<String> exitWaitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
         Member currentMember = userDetails.getMember();
-        return challengeGoalService.exitWaitingChallenge(currentMember, id);
+        return challengeGoalService.exitWaitingChallenge(id);
     }
 
 }

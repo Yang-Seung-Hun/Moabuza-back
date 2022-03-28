@@ -2,6 +2,7 @@ package com.project.moabuja.service;
 
 import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.alarm.AlarmDetailType;
+import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.goal.*;
 import com.project.moabuja.domain.member.Member;
@@ -169,17 +170,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     @Override
     public ResponseEntity<String> postGroup(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
         WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.GROUP));
-        memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, true));
-
-        for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
-            Optional<Member> member = memberRepository.findMemberByNickname(friendNickname);
-            if (member.isPresent()) {
-                MemberWaitingGoal memberWaitingGoal = new MemberWaitingGoal(member.get(), waitingGoal, false);
-                memberWaitingGoalRepository.save(memberWaitingGoal);
-
-                alarmRepository.save(GoalAlarmSaveDto.goalToEntity(goalAlarmRequestDto, waitingGoal.getId(), GROUP, AlarmDetailType.invite, currentMember.getNickname(), member.get()));
-            } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
-        }
+        inviteFriends(currentMember, goalAlarmRequestDto, waitingGoal, memberWaitingGoalRepository, memberRepository, alarmRepository, GROUP);
 
         return ResponseEntity.ok().body("해부자 요청 완료");
     }
@@ -282,20 +273,24 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Override
     @Transactional
-    public ResponseEntity<String> exitWaitingGroup(Member current, Long id) {
-
-        Optional<Member> currentMemberTmp = memberRepository.findById(current.getId());
-        Member currentMember = null;
-
-        if(currentMemberTmp.isPresent()){
-            currentMember = currentMemberTmp.get();
-        } else{
-            throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다.");
-        }
+    public ResponseEntity<String> exitWaitingGroup(Long id) {
 
         WaitingGoal waitingGoalById = waitingGoalRepository.findWaitingGoalById(id);
         waitingGoalRepository.delete(waitingGoalById);
 
         return ResponseEntity.ok().body("도전해부자 나가기 완료");
+    }
+
+    //challengeGoalServiceImpl에서도 사용
+    static void inviteFriends(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto, WaitingGoal waitingGoal, MemberWaitingGoalRepository memberWaitingGoalRepository, MemberRepository memberRepository, AlarmRepository alarmRepository, AlarmType group) {
+        memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, true));
+
+        for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
+            if (memberRepository.findMemberByNickname(friendNickname).isEmpty()) { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
+            Member member = memberRepository.findMemberByNickname(friendNickname).get();
+            MemberWaitingGoal memberWaitingGoal = new MemberWaitingGoal(member, waitingGoal, false);
+            memberWaitingGoalRepository.save(memberWaitingGoal);
+            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(goalAlarmRequestDto, waitingGoal.getId(), group, AlarmDetailType.invite, currentMember.getNickname(), member));
+        }
     }
 }
