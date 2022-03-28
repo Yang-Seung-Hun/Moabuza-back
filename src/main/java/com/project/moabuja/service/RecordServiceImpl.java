@@ -164,25 +164,6 @@ public class RecordServiceImpl implements RecordService{
         return ResponseEntity.ok().body(recordResponseDto);
     }
 
-    public int walletCheck(Member currentMember) {
-        int wallet = 0;
-        List<Record> recordsByMember = recordRepository.findRecordsByMember(currentMember);
-        for (Record recordData : recordsByMember) {
-            if (recordData.getRecordType() == RecordType.expense) {
-                wallet -= recordData.getRecordAmount();
-            }
-            if (recordData.getRecordType() == RecordType.income) {
-                wallet += recordData.getRecordAmount();
-            }
-            if (recordData.getRecordType() == RecordType.challenge && recordData.getRecordAmount() > 0) {
-                wallet -= recordData.getRecordAmount();
-            }
-            if (recordData.getRecordType() == RecordType.group && recordData.getRecordAmount() > 0) {
-                wallet -= recordData.getRecordAmount();
-            }
-        }
-        return wallet;
-    }
 
     @Override//wallet, totalAmount 보류
     public ResponseEntity<DayListResponseDto> getDayList(DayListRequestDto dayListRequestDto, Member currentUser) {
@@ -253,5 +234,25 @@ public class RecordServiceImpl implements RecordService{
             separateAmounts.put(member,tmpAmount);
         }
         return separateAmounts;
+    }
+
+    public int walletCheck(Member currentMember) {
+        int wallet = 0;
+        List<Record> recordsByMember = recordRepository.findRecordsByMember(currentMember);
+        for (Record recordData : recordsByMember) {
+            if (recordData.getRecordType() == RecordType.expense) {
+                wallet -= recordData.getRecordAmount();
+            }
+            if (recordData.getRecordType() == RecordType.income) {
+                wallet += recordData.getRecordAmount();
+            }
+            if (recordData.getRecordType() == RecordType.challenge && recordData.getRecordAmount() > 0) {
+                wallet -= recordData.getRecordAmount();
+            }
+            if (recordData.getRecordType() == RecordType.group && recordData.getRecordAmount() > 0) {
+                wallet -= recordData.getRecordAmount();
+            }
+        }
+        return wallet;
     }
 }
