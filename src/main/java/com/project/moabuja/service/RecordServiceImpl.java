@@ -14,6 +14,7 @@ import com.project.moabuja.dto.request.record.RecordRequestDto;
 import com.project.moabuja.dto.response.record.DayListResponseDto;
 import com.project.moabuja.dto.response.record.DayRecordResponseDto;
 import com.project.moabuja.dto.response.record.RecordResponseDto;
+import com.project.moabuja.exception.exceptionClass.AlarmErrorException;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.exception.exceptionClass.RecordErrorException;
 import com.project.moabuja.repository.AlarmRepository;
@@ -46,25 +47,19 @@ public class RecordServiceImpl implements RecordService{
     @Override
     public ResponseEntity<RecordResponseDto> save(RecordRequestDto recordRequestDto, Member currentMemberTemp) {
 
-        Optional<Member> memberTemp = memberRepository.findById(currentMemberTemp.getId());
-        Member currentMember = null;
-        if(memberTemp.isPresent()){
-            currentMember = memberTemp.get();
-        }
-        else{
-            throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다.");
-        }
+        if (memberRepository.findById(currentMemberTemp.getId()).isEmpty()) { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
+        Member currentMember = memberRepository.findById(currentMemberTemp.getId()).get();
 
         RecordResponseDto recordResponseDto = new RecordResponseDto(false);
-
         Record record = new Record(recordRequestDto, currentMember);
+
+        int wallet = walletCheck(currentMember);
 
         if(recordRequestDto.getRecordType() == RecordType.income) {
             recordRepository.save(record);
         }
 
         else if(recordRequestDto.getRecordType() == RecordType.expense) {
-            int wallet = walletCheck(currentMember);
             if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
             } else { throw new RecordErrorException("지갑보다 큰 돈을 사용할 수 없습니다."); }
@@ -72,7 +67,6 @@ public class RecordServiceImpl implements RecordService{
 
         //type이 challenge일때 목표완료됐는지 확인
         else if(recordRequestDto.getRecordType() == RecordType.challenge){
-            int wallet = walletCheck(currentMember);
             if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
             } else { throw new RecordErrorException("지갑보다 큰 돈을 저금하는 것은 불가능 합니다."); }
@@ -117,7 +111,6 @@ public class RecordServiceImpl implements RecordService{
 
         //group goal 완료 로직
         else if(recordRequestDto.getRecordType() == RecordType.group){
-            int wallet = walletCheck(currentMember);
             if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
             } else { throw new RecordErrorException("지갑보다 큰 돈을 저금하는 것은 불가능 합니다."); }
@@ -130,7 +123,6 @@ public class RecordServiceImpl implements RecordService{
             }
 
             int goalAmount = currentMember.getGroupGoal().getGroupGoalAmount();
-
             GroupGoal groupGoal = currentMember.getGroupGoal();
             HashMap<Member, Integer> separateAmount = countSeparateCurrentGroup(groupGoal);
             int currentAmount = 0;
@@ -160,13 +152,16 @@ public class RecordServiceImpl implements RecordService{
                 recordResponseDto.changeIsComplete();
             }
         }
-
         return ResponseEntity.ok().body(recordResponseDto);
     }
 
-
     @Override//wallet, totalAmount 보류
     public ResponseEntity<DayListResponseDto> getDayList(DayListRequestDto dayListRequestDto, Member currentUser) {
+
+        int dayIncomeAmount = 0;
+        int dayExpenseAmount = 0;
+        int dayChallengeAmount = 0;
+        int dayGroupAmount = 0;
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
@@ -176,10 +171,6 @@ public class RecordServiceImpl implements RecordService{
             return new DayRecordResponseDto(record.getId(),record.getRecordType(), record.getRecordDate(), record.getMemo(), record.getRecordAmount());
         }).collect(Collectors.toList());
 
-        int dayIncomeAmount = 0;
-        int dayExpenseAmount = 0;
-        int dayChallengeAmount = 0;
-        int dayGroupAmount = 0;
         for (DayRecordResponseDto dayRecordResponseDto : dayRecordList) {
             if (dayRecordResponseDto.getRecordType() == RecordType.income){
                 dayIncomeAmount += dayRecordResponseDto.getRecordAmount();
@@ -238,6 +229,12 @@ public class RecordServiceImpl implements RecordService{
 
     public int walletCheck(Member currentMember) {
         int wallet = 0;
+        wallet = getWallet(currentMember, wallet, recordRepository);
+        return wallet;
+    }
+
+    //memberServicImpl에서 중복 되는 부분이라 추출
+    static int getWallet(Member currentMember, int wallet, RecordRepository recordRepository) {
         List<Record> recordsByMember = recordRepository.findRecordsByMember(currentMember);
         for (Record recordData : recordsByMember) {
             if (recordData.getRecordType() == RecordType.expense) {

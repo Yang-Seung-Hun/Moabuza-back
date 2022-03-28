@@ -48,14 +48,16 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Override
     public ResponseEntity<String> save(CreateChallengeRequestDto createChallengeRequestDto, Member currentTemp) {
 
+        if (memberRepository.findById(currentTemp.getId()).isEmpty()) { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
+        Member currentMember = memberRepository.findById(currentTemp.getId()).get();
 
-        Optional<Member> currentMemberTemp = memberRepository.findById(currentTemp.getId());
-        Member currentMember = null;
-        if(currentMemberTemp.isPresent()){
-            currentMember = currentMemberTemp.get();
-        }else{
-            throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다.");
-        }
+//        Optional<Member> currentMemberTemp = memberRepository.findById(currentTemp.getId());
+//        Member currentMember = null;
+//        if(currentMemberTemp.isPresent()){
+//            currentMember = currentMemberTemp.get();
+//        }else{
+//            throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다.");
+//        }
 
         ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(), createChallengeRequestDto.getCreateChallengeAmount(), 0);
 
@@ -66,12 +68,15 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         }
 
         for(String name :createChallengeRequestDto.getChallengeFriends()){
-            Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
-            if (memberByNickname.isPresent()) {
-                challengeGoal.addMember(memberByNickname.get());
-            } else {
-                throw new MemberNotFoundException("선택하신 친구 중 존재하지 않는 사용자가 있습니다.");
-            }
+            if (memberRepository.findMemberByNickname(name).isEmpty()) { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
+            challengeGoal.addMember(memberRepository.findMemberByNickname(name).get());
+
+//            Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
+//            if (memberByNickname.isPresent()) {
+//                challengeGoal.addMember(memberByNickname.get());
+//            } else {
+//                throw new MemberNotFoundException("선택하신 친구 중 존재하지 않는 사용자가 있습니다.");
+//            }
         }
 
         //member랑 challengegoal 연관관계 맺음
