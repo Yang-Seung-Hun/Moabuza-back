@@ -24,6 +24,7 @@ import com.project.moabuja.repository.RecordRepository;
 import com.project.moabuja.security.filter.JwtTokenProvider;
 import com.project.moabuja.util.CustomResponseEntity;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
@@ -41,6 +42,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional
@@ -135,7 +137,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public RegToLoginDto register(KakaoUserInfoDto dto) {
         Member member = new Member();
-        RegToLoginDto regToLoginDto = null;
+        RegToLoginDto regToLoginDto = new RegToLoginDto();
 
         // 기존회원이 아니면 회원가입 완료
         if(!memberRepository.existsByEmail(dto.getEmail())){
