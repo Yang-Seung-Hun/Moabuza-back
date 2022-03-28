@@ -66,4 +66,4 @@ jobs:
         version_label: github-action-${{steps.current-time.outputs.formattedTime}}
         region: ap-northeast-2
         wait_for_environment_recovery: 180
-        deployment_package: /deploy.zip
+        deployment_package: deploy/deploy.zip
