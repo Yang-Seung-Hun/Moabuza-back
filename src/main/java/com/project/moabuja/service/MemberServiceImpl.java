@@ -83,8 +83,8 @@ public class MemberServiceImpl implements MemberService{
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "f367d5c13479608400bba9be2af87fc6");
-        body.add("redirect_uri", "http://localhost:3000/user/kakao/callback");
-//        body.add("redirect_uri", "https://moabuza.com/user/kakao/callback");
+        body.add("redirect_uri", "http://localhost:3000/member/kakao/callback");
+//        body.add("redirect_uri", "https://moabuza.com/member/kakao/callback");
         body.add("code", code);
         body.add("client_secret", "X8m672khDWbTiYJlRBNwNGtH8K3k7HVE");
         // HTTP 요청 보내기
@@ -151,6 +151,7 @@ public class MemberServiceImpl implements MemberService{
         Optional<Member> byEmail = Optional
                 .ofNullable(memberRepository.findByEmails(dto.getEmail()))
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저 없음"));
+
 
         regToLoginDto.setNickname(byEmail.get().getNickname());
         regToLoginDto.setPassword(byEmail.get().getPassword());
@@ -237,6 +238,7 @@ public class MemberServiceImpl implements MemberService{
 //        Member currentUser = currentUserTmp.get();
         Member currentUser = null;
 
+        //TODO : OPTIONAL 코드 바꾸기!!
         if(currentUserTmp.isPresent()){
             currentUser = currentUserTmp.get();
         } else {

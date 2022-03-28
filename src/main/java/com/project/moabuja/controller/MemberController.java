@@ -33,8 +33,7 @@ public class MemberController {
         if(userDetails == null){
             throw  new MemberNotFoundException("컨트롤러 Move to Login Page");
         }
-        Member currentUser = userDetails.getMember();
-        return memberService.getHomeInfo(currentUser);
+        return memberService.getHomeInfo(userDetails.getMember());
     }
 
     @ApiOperation(value = "카카오 로그인 api")
@@ -48,8 +47,7 @@ public class MemberController {
     public ResponseEntity<String> update(@Valid @RequestBody MemberUpdateRequestDto dto,
                                  @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
         fcmService.register(dto.getNickname(), dto.getFcmToken());
-        String email = userDetails.getMember().getEmail();
-        return memberService.updateMemberInfo(dto, email);
+        return memberService.updateMemberInfo(dto, userDetails.getMember().getEmail());
     }
 
     @ApiOperation(value = "닉네임 중복체크")
