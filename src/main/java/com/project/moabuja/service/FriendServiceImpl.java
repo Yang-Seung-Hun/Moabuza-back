@@ -62,10 +62,10 @@ public class FriendServiceImpl implements FriendService{
     public ResponseEntity<FriendSearchResponseDto> searchFriend(FriendRequestDto friendRequestDto) {
         Optional<Member> friend = memberRepository.findMemberByNickname(friendRequestDto.getFriendNickname());
         if (friend.isPresent()) {
-            FriendSearchResponseDto friendSearchResponseDto = new FriendSearchResponseDto(true, friend.get().getNickname());
+            FriendSearchResponseDto friendSearchResponseDto = new FriendSearchResponseDto(true, friend.get().getNickname(), friend.get().getHero());
             return ResponseEntity.ok().body(friendSearchResponseDto);
         } else {
-            FriendSearchResponseDto friendSearchResponseDto = new FriendSearchResponseDto(false, null);
+            FriendSearchResponseDto friendSearchResponseDto = new FriendSearchResponseDto(false, null, null);
             return ResponseEntity.ok().body(friendSearchResponseDto);
         }
     }
