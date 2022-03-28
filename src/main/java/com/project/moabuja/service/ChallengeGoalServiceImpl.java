@@ -168,15 +168,11 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         Optional<Member> currentMember = memberRepository.findById(currentMemberTemp.getId());
 
         List<Member> memberList = currentMember.get().getChallengeGoal().getMembers();
-        if (memberList.size() <= 1) {
-            ChallengeGoal challengeGoal = currentMember.get().getChallengeGoal();
-            for (Member member : memberList) {
-                member.changeGroupGoal(null);
-            }
-            challengeGoalRepository.delete(challengeGoal);
-        } else {
-            currentMember.get().changeGroupGoal(null);
-        }
+
+        ChallengeGoal challengeGoal = currentMember.get().getChallengeGoal();
+        currentMember.get().changeGroupGoal(null);
+
+        if (memberList.size() == 1) { challengeGoalRepository.delete(challengeGoal); }
 
         return ResponseEntity.ok().body("도전해부자 나가기 완료");
     }
