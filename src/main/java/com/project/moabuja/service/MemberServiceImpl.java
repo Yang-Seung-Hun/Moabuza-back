@@ -17,6 +17,8 @@ import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.request.member.RegToLoginDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.dto.response.member.ReissueDto;
+import com.project.moabuja.exception.ErrorException;
+import com.project.moabuja.exception.ErrorManual;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.MemberRepository;
@@ -41,6 +43,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import static com.project.moabuja.exception.ErrorManual.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -150,7 +154,7 @@ public class MemberServiceImpl implements MemberService{
 
         Optional<Member> byEmail = Optional
                 .ofNullable(memberRepository.findByEmails(dto.getEmail()))
-                .orElseThrow(() -> new UsernameNotFoundException("해당 유저 없음"));
+                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
 
         regToLoginDto.setNickname(byEmail.get().getNickname());
@@ -163,7 +167,7 @@ public class MemberServiceImpl implements MemberService{
     public ResponseEntity<String> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
         String nickname = nicknameValidationRequestDto.getNickname();
         if(memberRepository.existsByNickname(nickname)){
-            return ResponseEntity.ok().body("사용중인 닉네임");
+            return ResponseEntity.ok().body("사용 중인 닉네임입니다.");
         }
         return ResponseEntity.ok().body("닉네임 사용 가능");
     }
@@ -173,7 +177,7 @@ public class MemberServiceImpl implements MemberService{
     public ResponseEntity<String> updateMemberInfo(MemberUpdateRequestDto dto, String email) {
         Member byEmail = memberRepository.findByEmail(email);
         if(byEmail == null){
-            throw new UsernameNotFoundException("유저를 찾을 수 없습니다.");
+            throw new ErrorException(MEMBER_NOT_FOUND);
         }
         byEmail.updateInfo(dto);
         return ResponseEntity.ok().body("캐릭터, 닉네임 설정 완료");
@@ -185,15 +189,15 @@ public class MemberServiceImpl implements MemberService{
         String refresh = request.getHeader("R-AUTH-TOKEN").substring(7);
 
         if (!jwtTokenProvider.validateToken(refresh)) {
-            throw new RuntimeException("Refresh Token 이 유효하지 않습니다.");
+            throw new ErrorException(REFRESH_NOT_VALID);
         }
         Authentication authentication = jwtTokenProvider.getAuthentication(access);
         String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
         if(ObjectUtils.isEmpty(refreshToken)) {
-            throw new RuntimeException("잘못된 요청");
+            throw new ErrorException(REFRESH_NOT_EXIST);
         }
         if(!refreshToken.equals(refresh)) {
-            throw new IllegalArgumentException("refresh 일치하지 않음");
+            throw new ErrorException(REFRESH_NOT_MATCH);
         }
         ReissueDto dto = ReissueDto.builder()
                 .refresh(jwtTokenProvider.createRefreshToken(authentication.getName()))
@@ -217,7 +221,7 @@ public class MemberServiceImpl implements MemberService{
     public ResponseEntity<String> logout(HttpServletRequest request) {
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         if (!jwtTokenProvider.validateToken(access)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 요청");
+            throw new ErrorException(ACCESS_NOT_VALID);
         }
         Authentication authentication = jwtTokenProvider.getAuthentication(access);
 
@@ -234,16 +238,11 @@ public class MemberServiceImpl implements MemberService{
     @Transactional
     @Override
     public ResponseEntity<HomeResponseDto> getHomeInfo(Member current) {
-        Optional<Member> currentUserTmp = memberRepository.findById(current.getId());
-//        Member currentUser = currentUserTmp.get();
-        Member currentUser = null;
+        Optional<Member> currentUserTmp = Optional
+                .of(memberRepository.findById(current.getId()))
+                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
-        //TODO : OPTIONAL 코드 바꾸기!!
-        if(currentUserTmp.isPresent()){
-            currentUser = currentUserTmp.get();
-        } else {
-            throw new MemberNotFoundException("서비스단 Move to Login Page");
-        }
+        Member currentUser = currentUserTmp.get();
 
         Hero hero = currentUser.getHero();
 
@@ -318,9 +317,21 @@ public class MemberServiceImpl implements MemberService{
         List<Alarm> alarmList = alarmRepository.findAllByMember(currentUser);
         int alarmCount = alarmList.size();
 
-        HomeResponseDto homeResponseDto = new HomeResponseDto(groupCurrentAmount, groupNeedAmount, groupAmount, groupPercent, groupName,
-                challengeCurrentAmount, challengeNeedAmount, challengeAmount, challengePercent, challengeName,
-                hero, 0, totalAmount, wallet, alarmCount);//heroLevel 일단 0으로
+        HomeResponseDto homeResponseDto = HomeResponseDto.builder()
+                .groupCurrentAmount(groupCurrentAmount)
+                .groupNeedAmount(groupNeedAmount)
+                .groupAmount(groupAmount)
+                .groupPercent(groupPercent)
+                .groupName(groupName)
+                .challengeCurrentAmount(challengeCurrentAmount)
+                .challengeNeedAmount(challengeAmount)
+                .challengePercent(challengePercent)
+                .challengeName(challengeName)
+                .hero(hero)
+                .totalAmount(totalAmount)
+                .wallet(wallet)
+                .alarmCount(alarmCount)
+                .build();
 
         return ResponseEntity.ok().body(homeResponseDto);
     }

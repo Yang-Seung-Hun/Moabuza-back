@@ -5,6 +5,7 @@ import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
+import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.FCMServiceImpl;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import static com.project.moabuja.exception.ErrorManual.*;
+
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
@@ -31,7 +34,7 @@ public class MemberController {
     @GetMapping("/home")
     public ResponseEntity<HomeResponseDto> getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
         if(userDetails == null){
-            throw  new MemberNotFoundException("컨트롤러 Move to Login Page");
+            throw new ErrorException(GEUST_TO_LOGIN);
         }
         return memberService.getHomeInfo(userDetails.getMember());
     }

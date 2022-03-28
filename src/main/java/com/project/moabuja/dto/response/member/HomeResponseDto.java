@@ -1,6 +1,7 @@
 package com.project.moabuja.dto.response.member;
 
 import com.project.moabuja.domain.member.Hero;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,18 +23,17 @@ public class HomeResponseDto {
     private String challengeName;
 
     private Hero hero;
-    private int heroLevel;
 
     private int totalAmount;
     private int wallet;
 
     private int alarmCount;
 
-
+    @Builder
     public HomeResponseDto(int groupCurrentAmount, int groupNeedAmount, int groupAmount, int groupPercent,
                            String groupName, int challengeCurrentAmount, int challengeNeedAmount,
                            int challengeAmount, int challengePercent, String challengeName, Hero hero,
-                           int heroLevel, int totalAmount, int wallet, int alarmCount) {
+                           int totalAmount, int wallet, int alarmCount) {
         this.groupCurrentAmount = groupCurrentAmount;
         this.groupNeedAmount = groupNeedAmount;
         this.groupAmount = groupAmount;
@@ -45,7 +45,6 @@ public class HomeResponseDto {
         this.challengePercent = challengePercent;
         this.challengeName = challengeName;
         this.hero = hero;
-        this.heroLevel = heroLevel;
         this.totalAmount = totalAmount;
         this.wallet = wallet;
         this.alarmCount = alarmCount;
