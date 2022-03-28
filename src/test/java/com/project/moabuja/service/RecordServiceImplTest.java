@@ -214,12 +214,86 @@ class RecordServiceImplTest {
     }
 
     @Test
-    @DisplayName("기록 삭제")
+    @DisplayName("기록 삭제 성공")
     public void deleteRecord(){
 
+        //given
+        Member member = new Member("123456",123456L,"nickname1","email1@naver.com", Hero.tongki);
+        Member savedMember1 = memberRepository.save(member);
+
+        CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("5만원 모으기", 50000, null);
+        challengeGoalService.save(createChallengeRequestDto, savedMember1);
+
+        RecordRequestDto recordRequestDto1 = new RecordRequestDto(RecordType.income, "2022-03-05 00:00:00.000","3월용돈",50000);
+        RecordRequestDto recordRequestDto2 = new RecordRequestDto(RecordType.expense, "2022-03-05 00:00:00.000","편의점",5000);
+        RecordRequestDto recordRequestDto3 = new RecordRequestDto(RecordType.challenge, "2022-03-10 00:00:00.000","가즈아!!",45000);
+        RecordRequestDto recordRequestDto4 = new RecordRequestDto(RecordType.income, "2022-03-10 00:00:00.000","심부름",10000);
+        RecordRequestDto recordRequestDto5 = new RecordRequestDto(RecordType.challenge, "2022-03-10 00:00:00.000","완료!!!",4000);
+
+        recordService.save(recordRequestDto1, savedMember1);
+        recordService.save(recordRequestDto2, savedMember1);
+        recordService.save(recordRequestDto3, savedMember1);
+        recordService.save(recordRequestDto4, savedMember1);
+        recordService.save(recordRequestDto5, savedMember1);
+
+        DayListRequestDto dayListRequestDto1 = new DayListRequestDto("2022-03-05 00:00:00.000");
+        DayListRequestDto dayListRequestDto2 = new DayListRequestDto("2022-03-10 00:00:00.000");
+
+        ResponseEntity<DayListResponseDto> dayList1Tmp = recordService.getDayList(dayListRequestDto1, savedMember1);
+        ResponseEntity<DayListResponseDto> dayList2Tmp = recordService.getDayList(dayListRequestDto2, savedMember1);
+
+        //when
+        recordService.deleteRecord(dayList1Tmp.getBody().getDayRecordList().get(1).getId(),savedMember1);
+        recordService.deleteRecord(dayList2Tmp.getBody().getDayRecordList().get(1).getId(),savedMember1);
+
+        ResponseEntity<DayListResponseDto> dayList1 = recordService.getDayList(dayListRequestDto1,savedMember1);
+        ResponseEntity<DayListResponseDto> dayList2 = recordService.getDayList(dayListRequestDto2,savedMember1);
+
+        //then
+        Assertions.assertThat(dayList1.getBody().getDayRecordList().size()).isEqualTo(1);
+        Assertions.assertThat(dayList1.getBody().getDayExpenseAmount()).isEqualTo(0);
+        Assertions.assertThat(dayList2.getBody().getDayRecordList().size()).isEqualTo(2);
+        Assertions.assertThat(dayList2.getBody().getDayIncomeAmount()).isEqualTo(0);
     }
 
+    @Test
+    @DisplayName("없는 권한 없는 기록 삭제 시 오류 발생")
+    public void deleteRecord2(){
 
+        //given
+        Member member = new Member("123456",123456L,"nickname1","email1@naver.com", Hero.tongki);
+        Member savedMember1 = memberRepository.save(member);
 
+        Member member2 = new Member("123457",123457L,"nickname2","email2@naver.com", Hero.tongki);
+        Member savedMember2 = memberRepository.save(member2);
 
+        CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("5만원 모으기", 50000, null);
+        challengeGoalService.save(createChallengeRequestDto, savedMember1);
+
+        RecordRequestDto recordRequestDto1 = new RecordRequestDto(RecordType.income, "2022-03-05 00:00:00.000","3월용돈",50000);
+        RecordRequestDto recordRequestDto2 = new RecordRequestDto(RecordType.expense, "2022-03-05 00:00:00.000","편의점",5000);
+        RecordRequestDto recordRequestDto3 = new RecordRequestDto(RecordType.challenge, "2022-03-10 00:00:00.000","가즈아!!",45000);
+        RecordRequestDto recordRequestDto4 = new RecordRequestDto(RecordType.income, "2022-03-10 00:00:00.000","심부름",10000);
+        RecordRequestDto recordRequestDto5 = new RecordRequestDto(RecordType.challenge, "2022-03-10 00:00:00.000","완료!!!",4000);
+
+        recordService.save(recordRequestDto1, savedMember1);
+        recordService.save(recordRequestDto2, savedMember1);
+        recordService.save(recordRequestDto3, savedMember1);
+        recordService.save(recordRequestDto4, savedMember1);
+        recordService.save(recordRequestDto5, savedMember1);
+
+        DayListRequestDto dayListRequestDto1 = new DayListRequestDto("2022-03-05 00:00:00.000");
+        DayListRequestDto dayListRequestDto2 = new DayListRequestDto("2022-03-10 00:00:00.000");
+
+        ResponseEntity<DayListResponseDto> dayList1Tmp = recordService.getDayList(dayListRequestDto1, savedMember1);
+        ResponseEntity<DayListResponseDto> dayList2Tmp = recordService.getDayList(dayListRequestDto2, savedMember1);
+
+        //when
+        Long recordId = dayList1Tmp.getBody().getDayRecordList().get(1).getId();
+
+        //then
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, ()->{
+            recordService.deleteRecord(recordId, savedMember2);
+        });
+    }
 }
