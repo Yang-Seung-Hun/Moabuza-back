@@ -296,21 +296,7 @@ public class MemberServiceImpl implements MemberService{
             groupUserWallet += groupUserRecord.getRecordAmount();
         }
 
-        List<Record> recordsByMember = recordRepository.findRecordsByMember(currentUser);
-        for (Record record : recordsByMember) {
-            if (record.getRecordType() == RecordType.expense) {
-                wallet -= record.getRecordAmount();
-            }
-            if (record.getRecordType() == RecordType.income) {
-                wallet += record.getRecordAmount();
-            }
-            if (record.getRecordType() == RecordType.challenge && record.getRecordAmount() > 0) {
-                wallet -= record.getRecordAmount();
-            }
-            if (record.getRecordType() == RecordType.group && record.getRecordAmount() > 0) {
-                wallet -= record.getRecordAmount();
-            }
-        }
+        wallet = RecordServiceImpl.getWallet(currentUser, wallet, recordRepository);
         totalAmount = wallet + challengeCurrentAmount + groupUserWallet;
 
         List<Alarm> alarmList = alarmRepository.findAllByMember(currentUser);

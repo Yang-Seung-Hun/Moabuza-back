@@ -68,7 +68,7 @@ public class GroupGoalController {
     @DeleteMapping("/group/{id}/waiting")
     public ResponseEntity<String> exitWaitGroup(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
         Member currentMember = userDetails.getMember();
-        return groupGoalService.exitWaitingGroup(currentMember, id);
+        return groupGoalService.exitWaitingGroup(id);
     }
 
 }

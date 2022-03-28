@@ -25,5 +25,5 @@ public interface ChallengeGoalService {
 
     ResponseEntity<String> exitChallenge(Member currentMember, Long id);
 
-    ResponseEntity<String> exitWaitingChallenge(Member currentMember, Long id);
+    ResponseEntity<String> exitWaitingChallenge(Long id);
 }
