@@ -14,6 +14,7 @@ import com.project.moabuja.dto.request.record.RecordRequestDto;
 import com.project.moabuja.dto.response.record.DayListResponseDto;
 import com.project.moabuja.dto.response.record.DayRecordResponseDto;
 import com.project.moabuja.dto.response.record.RecordResponseDto;
+import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.exception.exceptionClass.RecordErrorException;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.DoneGoalRepository;
@@ -46,7 +47,13 @@ public class RecordServiceImpl implements RecordService{
     public ResponseEntity<RecordResponseDto> save(RecordRequestDto recordRequestDto, Member currentMemberTemp) {
 
         Optional<Member> memberTemp = memberRepository.findById(currentMemberTemp.getId());
-        Member currentMember = memberTemp.get();
+        Member currentMember = null;
+        if(memberTemp.isPresent()){
+            currentMember = memberTemp.get();
+        }
+        else{
+            throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다.");
+        }
 
         RecordResponseDto recordResponseDto = new RecordResponseDto(false);
 
@@ -58,7 +65,7 @@ public class RecordServiceImpl implements RecordService{
 
         else if(recordRequestDto.getRecordType() == RecordType.expense) {
             int wallet = walletCheck(currentMember);
-            if (recordRequestDto.getRecordAmount() < wallet) {
+            if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
             } else { throw new RecordErrorException("지갑보다 큰 돈을 사용할 수 없습니다."); }
         }
@@ -66,7 +73,7 @@ public class RecordServiceImpl implements RecordService{
         //type이 challenge일때 목표완료됐는지 확인
         else if(recordRequestDto.getRecordType() == RecordType.challenge){
             int wallet = walletCheck(currentMember);
-            if (recordRequestDto.getRecordAmount() < wallet) {
+            if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
             } else { throw new RecordErrorException("지갑보다 큰 돈을 저금하는 것은 불가능 합니다."); }
 
@@ -111,7 +118,7 @@ public class RecordServiceImpl implements RecordService{
         //group goal 완료 로직
         else if(recordRequestDto.getRecordType() == RecordType.group){
             int wallet = walletCheck(currentMember);
-            if (recordRequestDto.getRecordAmount() < wallet) {
+            if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
             } else { throw new RecordErrorException("지갑보다 큰 돈을 저금하는 것은 불가능 합니다."); }
 
