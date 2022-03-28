@@ -46,3 +46,16 @@ jobs:
     - name: Show Current Time
       run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}" # (2)
       shell: bash
+      
+      
+    - name: Beanstalk Deploy
+      uses: einaregilsson/beanstalk-deploy@v20
+      with:
+        aws_access_key: ${{ secrets.BT.AWS_ACCESS_KEY_ID }}
+        aws_secret_key: ${{ secrets.BT.AWS_SECRET_ACCESS_KEY }}
+        application_name: moabuza
+        environment_name: Moabuza-env1
+        version_label: 12345
+        region: ap-northeast-2
+        deployment_package: deploy.zip
+        wait_for_environment_recovery: 180
