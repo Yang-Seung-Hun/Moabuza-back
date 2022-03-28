@@ -24,6 +24,7 @@ import com.project.moabuja.repository.RecordRepository;
 import com.project.moabuja.security.filter.JwtTokenProvider;
 import com.project.moabuja.util.CustomResponseEntity;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
@@ -41,6 +42,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional
@@ -81,11 +83,10 @@ public class MemberServiceImpl implements MemberService{
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "f367d5c13479608400bba9be2af87fc6");
-        body.add("redirect_uri", "http://localhost:3000/user/kakao/callback");
-//        body.add("redirect_uri", "https://moabuza.com/user/kakao/callback");
+        body.add("redirect_uri", "http://localhost:3000/member/kakao/callback");
+//        body.add("redirect_uri", "https://moabuza.com/member/kakao/callback");
         body.add("code", code);
         body.add("client_secret", "X8m672khDWbTiYJlRBNwNGtH8K3k7HVE");
-
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
                 new HttpEntity<>(body, headers);
@@ -136,7 +137,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public RegToLoginDto register(KakaoUserInfoDto dto) {
         Member member = new Member();
-        RegToLoginDto regToLoginDto = null;
+        RegToLoginDto regToLoginDto = new RegToLoginDto();
 
         // 기존회원이 아니면 회원가입 완료
         if(!memberRepository.existsByEmail(dto.getEmail())){
@@ -150,6 +151,7 @@ public class MemberServiceImpl implements MemberService{
         Optional<Member> byEmail = Optional
                 .ofNullable(memberRepository.findByEmails(dto.getEmail()))
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저 없음"));
+
 
         regToLoginDto.setNickname(byEmail.get().getNickname());
         regToLoginDto.setPassword(byEmail.get().getPassword());
@@ -236,6 +238,7 @@ public class MemberServiceImpl implements MemberService{
 //        Member currentUser = currentUserTmp.get();
         Member currentUser = null;
 
+        //TODO : OPTIONAL 코드 바꾸기!!
         if(currentUserTmp.isPresent()){
             currentUser = currentUserTmp.get();
         } else {

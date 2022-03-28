@@ -25,7 +25,7 @@ public class RecordController {
     private final RecordService recordService;
 
     @ApiOperation(value = "레코드 생성")
-    @PostMapping("/money/addRecord/post")
+    @PostMapping("/daylist/record")
     public ResponseEntity<RecordResponseDto> addRecord(@RequestBody RecordRequestDto recordRequestDto,
                                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentUser = userDetails.getMember();
@@ -33,7 +33,7 @@ public class RecordController {
     }
 
     @ApiOperation(value = "하루부자 내역 불러오기")
-    @PostMapping("/money/dayList")
+    @PostMapping("/daylist")
     public ResponseEntity<DayListResponseDto> getDay(@RequestBody DayListRequestDto dayListRequestDto,
                                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentUser = userDetails.getMember();
@@ -41,7 +41,7 @@ public class RecordController {
     }
 
     @ApiOperation(value = "레코드 삭제")
-    @DeleteMapping("/money/dayList/delete/{id}")
+    @DeleteMapping("/daylist/{id}")
     public ResponseEntity<String> DeleteDay(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentUser = userDetails.getMember();
         return recordService.deleteRecord(id, currentUser);

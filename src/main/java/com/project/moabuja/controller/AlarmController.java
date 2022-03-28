@@ -30,30 +30,6 @@ public class AlarmController {
         return alarmService.getFriendAlarm(currentMember);
     }
 
-    @ApiOperation(value = "친구 요청")
-    @PostMapping("/alarm/friend")
-    public ResponseEntity<String> postFriendAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                          @RequestBody FriendAlarmDto friendAlarmDto) {
-        Member currentMember = userDetails.getMember();
-        return alarmService.postFriendAlarm(friendAlarmDto, currentMember);
-    }
-
-    @ApiOperation(value = "친구 수락 알람")
-    @PostMapping("/alarm/friend/accept")
-    public ResponseEntity<String> postFriendAcceptAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                        @RequestParam String friendNickname) {
-        Member currentMember = userDetails.getMember();
-        return alarmService.postFriendAcceptAlarm(currentMember, friendNickname);
-    }
-
-    @ApiOperation(value = "친구 거절 알람")
-    @PostMapping("/alarm/friend/refuse")
-    public ResponseEntity<String> postFriendRefuseAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                        @RequestParam String friendNickname) {
-        Member currentMember = userDetails.getMember();
-        return alarmService.postFriendRefuseAlarm(currentMember, friendNickname);
-    }
-
     @ApiOperation(value = "같이해부자 알람 페이지")
     @GetMapping("/alarm/group")
     public ResponseEntity<List<GoalAlarmResponseDto>> getGroupGoalAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -68,33 +44,8 @@ public class AlarmController {
         return alarmService.getChallengeGoalAlarm(currentMember);
     }
 
-    @ApiOperation(value = "해부자 요청")
-    @PostMapping("/alarm/goal")
-    public ResponseEntity<String> postGoalAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                @RequestBody GoalAlarmRequestDto goalAlarmRequestDto) {
-        log.info("============== 해부자 요청 나옵니까? ===============");
-        Member currentMember = userDetails.getMember();
-        return alarmService.postGoalAlarm(currentMember, goalAlarmRequestDto);
-    }
-
-    @ApiOperation(value = "해부자 수락")
-    @PostMapping("/alarm/goal/accept/{alarmId}")
-    public ResponseEntity<String> postGoalAcceptAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                      @PathVariable Long alarmId) {
-        Member currentMember = userDetails.getMember();
-        return alarmService.postGoalAcceptAlarm(currentMember, alarmId);
-    }
-
-    @ApiOperation(value = "해부자 거절")
-    @PostMapping("/alarm/goal/refuse/{alarmId}")
-    public ResponseEntity<String> postGoalRefuseAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                      @PathVariable Long alarmId) {
-        Member currentMember = userDetails.getMember();
-        return alarmService.postGoalRefuseAlarm(currentMember, alarmId);
-    }
-
     @ApiOperation(value = "알람 삭제")
-    @DeleteMapping("/alarm/delete/{alarmId}")
+    @DeleteMapping("/alarm/{id}")
     public ResponseEntity<String> deleteAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                               @PathVariable Long alarmId) {
         Member currentMember = userDetails.getMember();

@@ -1,11 +1,17 @@
 package com.project.moabuja.service;
 
+import com.project.moabuja.domain.alarm.Alarm;
+import com.project.moabuja.domain.alarm.AlarmDetailType;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.goal.*;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
+import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
+import com.project.moabuja.dto.request.alarm.GoalAlarmSaveDto;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
+import com.project.moabuja.dto.request.goal.CreateGroupRequestDto;
+import com.project.moabuja.dto.request.goal.WaitingGoalSaveDto;
 import com.project.moabuja.dto.response.goal.*;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.repository.*;
@@ -20,6 +26,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.project.moabuja.domain.alarm.AlarmType.CHALLENGE;
+import static com.project.moabuja.domain.alarm.AlarmType.GROUP;
+
 @Slf4j
 @Service
 @Transactional(readOnly = true)
@@ -31,7 +40,9 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     private final ChallengeGoalRepository challengeGoalRepository;
     private final RecordRepository recordRepository;
     private final FriendRepository friendRepository;
+    private final AlarmRepository alarmRepository;
     private final WaitingGoalRepository waitingGoalRepository;
+    private final MemberWaitingGoalRepository memberWaitingGoalRepository;
 
     @Transactional
     @Override
@@ -161,6 +172,108 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         return ResponseEntity.ok().body(challengeResponseDto);
     }
 
+
+    @Transactional
+    @Override
+    public ResponseEntity<String> postChallenge(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
+        if (Optional.ofNullable(goalAlarmRequestDto.getFriendNickname()).isEmpty()) {
+            CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), null);
+            save(createChallengeRequestDto, currentMember);
+
+            return ResponseEntity.ok().body("해부자 요청 완료");
+        }
+
+        WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.CHALLENGE));
+        memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, true));
+
+        for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
+            Optional<Member> member = memberRepository.findMemberByNickname(friendNickname);
+            if (member.isPresent()) {
+                MemberWaitingGoal memberWaitingGoal = new MemberWaitingGoal(member.get(), waitingGoal, false);
+                memberWaitingGoalRepository.save(memberWaitingGoal);
+
+                alarmRepository.save(GoalAlarmSaveDto.goalToEntity(goalAlarmRequestDto, waitingGoal.getId(), CHALLENGE, AlarmDetailType.invite, currentMember.getNickname(), member.get()));
+            } else { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
+        }
+
+        return ResponseEntity.ok().body("해부자 요청 완료");
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<String> postChallengeAccept(Member currentMember, Long alarmId) {
+        Alarm alarm = alarmRepository.findAlarmById(alarmId);
+        WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
+        MemberWaitingGoal currentMemberWaitingGoal = memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal);
+        currentMemberWaitingGoal.changeIsAcceptedGoal();
+
+        List<MemberWaitingGoal> friends = memberWaitingGoalRepository.findMemberWaitingGoalsByWaitingGoal(waitingGoal);
+
+        // 전체 수락 전
+        if (! checkAccepted(friends)) {
+            List<String> friendList = new ArrayList<>();
+
+            for (MemberWaitingGoal friend : friends) {
+                if (friend.getMember() != currentMember) {
+                    friendList.add(friend.getMember().getNickname());
+                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.CHALLENGE, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                            waitingGoal.getId(), CHALLENGE, AlarmDetailType.accept, currentMember.getNickname(), friend.getMember()));
+                }
+            }
+            alarmRepository.delete(alarm);
+        }
+
+        // 전체 수락 후 마지막 수락
+        else if (checkAccepted(friends)) {
+            List<String> friendList = new ArrayList<>();
+
+            for (MemberWaitingGoal friend : friends) {
+                if (friend.getMember() != currentMember) {
+                    friendList.add(friend.getMember().getNickname());
+                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.CHALLENGE, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                            waitingGoal.getId(), CHALLENGE, AlarmDetailType.create, currentMember.getNickname(), friend.getMember()));
+                }
+            }
+            // ChallengeGoal 생성
+            CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
+            save(createChallengeRequestDto, currentMember);
+            waitingGoalRepository.delete(waitingGoal);
+            alarmRepository.delete(alarm);
+        }
+
+        return ResponseEntity.ok().body("해부자 수락 완료");
+    }
+
+    public boolean checkAccepted(List<MemberWaitingGoal> memberWaitingGoals) {
+        boolean result = true;
+
+        for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
+            if (! memberWaitingGoal.isAcceptedGoal()) {
+                result = false;
+                break; }}
+        return result;
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<String> postChallengeRefuse(Member currentMember, Long alarmId) {
+        Alarm alarm = alarmRepository.findAlarmById(alarmId);
+        WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
+        List<MemberWaitingGoal> friends = memberWaitingGoalRepository.findMemberWaitingGoalsByWaitingGoal(waitingGoal);
+
+        List<String> friendList = new ArrayList<>();
+
+        for (MemberWaitingGoal friend : friends) {
+            friendList.add(friend.getMember().getNickname());
+            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.CHALLENGE, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
+                    waitingGoal.getId(), CHALLENGE, AlarmDetailType.boom, currentMember.getNickname(), friend.getMember()));
+        }
+        alarmRepository.delete(alarm);
+        waitingGoalRepository.delete(waitingGoal);
+
+        return ResponseEntity.ok().body("해부자 거절 완료");
+    }
+
     @Override
     @Transactional
     public ResponseEntity<String> exitChallenge(Member currentMemberTemp, Long id) {
@@ -168,15 +281,11 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         Optional<Member> currentMember = memberRepository.findById(currentMemberTemp.getId());
 
         List<Member> memberList = currentMember.get().getChallengeGoal().getMembers();
-        if (memberList.size() <= 1) {
-            ChallengeGoal challengeGoal = currentMember.get().getChallengeGoal();
-            for (Member member : memberList) {
-                member.changeGroupGoal(null);
-            }
-            challengeGoalRepository.delete(challengeGoal);
-        } else {
-            currentMember.get().changeGroupGoal(null);
-        }
+
+        ChallengeGoal challengeGoal = currentMember.get().getChallengeGoal();
+        currentMember.get().changeGroupGoal(null);
+
+        if (memberList.size() == 1) { challengeGoalRepository.delete(challengeGoal); }
 
         return ResponseEntity.ok().body("도전해부자 나가기 완료");
     }

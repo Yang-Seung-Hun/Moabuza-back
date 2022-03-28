@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
+import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.FCMServiceImpl;
 import com.project.moabuja.service.MemberService;
+import com.project.moabuja.util.CustomResponseEntity;
 import com.project.moabuja.util.Validation;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -24,48 +26,45 @@ public class MemberController {
 
     private final MemberService memberService;
     private final FCMServiceImpl fcmService;
-    private final Validation validation;
+
+    @ApiOperation(value = "로그인 후 home 페이지")
+    @GetMapping("/home")
+    public ResponseEntity<HomeResponseDto> getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        if(userDetails == null){
+            throw  new MemberNotFoundException("컨트롤러 Move to Login Page");
+        }
+        return memberService.getHomeInfo(userDetails.getMember());
+    }
 
     @ApiOperation(value = "카카오 로그인 api")
-    @GetMapping("/user/kakao/callback")
-    public ResponseEntity kakaoLogin(@RequestParam String code) throws JsonProcessingException {
+    @GetMapping("/member/kakao/callback")
+    public ResponseEntity<CustomResponseEntity> kakaoLogin(@RequestParam String code) throws JsonProcessingException {
         return memberService.kakaoLogin(code);
     }
 
     @ApiOperation(value = "닉네임, 캐릭터 선택")
     @PutMapping("/member/info")
-    public ResponseEntity update(@Valid @RequestBody MemberUpdateRequestDto dto,
+    public ResponseEntity<String> update(@Valid @RequestBody MemberUpdateRequestDto dto,
                                  @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
         fcmService.register(dto.getNickname(), dto.getFcmToken());
-        String email = userDetails.getMember().getEmail();
-        return memberService.updateMemberInfo(dto, email);
+        return memberService.updateMemberInfo(dto, userDetails.getMember().getEmail());
     }
 
     @ApiOperation(value = "닉네임 중복체크")
-    @PostMapping("/nickname/validation")
-    public ResponseEntity nicknameValid(@Valid @RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
+    @PostMapping("/member/validation")
+    public ResponseEntity<String> nicknameValid(@Valid @RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
         return memberService.nicknameValid(nicknameValidationRequestDto);
     }
 
     @ApiOperation(value = "access 토큰 재발급")
-    @GetMapping("/api/reissue")
-    public ResponseEntity reissue(HttpServletRequest request){
+    @GetMapping("/member/reissue")
+    public ResponseEntity<CustomResponseEntity> reissue(HttpServletRequest request){
         return memberService.reissue(request);
     }
 
     @ApiOperation(value = "로그아웃")
-    @GetMapping("/api/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request){
+    @GetMapping("/member/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request){
         return memberService.logout(request);
-    }
-
-    @ApiOperation(value = "로그인 후 home 페이지")
-    @GetMapping("/home")
-    public ResponseEntity getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
-        if(userDetails == null){
-            throw  new MemberNotFoundException("컨트롤러 Move to Login Page");
-        }
-        Member currentUser = userDetails.getMember();
-        return memberService.getHomeInfo(currentUser);
     }
 }
