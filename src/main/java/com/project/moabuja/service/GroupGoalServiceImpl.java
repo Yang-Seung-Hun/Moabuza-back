@@ -45,7 +45,10 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     public ResponseEntity<String> save(CreateGroupRequestDto groupRequestDto, Member current) {
 
         Optional<Member> currentMemberTemp = memberRepository.findById(current.getId());
-        Member currentMember = currentMemberTemp.get();
+        Member currentMember = null;
+        if(currentMemberTemp.isPresent()){
+            currentMember = currentMemberTemp.get();
+        }
 
         GroupGoal groupGoal = new GroupGoal(groupRequestDto.getCreateGroupName(), groupRequestDto.getCreateGroupAmount(), 0);
 
@@ -54,11 +57,13 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         Optional<GroupGoal> goal = groupGoalRepository.findById(savedGoal.getId());
 
-        goal.get().addMember(currentMember);
+        if(goal.isPresent()) {
+            goal.get().addMember(currentMember);
 
-        for(String name :groupRequestDto.getGroupFriends()){
-            Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
-            goal.get().addMember(memberByNickname.get());
+            for (String name : groupRequestDto.getGroupFriends()) {
+                Optional<Member> memberByNickname = memberRepository.findMemberByNickname(name);
+                memberByNickname.ifPresent(member -> goal.get().addMember(member));
+            }
         }
         return ResponseEntity.ok().body("같이해부자 생성 완료");
     }
