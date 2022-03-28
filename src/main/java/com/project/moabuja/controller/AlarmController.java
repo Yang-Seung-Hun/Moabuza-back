@@ -45,7 +45,7 @@ public class AlarmController {
     }
 
     @ApiOperation(value = "알람 삭제")
-    @DeleteMapping("/alarm/delete/{alarmId}")
+    @DeleteMapping("/alarm/{id}")
     public ResponseEntity<String> deleteAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                               @PathVariable Long alarmId) {
         Member currentMember = userDetails.getMember();
