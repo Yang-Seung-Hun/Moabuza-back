@@ -19,7 +19,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String password) throws UsernameNotFoundException {
         Member member = Optional
-                .ofNullable(memberRepository.findByEmail(password))
+                .ofNullable(memberRepository.findByPassword(password))
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저 없음"));
 
         return new UserDetailsImpl(member);
