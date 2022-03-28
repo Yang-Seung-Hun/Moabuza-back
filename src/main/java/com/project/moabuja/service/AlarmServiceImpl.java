@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.project.moabuja.domain.alarm.AlarmType.*;
@@ -58,17 +60,14 @@ public class AlarmServiceImpl implements AlarmService {
     @Transactional
     @Override
     public ResponseEntity<String> deleteAlarm(Member currentMember, Long alarmId) {
-        if (alarmRepository.findById(alarmId).isEmpty()) { throw new AlarmErrorException("해당 알람이 없습니다."); }
+        Optional<Alarm> alarm = Optional
+                .of(alarmRepository.findById(alarmId))
+                .orElseThrow(() -> new AlarmErrorException("해당 알람이 없습니다."));
 
-        Member member = alarmRepository.findById(alarmId).get().getMember();
-
-        if (member.getClass().isInstance(currentMember)) {
+        if (Objects.equals(currentMember, alarm.get().getMember())) {
             alarmRepository.deleteById(alarmId);
-
             return ResponseEntity.ok().body("알람이 삭제되었습니다.");
-        }
-
-        throw new AlarmErrorException("알람에 해당하는 사용자가 아닙니다.");
+        } throw new AlarmErrorException("알람에 해당하는 사용자가 아닙니다.");
     }
 
 }
