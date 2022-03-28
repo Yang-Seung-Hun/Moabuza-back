@@ -40,7 +40,7 @@ class RecordServiceImplTest {
     public void save1(){
         //given
 
-        Member member = new Member("123456",123456L,"nickname1","email1@naver.com", Hero.tongki);
+        Member member = new Member("654321",654321L,"nonickname1","email1@gmail.com", Hero.tongki);
         Member savedMember1 = memberRepository.save(member);
 
         RecordRequestDto recordRequestDto1 = new RecordRequestDto(RecordType.income, "2022-03-05 00:00:00.000","3월용돈",50000);
@@ -62,7 +62,7 @@ class RecordServiceImplTest {
     public void save2(){
 
         //given
-        Member member = new Member("123456",123456L,"nickname1","email1@naver.com", Hero.tongki);
+        Member member = new Member("987654",987654L,"nonickname2","email2@gmail.com", Hero.tongki);
         Member savedMember1 = memberRepository.save(member);
         RecordRequestDto recordRequestDto = new RecordRequestDto(RecordType.income, "2022-03-05 00:00:00.000","3월용돈",50000);
 
@@ -79,8 +79,8 @@ class RecordServiceImplTest {
     public void save3(){
 
         //given
-        Member member = new Member("123456",123456L,"nickname1","email1@naver.com", Hero.tongki);
-        Member savedMember1 = memberRepository.save(member);
+        Member member1 = new Member("456789",456789L,"nonickname3","email3@gmail.com", Hero.tongki);
+        Member savedMember1 = memberRepository.save(member1);
         RecordRequestDto recordRequestDto1 = new RecordRequestDto(RecordType.income, "2022-03-05 00:00:00.000","3월용돈",50000);
 
         CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("5만원 모으기", 50000, null);
@@ -163,7 +163,7 @@ class RecordServiceImplTest {
     public void getDayList(){
 
         //given
-        Member member = new Member("123456",123456L,"nickname1","email1@naver.com", Hero.tongki);
+        Member member = new Member("321654",321654L,"nonickname4","email4@gmail.com", Hero.tongki);
         Member savedMember1 = memberRepository.save(member);
 
         CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("5만원 모으기", 50000, null);
@@ -218,7 +218,7 @@ class RecordServiceImplTest {
     public void deleteRecord(){
 
         //given
-        Member member = new Member("123456",123456L,"nickname1","email1@naver.com", Hero.tongki);
+        Member member = new Member("147258",147258L,"nonickname5","email5@gmail.com", Hero.tongki);
         Member savedMember1 = memberRepository.save(member);
 
         CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("5만원 모으기", 50000, null);
@@ -261,10 +261,10 @@ class RecordServiceImplTest {
     public void deleteRecord2(){
 
         //given
-        Member member = new Member("123456",123456L,"nickname1","email1@naver.com", Hero.tongki);
+        Member member = new Member("258369",258369L,"nonickname6","email6@gmail.com", Hero.tongki);
         Member savedMember1 = memberRepository.save(member);
 
-        Member member2 = new Member("123457",123457L,"nickname2","email2@naver.com", Hero.tongki);
+        Member member2 = new Member("963852",963852L,"nonickname7","email7@gmail.com", Hero.tongki);
         Member savedMember2 = memberRepository.save(member2);
 
         CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("5만원 모으기", 50000, null);
