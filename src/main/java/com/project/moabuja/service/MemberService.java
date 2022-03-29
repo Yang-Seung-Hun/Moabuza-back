@@ -7,12 +7,17 @@ import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.request.member.RegToLoginDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
+import com.project.moabuja.model.LogoutResponse;
+import com.project.moabuja.model.NicknameValidResponse;
+import com.project.moabuja.model.UpdateInfoResponse;
 import com.project.moabuja.util.CustomResponseEntity;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
 
 public interface MemberService {
+
+    ResponseEntity<HomeResponseDto> getHomeInfo(Member current);
 
     ResponseEntity<CustomResponseEntity> kakaoLogin(String code) throws JsonProcessingException;
 
@@ -22,14 +27,12 @@ public interface MemberService {
 
     RegToLoginDto register(KakaoUserInfoDto dto);
 
-    ResponseEntity<String> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto);
+    ResponseEntity<NicknameValidResponse> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto);
 
-    ResponseEntity<String> updateMemberInfo(MemberUpdateRequestDto dto, String email);
+    ResponseEntity<UpdateInfoResponse> updateMemberInfo(MemberUpdateRequestDto dto, String email);
 
     ResponseEntity<CustomResponseEntity> reissue(HttpServletRequest request);
 
-    ResponseEntity<String> logout(HttpServletRequest request);
-
-    ResponseEntity<HomeResponseDto> getHomeInfo(Member current);
+    ResponseEntity<LogoutResponse> logout(HttpServletRequest request);
 
 }

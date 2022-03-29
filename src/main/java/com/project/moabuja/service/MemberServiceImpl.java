@@ -18,6 +18,9 @@ import com.project.moabuja.dto.request.member.RegToLoginDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.dto.response.member.ReissueDto;
 import com.project.moabuja.exception.ErrorException;
+import com.project.moabuja.model.LogoutResponse;
+import com.project.moabuja.model.NicknameValidResponse;
+import com.project.moabuja.model.UpdateInfoResponse;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
@@ -54,15 +57,97 @@ public class MemberServiceImpl implements MemberService{
     private final RecordRepository recordRepository;
     private final AlarmRepository alarmRepository;
 
+    @Transactional
+    @Override
+    public ResponseEntity<HomeResponseDto> getHomeInfo(Member currentMemberTemp) {
+        Member currentMember = Optional
+                .of(memberRepository.findById(currentMemberTemp.getId())).get()
+                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+
+        Hero hero = currentMember.getHero();
+
+        int groupCurrentAmount = 0;
+        int groupNeedAmount = 0;
+        int groupAmount = 0;
+        int groupPercent = 0;
+        String groupName = null;
+
+        int challengeCurrentAmount = 0;
+        int challengeNeedAmount = 0;
+        int challengeAmount = 0;
+        int challengePercent = 0;
+        String challengeName = null;
+
+        int totalAmount = 0;
+        int wallet = 0;
+
+        GroupGoal groupGoal = currentMember.getGroupGoal();
+        if (groupGoal != null) { //  && groupGoal.isAcceptedGroup()
+
+            List<Member> members = groupGoal.getMembers();
+            int currentGroupAmount = 0;
+            for (Member member : members) {
+                List<Record> memberGroupRecord = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
+                for (Record record : memberGroupRecord) {
+                    groupCurrentAmount += record.getRecordAmount();
+                }
+            }
+            groupNeedAmount = groupGoal.getGroupGoalAmount() - groupCurrentAmount;
+            groupPercent = (int) (((double) groupCurrentAmount / (double) (groupGoal.getGroupGoalAmount())) * 100);
+            groupName = groupGoal.getGroupGoalName();
+        }
+
+        ChallengeGoal challengeGoal = currentMember.getChallengeGoal();
+        if (challengeGoal != null) { //  && challengeGoal.isAcceptedChallenge()
+
+            List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentMember);
+            for (Record challengeRecord : challengeRecords) {
+                challengeCurrentAmount += challengeRecord.getRecordAmount();
+            }
+            challengeNeedAmount = challengeGoal.getChallengeGoalAmount() - challengeCurrentAmount;
+            challengePercent = (int) (((double) challengeCurrentAmount / (double) (challengeGoal.getChallengeGoalAmount())) * 100);
+            challengeName = challengeGoal.getChallengeGoalName();
+        }
+
+        //hero랑 heroLevel(레벨은 기준 정해야 함)
+        //순자산(지갑+저금통), 지갑 계산
+        int groupUserWallet = 0;//해당 user가 group에 넣은 돈
+        List<Record> groupUserRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, currentMember);
+        for (Record groupUserRecord : groupUserRecords) {
+            groupUserWallet += groupUserRecord.getRecordAmount();
+        }
+
+        wallet = RecordServiceImpl.getWallet(currentMember, wallet, recordRepository);
+        totalAmount = wallet + challengeCurrentAmount + groupUserWallet;
+
+        List<Alarm> alarmList = alarmRepository.findAllByMember(currentMember);
+        int alarmCount = alarmList.size();
+
+        HomeResponseDto homeResponseDto = HomeResponseDto.builder()
+                .groupCurrentAmount(groupCurrentAmount)
+                .groupNeedAmount(groupNeedAmount)
+                .groupAmount(groupAmount)
+                .groupPercent(groupPercent)
+                .groupName(groupName)
+                .challengeCurrentAmount(challengeCurrentAmount)
+                .challengeNeedAmount(challengeAmount)
+                .challengePercent(challengePercent)
+                .challengeName(challengeName)
+                .hero(hero)
+                .totalAmount(totalAmount)
+                .wallet(wallet)
+                .alarmCount(alarmCount)
+                .build();
+
+        return new ResponseEntity<>(homeResponseDto, HttpStatus.OK);
+    }
+
     @Override
     public ResponseEntity<CustomResponseEntity> kakaoLogin(String code) throws JsonProcessingException {
         KakaoUserInfoDto kakaoUserInfoDto = getKakaoUserInfo(getAccessToken(code));
         RegToLoginDto regToLoginDto = register(kakaoUserInfoDto);
         String access = jwtTokenProvider.createAccessToken(regToLoginDto.getPassword());
         String refresh = jwtTokenProvider.createRefreshToken(regToLoginDto.getPassword());
-
-        System.out.println("로그인 시 발급되는 토큰 리프래쉬 : " + refresh);
-        System.out.println("로그인 시 발급되는 토큰 어세스: " + access);
 
         TokenDto dto = TokenDto.builder()
                 .nickname(regToLoginDto.getNickname())
@@ -155,35 +240,34 @@ public class MemberServiceImpl implements MemberService{
             return regToLoginDto;
         }
 
-        Optional<Member> byEmail = Optional
-                .ofNullable(memberRepository.findByEmails(dto.getEmail()))
+        Member memberByEmail = Optional
+                .of(memberRepository.findByEmails(dto.getEmail())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
-
-        regToLoginDto.setNickname(byEmail.get().getNickname());
-        regToLoginDto.setPassword(byEmail.get().getPassword());
+        regToLoginDto.setNickname(memberByEmail.getNickname());
+        regToLoginDto.setPassword(memberByEmail.getPassword());
         return regToLoginDto;
     }
 
     @Transactional
     @Override
-    public ResponseEntity<String> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
+    public ResponseEntity<NicknameValidResponse> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
         String nickname = nicknameValidationRequestDto.getNickname();
         if(memberRepository.existsByNickname(nickname)){
-            return ResponseEntity.ok().body("사용 중인 닉네임입니다.");
+            return new ResponseEntity<>(new NicknameValidResponse(nickname), HttpStatus.OK);
         }
-        return ResponseEntity.ok().body("닉네임 사용 가능");
+        return new ResponseEntity<>(new NicknameValidResponse(), HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<String> updateMemberInfo(MemberUpdateRequestDto dto, String email) {
+    public ResponseEntity<UpdateInfoResponse> updateMemberInfo(MemberUpdateRequestDto dto, String email) {
         Member byEmail = memberRepository.findByEmail(email);
         if(byEmail == null){
             throw new ErrorException(MEMBER_NOT_FOUND);
         }
         byEmail.updateInfo(dto);
-        return ResponseEntity.ok().body("캐릭터, 닉네임 설정 완료");
+        return new ResponseEntity<>(new UpdateInfoResponse(), HttpStatus.OK);
     }
 
     @Override
@@ -196,6 +280,7 @@ public class MemberServiceImpl implements MemberService{
             throw new ErrorException(REFRESH_NOT_VALID);
         }
         Authentication authentication = jwtTokenProvider.getAuthentication(access);
+
         String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
 
         System.out.println("아이디 : " + authentication.getName());
@@ -207,9 +292,10 @@ public class MemberServiceImpl implements MemberService{
             throw new ErrorException(REFRESH_NOT_MATCH);
         }
 
+        String password = memberRepository.findByEmail(authentication.getName()).getPassword();
         ReissueDto dto = ReissueDto.builder()
-                .refresh(jwtTokenProvider.createRefreshToken(authentication.getName()))
-                .access(jwtTokenProvider.createAccessToken(authentication.getName()))
+                .refresh(jwtTokenProvider.createRefreshToken(password))
+                .access(jwtTokenProvider.createAccessToken(password))
                 .build();
 
         System.out.println("다시 만든 리프래쉬 : " + dto.getRefresh());
@@ -228,7 +314,7 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public ResponseEntity<String> logout(HttpServletRequest request) {
+    public ResponseEntity<LogoutResponse> logout(HttpServletRequest request) {
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         if (!jwtTokenProvider.validateToken(access)) {
             throw new ErrorException(ACCESS_NOT_VALID);
@@ -242,93 +328,6 @@ public class MemberServiceImpl implements MemberService{
         Long expiration = jwtTokenProvider.getExpiration(access);
         redisTemplate.opsForValue()
                 .set(access, "logout", expiration, TimeUnit.MILLISECONDS);
-        return ResponseEntity.ok().body("로그아웃 성공");
-    }
-
-    @Transactional
-    @Override
-    public ResponseEntity<HomeResponseDto> getHomeInfo(Member current) {
-        Optional<Member> currentUserTmp = Optional
-                .of(memberRepository.findById(current.getId()))
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
-
-        Member currentUser = currentUserTmp.get();
-
-        Hero hero = currentUser.getHero();
-
-        int groupCurrentAmount = 0;
-        int groupNeedAmount = 0;
-        int groupAmount = 0;
-        int groupPercent = 0;
-        String groupName = null;
-
-        int challengeCurrentAmount = 0;
-        int challengeNeedAmount = 0;
-        int challengeAmount = 0;
-        int challengePercent = 0;
-        String challengeName = null;
-
-        int totalAmount = 0;
-        int wallet = 0;
-
-        GroupGoal groupGoal = currentUser.getGroupGoal();
-        if (groupGoal != null) { //  && groupGoal.isAcceptedGroup()
-
-            List<Member> members = groupGoal.getMembers();
-            int currentGroupAmount = 0;
-            for (Member member : members) {
-                List<Record> memberGroupRecord = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
-                for (Record record : memberGroupRecord) {
-                    groupCurrentAmount += record.getRecordAmount();
-                }
-            }
-            groupNeedAmount = groupGoal.getGroupGoalAmount() - groupCurrentAmount;
-            groupPercent = (int) (((double) groupCurrentAmount / (double) (groupGoal.getGroupGoalAmount())) * 100);
-            groupName = groupGoal.getGroupGoalName();
-        }
-
-        ChallengeGoal challengeGoal = currentUser.getChallengeGoal();
-        if (challengeGoal != null) { //  && challengeGoal.isAcceptedChallenge()
-
-            List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentUser);
-            for (Record challengeRecord : challengeRecords) {
-                challengeCurrentAmount += challengeRecord.getRecordAmount();
-            }
-            challengeNeedAmount = challengeGoal.getChallengeGoalAmount() - challengeCurrentAmount;
-            challengePercent = (int) (((double) challengeCurrentAmount / (double) (challengeGoal.getChallengeGoalAmount())) * 100);
-            challengeName = challengeGoal.getChallengeGoalName();
-        }
-
-        //hero랑 heroLevel(레벨은 기준 정해야 함)
-        //순자산(지갑+저금통), 지갑 계산
-        int groupUserWallet = 0;//해당 user가 group에 넣은 돈
-        List<Record> groupUserRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, currentUser);
-        for (Record groupUserRecord : groupUserRecords) {
-            groupUserWallet += groupUserRecord.getRecordAmount();
-        }
-
-        wallet = RecordServiceImpl.getWallet(currentUser, wallet, recordRepository);
-        totalAmount = wallet + challengeCurrentAmount + groupUserWallet;
-
-        List<Alarm> alarmList = alarmRepository.findAllByMember(currentUser);
-        int alarmCount = alarmList.size();
-
-        HomeResponseDto homeResponseDto = HomeResponseDto.builder()
-                .groupCurrentAmount(groupCurrentAmount)
-                .groupNeedAmount(groupNeedAmount)
-                .groupAmount(groupAmount)
-                .groupPercent(groupPercent)
-                .groupName(groupName)
-                .challengeCurrentAmount(challengeCurrentAmount)
-                .challengeNeedAmount(challengeAmount)
-                .challengePercent(challengePercent)
-                .challengeName(challengeName)
-                .hero(hero)
-                .totalAmount(totalAmount)
-                .wallet(wallet)
-                .alarmCount(alarmCount)
-                .build();
-
-        return ResponseEntity.ok().body(homeResponseDto);
+        return new ResponseEntity<>(new LogoutResponse(), HttpStatus.OK);
     }
 }

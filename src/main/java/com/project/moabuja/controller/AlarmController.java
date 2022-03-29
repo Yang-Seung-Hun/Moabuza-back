@@ -1,10 +1,9 @@
 package com.project.moabuja.controller;
 
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
-import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.response.alarm.FriendAlarmResponseDto;
 import com.project.moabuja.dto.response.alarm.GoalAlarmResponseDto;
+import com.project.moabuja.model.AlarmDeleteResponse;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.AlarmService;
 import io.swagger.annotations.ApiOperation;
@@ -12,7 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -46,8 +48,8 @@ public class AlarmController {
 
     @ApiOperation(value = "알람 삭제")
     @DeleteMapping("/alarm/{id}")
-    public ResponseEntity<String> deleteAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                              @PathVariable Long alarmId) {
+    public ResponseEntity<AlarmDeleteResponse> deleteAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                           @PathVariable Long alarmId) {
         Member currentMember = userDetails.getMember();
         return alarmService.deleteAlarm(currentMember, alarmId);
     }

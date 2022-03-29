@@ -5,6 +5,10 @@ import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
 import com.project.moabuja.dto.request.friend.FriendRequestDto;
 import com.project.moabuja.dto.response.friend.FriendListResponseDto;
 import com.project.moabuja.dto.response.friend.FriendSearchResponseDto;
+import com.project.moabuja.model.FriendAcceptResponse;
+import com.project.moabuja.model.FriendDeleteResponse;
+import com.project.moabuja.model.FriendPostResponse;
+import com.project.moabuja.model.FriendRefuseResponse;
 import org.springframework.http.ResponseEntity;
 
 public interface FriendService {
@@ -15,11 +19,11 @@ public interface FriendService {
 
     ResponseEntity<FriendSearchResponseDto> searchFriend(FriendRequestDto friendRequestDto);
 
-    ResponseEntity<String> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember);
+    ResponseEntity<FriendPostResponse> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember);
 
-    ResponseEntity<String> postFriendAccept(Member currentMember, Long alarmId);
+    ResponseEntity<FriendAcceptResponse> postFriendAccept(Member currentMember, Long alarmId);
 
-    ResponseEntity<String> postFriendRefuse(Member currentMember, Long alarmId);
+    ResponseEntity<FriendRefuseResponse> postFriendRefuse(Member currentMember, Long alarmId);
 
-    ResponseEntity<String> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto);
+    ResponseEntity<FriendDeleteResponse> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto);
 }
