@@ -1,6 +1,7 @@
 package com.project.moabuja.dto.response.record;
 
 import com.project.moabuja.domain.record.RecordType;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,8 +23,9 @@ public class DayRecordResponseDto {
     private String memos;
     private int recordAmount;
 
+    @Builder
     public DayRecordResponseDto(Long id, RecordType recordType, LocalDateTime recordDate, String memos, int recordAmount) {
-        this. id = id;
+        this.id = id;
         this.recordType = recordType;
         this.recordDate = recordDate;
         this.memos = memos;
