@@ -106,11 +106,11 @@ class RecordServiceImplTest {
         Assertions.assertThat(result5.getBody().isComplete()).isTrue();
     }
 
-    @Test
-    @DisplayName("goal 생성전 입력하면 오류 발생")
-    public void save4(){
-
-    }
+//    @Test
+//    @DisplayName("goal 생성전 입력하면 오류 발생")
+//    public void save4(){
+//
+//    }
 
 //    @Test
 //    @DisplayName("group goal 완료 로직")
