@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.project.moabuja.domain.alarm.AlarmType.CHALLENGE;
+import static com.project.moabuja.domain.alarm.AlarmType.GROUP;
 import static com.project.moabuja.exception.ErrorCode.*;
 
 @Slf4j
@@ -45,10 +46,10 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
     @Transactional
     @Override
-    public ResponseEntity<String> save(CreateChallengeRequestDto createChallengeRequestDto, Member currentTemp) {
+    public ResponseEntity<String> save(CreateChallengeRequestDto createChallengeRequestDto, Member currentMemberTemp) {
 
         Member currentMember = Optional
-                .of(memberRepository.findById(currentTemp.getId())).get()
+                .of(memberRepository.findById(currentMemberTemp.getId())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(), createChallengeRequestDto.getCreateChallengeAmount(), 0);
@@ -73,11 +74,11 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     }
 
     @Override
-    public ResponseEntity<ChallengeResponseDto> getChallengeInfo(Member currentTemp) {
+    public ResponseEntity<ChallengeResponseDto> getChallengeInfo(Member currentMemberTemp) {
 
         //여기는 프록시 생명주기 문제 땜에 필요
         Member currentMember = Optional
-                .of(memberRepository.findById(currentTemp.getId())).get()
+                .of(memberRepository.findById(currentMemberTemp.getId())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         Optional<ChallengeGoal> challengeGoal = Optional.ofNullable(currentMember.getChallengeGoal());
@@ -222,9 +223,16 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                 if (friend.getMember() != currentMember) {
                     friendList.add(friend.getMember().getNickname());
 
-                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity
-                            (new GoalAlarmRequestDto(GoalType.CHALLENGE, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
-                                waitingGoal.getId(), CHALLENGE, AlarmDetailType.accept, currentMember.getNickname(), friend.getMember()));
+                    GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
+                            .alarmType(CHALLENGE)
+                            .alarmDetailType(AlarmDetailType.accept)
+                            .goalName(waitingGoal.getWaitingGoalName())
+                            .goalAmount(waitingGoal.getWaitingGoalAmount())
+                            .waitingGoalId(waitingGoal.getId())
+                            .friendNickname(currentMember.getNickname())
+                            .member(friend.getMember())
+                            .build();
+                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
                 }
             }
             alarmRepository.delete(alarm);
@@ -237,9 +245,16 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             for (MemberWaitingGoal friend : friends) {
                 if (friend.getMember() != currentMember) {
                     friendList.add(friend.getMember().getNickname());
-                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity
-                            (new GoalAlarmRequestDto(GoalType.CHALLENGE, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
-                            waitingGoal.getId(), CHALLENGE, AlarmDetailType.create, currentMember.getNickname(), friend.getMember()));
+                    GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
+                            .alarmType(CHALLENGE)
+                            .alarmDetailType(AlarmDetailType.create)
+                            .goalName(waitingGoal.getWaitingGoalName())
+                            .goalAmount(waitingGoal.getWaitingGoalAmount())
+                            .waitingGoalId(waitingGoal.getId())
+                            .friendNickname(currentMember.getNickname())
+                            .member(friend.getMember())
+                            .build();
+                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
                 }
             }
             // ChallengeGoal 생성
@@ -269,8 +284,16 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         for (MemberWaitingGoal friend : friends) {
             friendList.add(friend.getMember().getNickname());
-            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(new GoalAlarmRequestDto(GoalType.CHALLENGE, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList),
-                    waitingGoal.getId(), CHALLENGE, AlarmDetailType.boom, currentMember.getNickname(), friend.getMember()));
+            GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
+                    .alarmType(CHALLENGE)
+                    .alarmDetailType(AlarmDetailType.boom)
+                    .goalName(waitingGoal.getWaitingGoalName())
+                    .goalAmount(waitingGoal.getWaitingGoalAmount())
+                    .waitingGoalId(waitingGoal.getId())
+                    .friendNickname(currentMember.getNickname())
+                    .member(friend.getMember())
+                    .build();
+            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
         }
         alarmRepository.delete(alarm);
         waitingGoalRepository.delete(waitingGoal);

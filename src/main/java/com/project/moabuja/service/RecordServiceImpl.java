@@ -9,6 +9,7 @@ import com.project.moabuja.domain.goal.GroupGoal;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
+import com.project.moabuja.dto.request.alarm.GoalAlarmSaveDto;
 import com.project.moabuja.dto.request.record.DayListRequestDto;
 import com.project.moabuja.dto.request.record.RecordRequestDto;
 import com.project.moabuja.dto.response.record.DayListResponseDto;
@@ -224,15 +225,30 @@ public class RecordServiceImpl implements RecordService{
         }
 
         //완료 로직
-        RecordRequestDto dto1 = new RecordRequestDto(RecordType.challenge, recordRequestDto.getRecordDate(), "도전해부자 완료!!", -1 * currentAmount);
-        RecordRequestDto dto2 = new RecordRequestDto(RecordType.income, recordRequestDto.getRecordDate(), "도전해부자 완료!!", currentAmount);
+        RecordRequestDto dto1 = RecordRequestDto.builder()
+                .recordType(RecordType.challenge)
+                .recordDate(recordRequestDto.getRecordDate())
+                .memos("도전해부자 완료!!")
+                .recordAmount(-1 * currentAmount)
+                .build();
+        RecordRequestDto dto2 = RecordRequestDto.builder()
+                .recordType(RecordType.income)
+                .recordDate(recordRequestDto.getRecordDate())
+                .memos("도전해부자 완료!!")
+                .recordAmount(currentAmount)
+                .build();
         Record minusRecord = new Record(dto1, currentMember);
         Record plusRecord = new Record(dto2, currentMember);
         recordRepository.save(minusRecord);
         recordRepository.save(plusRecord);
 
         //완료된 목표 저장
-        DoneGoal doneGoal = new DoneGoal(currentMember.getChallengeGoal().getChallengeGoalName(), currentMember.getChallengeGoal().getChallengeGoalAmount(), currentMember, GoalType.CHALLENGE);
+        DoneGoal doneGoal = DoneGoal.builder()
+                .doneGoalName(currentMember.getChallengeGoal().getChallengeGoalName())
+                .doneGoalAmount(currentMember.getChallengeGoal().getChallengeGoalAmount())
+                .member(currentMember)
+                .goalType(GoalType.CHALLENGE)
+                .build();
         doneGoalRepository.save(doneGoal);
         currentMember.addDoneGoal(doneGoal);
 
@@ -244,17 +260,36 @@ public class RecordServiceImpl implements RecordService{
 
     private void makeGroupDoneGoal(RecordRequestDto recordRequestDto, Member currentMember, RecordResponseDto recordResponseDto, List<Member> members, HashMap<Member, Integer> separateAmount) {
         for (Member member : members) {
-            Alarm alarm = new Alarm(GROUP, AlarmDetailType.success, currentMember.getGroupGoal().getGroupGoalName(),
-                    recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
-            alarmRepository.save(alarm);
+            GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
+                    .alarmType(GROUP)
+                    .alarmDetailType(AlarmDetailType.success)
+                    .goalName(currentMember.getGroupGoal().getGroupGoalName())
+                    .goalAmount(recordRequestDto.getRecordAmount())
+                    .waitingGoalId(null)
+                    .friendNickname(currentMember.getNickname())
+                    .member(member)
+                    .build();
+            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
         }
 
         for (Member member : separateAmount.keySet()) {
-            RecordRequestDto dto = new RecordRequestDto(RecordType.group, recordRequestDto.getRecordDate(), "같이해부자 완료!!", -1* separateAmount.get(member));
+            RecordRequestDto dto = RecordRequestDto.builder()
+                    .recordType(RecordType.group)
+                    .recordDate(recordRequestDto.getRecordDate())
+                    .memos("같이해부자 완료!!")
+                    .recordAmount(-1* separateAmount.get(member))
+                    .build();
+
             Record minusRecord = new Record(dto, member);
             recordRepository.save(minusRecord);
 
-            DoneGoal doneGoal = new DoneGoal(member.getGroupGoal().getGroupGoalName(),member.getGroupGoal().getGroupGoalAmount(),member, GoalType.GROUP);
+            DoneGoal doneGoal = DoneGoal.builder()
+                    .doneGoalName(member.getGroupGoal().getGroupGoalName())
+                    .doneGoalAmount(member.getGroupGoal().getGroupGoalAmount())
+                    .member(member)
+                    .goalType(GoalType.GROUP)
+                    .build();
+
             doneGoalRepository.save(doneGoal);
             member.addDoneGoal(doneGoal);
             member.getGroupGoal().removeMember(member);

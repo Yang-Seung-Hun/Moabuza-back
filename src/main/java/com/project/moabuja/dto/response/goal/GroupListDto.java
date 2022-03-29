@@ -1,6 +1,7 @@
 package com.project.moabuja.dto.response.goal;
 
 import com.project.moabuja.domain.member.Hero;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ public class GroupListDto {
     private String groupMemo;
     private int groupAmount;
 
+    @Builder
     public GroupListDto(LocalDateTime groupDate, Hero hero, String nickname, String groupMemo, int groupAmount) {
         this.groupDate = groupDate;
         this.hero = hero;

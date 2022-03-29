@@ -34,15 +34,15 @@ public class GoalAlarmSaveDto {
         this.member = member;
     }
 
-    public static Alarm goalToEntity(GoalAlarmRequestDto requestDto, Long waitingGoalId, AlarmType alarmType, AlarmDetailType alarmDetailType, String friendNickname, Member member) {
+    public static Alarm goalToEntity(GoalAlarmSaveDto saveDto) {
         return Alarm.builder()
-                .alarmType(alarmType)
-                .alarmDetailType(alarmDetailType)
-                .goalName(requestDto.getGoalName())
-                .goalAmount(requestDto.getGoalAmount())
-                .waitingGoalId(waitingGoalId)
-                .friendNickname(friendNickname)
-                .member(member)
+                .alarmType(saveDto.getAlarmType())
+                .alarmDetailType(saveDto.getAlarmDetailType())
+                .goalName(saveDto.getGoalName())
+                .goalAmount(saveDto.getGoalAmount())
+                .waitingGoalId(saveDto.getWaitingGoalId())
+                .friendNickname(saveDto.getFriendNickname())
+                .member(saveDto.getMember())
                 .build();
     }
 }
