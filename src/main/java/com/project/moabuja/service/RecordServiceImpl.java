@@ -106,7 +106,7 @@ public class RecordServiceImpl implements RecordService{
 
             if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
-            } else { throw new RecordErrorException("지갑보다 큰 돈을 저금하는 것은 불가능 합니다."); }
+            } else { throw new ErrorException(SAVINGS_LESS_THAN_WALLET); }
 
             List<Member> members = currentMember.getGroupGoal().getMembers();
 
