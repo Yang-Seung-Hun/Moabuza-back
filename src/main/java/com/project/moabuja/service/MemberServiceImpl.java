@@ -188,10 +188,9 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     public ResponseEntity<CustomResponseEntity> reissue(HttpServletRequest request) {
+        System.out.println("리이슈 메서드 : " + request.getHeader("A-AUTH-TOKEN").substring(7));
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         String refresh = request.getHeader("R-AUTH-TOKEN").substring(7);
-
-        System.out.println("어세스토큰 : " + access);
 
         if (!jwtTokenProvider.validateToken(refresh)) {
             throw new ErrorException(REFRESH_NOT_VALID);
