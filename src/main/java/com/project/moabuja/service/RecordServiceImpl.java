@@ -14,6 +14,7 @@ import com.project.moabuja.dto.request.record.RecordRequestDto;
 import com.project.moabuja.dto.response.record.DayListResponseDto;
 import com.project.moabuja.dto.response.record.DayRecordResponseDto;
 import com.project.moabuja.dto.response.record.RecordResponseDto;
+import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.exception.exceptionClass.AlarmErrorException;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.exception.exceptionClass.RecordErrorException;
@@ -28,13 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.project.moabuja.domain.alarm.AlarmType.*;
+import static com.project.moabuja.exception.ErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -50,8 +49,9 @@ public class RecordServiceImpl implements RecordService{
     @Override
     public ResponseEntity<RecordResponseDto> save(RecordRequestDto recordRequestDto, Member currentMemberTemp) {
 
-        if (memberRepository.findById(currentMemberTemp.getId()).isEmpty()) { throw new MemberNotFoundException("해당 사용자는 존재하지 않습니다."); }
-        Member currentMember = memberRepository.findById(currentMemberTemp.getId()).get();
+        Member currentMember = Optional
+                .of(memberRepository.findById(currentMemberTemp.getId()).get())
+                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         RecordResponseDto recordResponseDto = new RecordResponseDto(false);
         Record record = new Record(recordRequestDto, currentMember);
@@ -65,14 +65,14 @@ public class RecordServiceImpl implements RecordService{
         else if(recordRequestDto.getRecordType() == RecordType.expense) {
             if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
-            } else { throw new RecordErrorException("지갑보다 큰 돈을 사용할 수 없습니다."); }
+            } else { throw new ErrorException(MONEY_LESS_THAN_WALLET); }
         }
 
         //type이 challenge일때
         else if(recordRequestDto.getRecordType() == RecordType.challenge){
             if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
-            } else { throw new RecordErrorException("지갑보다 큰 돈을 저금하는 것은 불가능 합니다."); }
+            } else { throw new ErrorException(SAVINGS_LESS_THAN_WALLET); }
 
             List<Member> members = currentMember.getChallengeGoal().getMembers();
 
@@ -163,17 +163,17 @@ public class RecordServiceImpl implements RecordService{
     @Override
     @Transactional
     public ResponseEntity<String> deleteRecord(Long id, Member currentMember) {
+//        if (recordRepository.findRecordById(id).isEmpty()) { throw new RecordErrorException("해당 내역은 존재하지 않습니다."); }
 
-        if (recordRepository.findRecordById(id).isEmpty()) { throw new RecordErrorException("해당 내역은 존재하지 않습니다."); }
-        Record selectRecord = recordRepository.findRecordById(id).get();
+        Record selectRecord = Optional
+                .of(recordRepository.findRecordById(id).get())
+                .orElseThrow(() -> new ErrorException(RECORD_NOT_EXIST));
         Long selectId = selectRecord.getMember().getId();
 
-        if (selectId.equals(currentMember.getId())) {
+        if (Objects.equals(currentMember.getId(), selectId)) {
             recordRepository.deleteRecordById(id);
-        } else {
-            throw new IllegalArgumentException("게시물을 등록한 사용자가 아닙니다.");
-        }
-        return ResponseEntity.ok().body("내역 삭제 완료");
+            return ResponseEntity.ok().body("내역 삭제 완료");
+        } throw new ErrorException(RECORD_MEMBER_NOT_MATCH);
     }
 
     public void sendRecordAlarm(List<Member> members,AlarmType alarmType, String goalName, int goalAmount,String friendNickname){

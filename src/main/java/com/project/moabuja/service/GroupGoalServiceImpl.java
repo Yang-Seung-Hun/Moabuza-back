@@ -14,6 +14,8 @@ import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import com.project.moabuja.dto.request.goal.CreateGroupRequestDto;
 import com.project.moabuja.dto.request.goal.WaitingGoalSaveDto;
 import com.project.moabuja.dto.response.goal.*;
+import com.project.moabuja.exception.ErrorCode;
+import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -178,7 +180,9 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     @Transactional
     @Override
     public ResponseEntity<String> postGroupAccept(Member currentMember, Long alarmId) {
-        Alarm alarm = alarmRepository.findAlarmById(alarmId);
+        Alarm alarm = Optional
+                .of(alarmRepository.findById(alarmId)).get()
+                .orElseThrow(() -> new ErrorException(ErrorCode.ALARM_NOT_EXIST));
         WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
         MemberWaitingGoal currentMemberWaitingGoal = memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal);
         currentMemberWaitingGoal.changeIsAcceptedGoal();
