@@ -41,8 +41,6 @@ public class MemberController {
     @ApiOperation(value = "카카오 로그인 api")
     @GetMapping("/user/kakao/callback")
     public ResponseEntity<CustomResponseEntity> kakaoLogin(@RequestParam String code) throws JsonProcessingException {
-
-        log.info("------------ 컨트롤러 확인");
         return memberService.kakaoLogin(code);
     }
 
