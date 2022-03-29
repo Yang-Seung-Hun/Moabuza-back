@@ -22,8 +22,8 @@ import static com.project.moabuja.exception.ErrorCode.*;
 
 @Component
 public class JwtTokenProvider {
-    private long accessTokenTime = 1000 * 20 * 1 * 1; // 하루
-    private long refreshTokenTime = 1000 * 60 * 1 * 1; // 하루
+    private long accessTokenTime = 1000 * 20 * 1 * 1; // 20초
+    private long refreshTokenTime = 1000 * 60 * 60 * 1; // 1시간
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
