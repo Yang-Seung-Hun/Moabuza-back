@@ -191,6 +191,8 @@ public class MemberServiceImpl implements MemberService{
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         String refresh = request.getHeader("R-AUTH-TOKEN").substring(7);
 
+        System.out.println("어세스토큰 : " + access);
+
         if (!jwtTokenProvider.validateToken(refresh)) {
             throw new ErrorException(REFRESH_NOT_VALID);
         }
