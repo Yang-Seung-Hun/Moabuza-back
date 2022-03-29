@@ -190,12 +190,18 @@ public class MemberServiceImpl implements MemberService{
         }
         Authentication authentication = jwtTokenProvider.getAuthentication(refresh);
         String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
+
+        System.out.println("아이디 : " + authentication.getName());
+        System.out.println("받아온 리프레쉬 : " + refresh);
+        System.out.println("꺼낸 리프래쉬 : " + refreshToken);
+
         if(ObjectUtils.isEmpty(refreshToken)) {
             throw new ErrorException(REFRESH_NOT_EXIST);
         }
         if(!refreshToken.equals(refresh)) {
             throw new ErrorException(REFRESH_NOT_MATCH);
         }
+
         ReissueDto dto = ReissueDto.builder()
                 .refresh(jwtTokenProvider.createRefreshToken(authentication.getName()))
                 .access(jwtTokenProvider.createAccessToken(authentication.getName()))
