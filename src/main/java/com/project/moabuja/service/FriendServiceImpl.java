@@ -11,7 +11,6 @@ import com.project.moabuja.dto.response.friend.FriendListDto;
 import com.project.moabuja.dto.response.friend.FriendListResponseDto;
 import com.project.moabuja.dto.response.friend.FriendSearchResponseDto;
 import com.project.moabuja.exception.ErrorException;
-import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.FriendRepository;
 import com.project.moabuja.repository.MemberRepository;
@@ -24,7 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.project.moabuja.exception.ErrorCode.*;
+import static com.project.moabuja.exception.ErrorCode.ALARM_NOT_EXIST;
+import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
@@ -68,7 +68,7 @@ public class FriendServiceImpl implements FriendService{
     @Override
     public ResponseEntity<String> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember) {
         Member friend = Optional
-                .of(memberRepository.findMemberByNickname(friendAlarmDto.getFriendNickname()).get())
+                .of(memberRepository.findMemberByNickname(friendAlarmDto.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, friend, currentMember.getNickname()));
@@ -83,7 +83,7 @@ public class FriendServiceImpl implements FriendService{
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
         Member friend = Optional
-                .of(memberRepository.findMemberByNickname(alarm.getFriendNickname()).get())
+                .of(memberRepository.findMemberByNickname(alarm.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         save(currentMember, friend);
@@ -109,7 +109,7 @@ public class FriendServiceImpl implements FriendService{
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
         Member friend = Optional
-                .of(memberRepository.findMemberByNickname(alarm.getFriendNickname()).get())
+                .of(memberRepository.findMemberByNickname(alarm.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.refuse, friend, currentMember.getNickname()));
@@ -123,7 +123,7 @@ public class FriendServiceImpl implements FriendService{
     @Override
     public ResponseEntity<String> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto) {
         Member friend = Optional
-                .of(memberRepository.findMemberByNickname(friendRequestDto.getFriendNickname()).get())
+                .of(memberRepository.findMemberByNickname(friendRequestDto.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         friendRepository.delete(friendRepository.findByMemberAndFriend(currentMember, friend));
