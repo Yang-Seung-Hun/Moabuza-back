@@ -51,9 +51,7 @@ public class RecordServiceImpl implements RecordService{
     @Override
     public ResponseEntity<RecordResponseDto> save(RecordRequestDto recordRequestDto, Member currentMemberTemp) {
 
-        Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         RecordResponseDto recordResponseDto = new RecordResponseDto(false);
         Record record = new Record(recordRequestDto, currentMember);
@@ -179,9 +177,7 @@ public class RecordServiceImpl implements RecordService{
     public ResponseEntity<String> deleteRecord(Long id, Member currentMember) {
 //        if (recordRepository.findRecordById(id).isEmpty()) { throw new RecordErrorException("해당 내역은 존재하지 않습니다."); }
 
-        Record selectRecord = Optional
-                .of(recordRepository.findRecordById(id)).get()
-                .orElseThrow(() -> new ErrorException(RECORD_NOT_EXIST));
+        Record selectRecord = Optional.of(recordRepository.findRecordById(id)).get().orElseThrow(() -> new ErrorException(RECORD_NOT_EXIST));
         Long selectId = selectRecord.getMember().getId();
 
         if (Objects.equals(currentMember.getId(), selectId)) {
