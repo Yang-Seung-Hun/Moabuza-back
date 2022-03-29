@@ -4,6 +4,7 @@ import com.project.moabuja.domain.member.Hero;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
+import com.project.moabuja.dto.request.goal.CreateGroupRequestDto;
 import com.project.moabuja.dto.request.record.DayListRequestDto;
 import com.project.moabuja.dto.request.record.RecordRequestDto;
 import com.project.moabuja.dto.response.record.DayListResponseDto;
@@ -105,15 +106,32 @@ class RecordServiceImplTest {
         Assertions.assertThat(result5.getBody().isComplete()).isTrue();
     }
 
-//    @Test
-//    @DisplayName("goal 생성전 입력하면 오류 발생")
-//    public void save4(){
-//
-//    }
+    @Test
+    @DisplayName("challenge goal 생성전 입력하면 오류 발생")
+    public void save4(){
+
+        //given
+        Member member1 = new Member("751423",751423L,"nonickname10","email10@gmail.com", Hero.tongki);
+        Member savedMember1 = memberRepository.save(member1);
+
+        RecordRequestDto recordRequestDto1 = new RecordRequestDto(RecordType.income, "2022-03-05 00:00:00.000","3월용돈",50000);
+        RecordRequestDto recordRequestDto2 = new RecordRequestDto(RecordType.expense, "2022-03-06 00:00:00.000","편의점",5000);
+        RecordRequestDto recordRequestDto3 = new RecordRequestDto(RecordType.challenge, "2022-03-10 00:00:00.000","가즈아!!",45000);
+
+
+        //when
+        recordService.save(recordRequestDto1, savedMember1);
+        recordService.save(recordRequestDto2, savedMember1);
+
+        //then
+        org.junit.jupiter.api.Assertions.assertThrows(ErrorException.class, ()-> {
+            recordService.save(recordRequestDto3, savedMember1);
+        });
+    }
 
 //    @Test
 //    @DisplayName("group goal 완료 로직")
-//    public void save4(){
+//    public void save5(){
 //
 //        //given
 //        Member member1 = new Member("123456",123456L,"nickname1","email1@naver.com", Hero.tongki);

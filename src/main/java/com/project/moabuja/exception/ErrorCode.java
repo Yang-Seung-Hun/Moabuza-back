@@ -27,6 +27,8 @@ public enum ErrorCode {
     RECORD_MEMBER_NOT_MATCH(400, "R002", "해당 기록의 사용자가 아닙니다."),
     MONEY_LESS_THAN_WALLET(403, "R003", "지갑에 있는 돈보다 큰 돈을 사용할 수 없습니다."),
     SAVINGS_LESS_THAN_WALLET(403, "R004", "지갑에 있는 돈보다 큰 돈을 저금할 수 없습니다."),
+    CHALLENGE_GOAL_NOT_EXIST(404, "R005", "생성된 도전해부자 없습니다.."),
+    GROUP_GOAL_NOT_EXIST(404, "R006", "생성된 같이해부자 없습니다.."),
 
     // Goal Error
     GOAL_NOT_EXIST(404, "G001", "해당 목표는 존재하지 않습니다."),
