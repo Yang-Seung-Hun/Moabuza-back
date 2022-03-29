@@ -49,11 +49,9 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Override
     @Transactional
-    public void save(CreateGroupRequestDto groupRequestDto, Member currentMemberTemp) {
+    public ResponseEntity<String> save(CreateGroupRequestDto groupRequestDto, Member currentMemberTemp) {
 
-        Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         GroupGoal groupGoal = new GroupGoal(groupRequestDto.getCreateGroupName(), groupRequestDto.getCreateGroupAmount(), 0);
 
@@ -72,6 +70,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                     .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
             memberByNickname.ifPresent(goal::addMember);
         }
+        return ResponseEntity.ok().body("같이해부자 생성 완료");
     }
 
     @Override

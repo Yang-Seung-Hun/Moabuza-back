@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface GroupGoalService {
 
-    void save(CreateGroupRequestDto groupRequestDto, Member currentUser);
+    public ResponseEntity<String> save(CreateGroupRequestDto groupRequestDto, Member currentUser);
 
     ResponseEntity<GroupResponseDto> getGroupInfo(Member currentUser);
 

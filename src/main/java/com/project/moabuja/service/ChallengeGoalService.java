@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface ChallengeGoalService {
 
-    void save(CreateChallengeRequestDto challengeRequestDto, Member currentMember);
+    public ResponseEntity<String> save(CreateChallengeRequestDto challengeRequestDto, Member currentMember);
 
     ResponseEntity<ChallengeResponseDto> getChallengeInfo(Member currentMember);
 
