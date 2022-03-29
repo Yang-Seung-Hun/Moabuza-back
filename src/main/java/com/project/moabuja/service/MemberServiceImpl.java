@@ -188,7 +188,7 @@ public class MemberServiceImpl implements MemberService{
         if (!jwtTokenProvider.validateToken(refresh)) {
             throw new ErrorException(REFRESH_NOT_VALID);
         }
-        Authentication authentication = jwtTokenProvider.getAuthentication(access);
+        Authentication authentication = jwtTokenProvider.getAuthentication(refresh);
         String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
         if(ObjectUtils.isEmpty(refreshToken)) {
             throw new ErrorException(REFRESH_NOT_EXIST);
