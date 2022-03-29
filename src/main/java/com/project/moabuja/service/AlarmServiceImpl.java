@@ -61,9 +61,8 @@ public class AlarmServiceImpl implements AlarmService {
     @Transactional
     @Override
     public ResponseEntity<String> deleteAlarm(Member currentMember, Long alarmId) {
-        Alarm alarm = Optional
-                .of(alarmRepository.findById(alarmId)).get()
-                .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
+
+        Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
 
         if (Objects.equals(currentMember, alarm.getMember())) {
             alarmRepository.deleteById(alarmId);
