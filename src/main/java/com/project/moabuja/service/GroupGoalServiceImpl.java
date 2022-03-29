@@ -15,8 +15,13 @@ import com.project.moabuja.dto.request.goal.WaitingGoalSaveDto;
 import com.project.moabuja.dto.response.goal.*;
 import com.project.moabuja.exception.ErrorCode;
 import com.project.moabuja.exception.ErrorException;
+import com.project.moabuja.model.GroupAcceptResponse;
+import com.project.moabuja.model.GroupExitResponse;
+import com.project.moabuja.model.GroupPostResponse;
+import com.project.moabuja.model.GroupRefuseResponse;
 import com.project.moabuja.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +49,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Override
     @Transactional
-    public ResponseEntity<String> save(CreateGroupRequestDto groupRequestDto, Member currentMemberTemp) {
+    public void save(CreateGroupRequestDto groupRequestDto, Member currentMemberTemp) {
 
         Member currentMember = Optional
                 .of(memberRepository.findById(currentMemberTemp.getId())).get()
@@ -67,7 +72,6 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                     .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
             memberByNickname.ifPresent(goal::addMember);
         }
-        return ResponseEntity.ok().body("같이해부자 생성 완료");
     }
 
     @Override
@@ -124,7 +128,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                     .groupLists(groupList)
                     .waitingGoals(null)
                     .build();
-            return ResponseEntity.ok().body(haveGoal);
+            return new ResponseEntity<>(haveGoal, HttpStatus.OK);
 
         } else {
 
@@ -147,7 +151,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                         .waitingGoals(waitingGoals)
                         .build();
 
-                return ResponseEntity.ok().body(waiting);
+                return new ResponseEntity<>(waiting, HttpStatus.OK);
             } else { //challengeGoal 없을때
                 String goalStatus = "noGoal";
                 GroupResponseDto noGoal = GroupResponseDto.builder()
@@ -161,7 +165,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                         .waitingGoals(null)
                         .build();
 
-                return ResponseEntity.ok().body(noGoal);
+                return new ResponseEntity<>(noGoal, HttpStatus.OK);
             }
         }
     }
@@ -174,7 +178,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         if (friends.size() == 0){
             CreateGroupResponseDto createGroupResponseDto = new CreateGroupResponseDto(groupMembers);
-            return ResponseEntity.ok().body(createGroupResponseDto);
+            return new ResponseEntity<>(createGroupResponseDto, HttpStatus.OK);
         }
 
         for(Friend friend : friends){
@@ -193,21 +197,21 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         }
 
         CreateGroupResponseDto groupResponseDto = new CreateGroupResponseDto(groupMembers);
-        return ResponseEntity.ok().body(groupResponseDto);
+        return new ResponseEntity<>(groupResponseDto, HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<String> postGroup(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
+    public ResponseEntity<GroupPostResponse> postGroup(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
         WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.GROUP));
         inviteFriends(currentMember, goalAlarmRequestDto, waitingGoal, memberWaitingGoalRepository, memberRepository, alarmRepository, GROUP);
 
-        return ResponseEntity.ok().body("같이해부자 요청 완료");
+        return new ResponseEntity<>(new GroupPostResponse(), HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<String> postGroupAccept(Member currentMember, Long alarmId) {
+    public ResponseEntity<GroupAcceptResponse> postGroupAccept(Member currentMember, Long alarmId) {
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ErrorCode.ALARM_NOT_EXIST));
@@ -266,7 +270,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             alarmRepository.delete(alarm);
         }
 
-        return ResponseEntity.ok().body("같이해부자 수락 완료");
+        return new ResponseEntity<>(new GroupAcceptResponse(), HttpStatus.OK);
     }
 
     public boolean checkAccepted(List<MemberWaitingGoal> memberWaitingGoals) {
@@ -281,7 +285,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Transactional
     @Override
-    public ResponseEntity<String> postGroupRefuse(Member currentMember, Long alarmId) {
+    public ResponseEntity<GroupRefuseResponse> postGroupRefuse(Member currentMember, Long alarmId) {
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ErrorCode.ALARM_NOT_EXIST));
@@ -306,12 +310,12 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         alarmRepository.delete(alarm);
         waitingGoalRepository.delete(waitingGoal);
 
-        return ResponseEntity.ok().body("같이해부자 거절 완료");
+        return new ResponseEntity<>(new GroupRefuseResponse(), HttpStatus.OK);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<String> exitGroup(Member currentMemberTemp, Long id) {
+    public ResponseEntity<GroupExitResponse> exitGroup(Member currentMemberTemp, Long id) {
 
         Member currentMember = Optional
                 .of(memberRepository.findById(currentMemberTemp.getId())).get()
@@ -328,17 +332,17 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             currentMember.changeGroupGoal(null);
         }
 
-        return ResponseEntity.ok().body("도전해부자 취소 완료");
+        return new ResponseEntity<>(new GroupExitResponse(), HttpStatus.OK);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<String> exitWaitingGroup(Long id) {
+    public ResponseEntity<GroupExitResponse> exitWaitingGroup(Long id) {
 
         WaitingGoal waitingGoalById = waitingGoalRepository.findWaitingGoalById(id);
         waitingGoalRepository.delete(waitingGoalById);
 
-        return ResponseEntity.ok().body("도전해부자 나가기 완료");
+        return new ResponseEntity<>(new GroupExitResponse(), HttpStatus.OK);
     }
 
     //challengeGoalServiceImpl에서도 사용

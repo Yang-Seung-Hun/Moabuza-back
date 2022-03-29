@@ -5,9 +5,11 @@ import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.response.alarm.FriendAlarmResponseDto;
 import com.project.moabuja.dto.response.alarm.GoalAlarmResponseDto;
 import com.project.moabuja.exception.ErrorException;
+import com.project.moabuja.model.AlarmDeleteResponse;
 import com.project.moabuja.repository.AlarmRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +37,7 @@ public class AlarmServiceImpl implements AlarmService {
                 .map(FriendAlarmResponseDto::of)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok().body(friendAlarmList);
+        return new ResponseEntity<>(friendAlarmList, HttpStatus.OK);
     }
 
     @Override
@@ -45,7 +47,7 @@ public class AlarmServiceImpl implements AlarmService {
                 .map(GoalAlarmResponseDto::of)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok().body(groupAlarmList);
+        return new ResponseEntity<>(groupAlarmList, HttpStatus.OK);
     }
 
     @Override
@@ -55,18 +57,18 @@ public class AlarmServiceImpl implements AlarmService {
                 .map(GoalAlarmResponseDto::of)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok().body(groupAlarmList);
+        return new ResponseEntity<>(groupAlarmList, HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<String> deleteAlarm(Member currentMember, Long alarmId) {
+    public ResponseEntity<AlarmDeleteResponse> deleteAlarm(Member currentMember, Long alarmId) {
 
         Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
 
         if (Objects.equals(currentMember, alarm.getMember())) {
             alarmRepository.deleteById(alarmId);
-            return ResponseEntity.ok().body("알람이 삭제되었습니다.");
+            return new ResponseEntity<>(new AlarmDeleteResponse(), HttpStatus.OK);
         } throw new ErrorException(ALARM_MEMBER_NOT_MATCH);
     }
 
