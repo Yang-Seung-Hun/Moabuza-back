@@ -196,6 +196,7 @@ public class MemberServiceImpl implements MemberService{
             throw new ErrorException(REFRESH_NOT_VALID);
         }
         Authentication authentication = jwtTokenProvider.getAuthentication(access);
+
         String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
 
         System.out.println("아이디 : " + authentication.getName());
@@ -207,9 +208,10 @@ public class MemberServiceImpl implements MemberService{
             throw new ErrorException(REFRESH_NOT_MATCH);
         }
 
+        String password = memberRepository.findByEmail(authentication.getName()).getPassword();
         ReissueDto dto = ReissueDto.builder()
-                .refresh(jwtTokenProvider.createRefreshToken(authentication.getName()))
-                .access(jwtTokenProvider.createAccessToken(authentication.getName()))
+                .refresh(jwtTokenProvider.createRefreshToken(password))
+                .access(jwtTokenProvider.createAccessToken(password))
                 .build();
 
         System.out.println("다시 만든 리프래쉬 : " + dto.getRefresh());

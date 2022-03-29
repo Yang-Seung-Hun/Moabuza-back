@@ -11,10 +11,15 @@ import com.project.moabuja.dto.response.friend.FriendListDto;
 import com.project.moabuja.dto.response.friend.FriendListResponseDto;
 import com.project.moabuja.dto.response.friend.FriendSearchResponseDto;
 import com.project.moabuja.exception.ErrorException;
+import com.project.moabuja.model.FriendAcceptResponse;
+import com.project.moabuja.model.FriendDeleteResponse;
+import com.project.moabuja.model.FriendPostResponse;
+import com.project.moabuja.model.FriendRefuseResponse;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.FriendRepository;
 import com.project.moabuja.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +54,7 @@ public class FriendServiceImpl implements FriendService{
 
         FriendListResponseDto friendListResponseDto = new FriendListResponseDto(waitingFriendListDto, friendListDto);
 
-        return ResponseEntity.ok().body(friendListResponseDto);
+        return new ResponseEntity<>(friendListResponseDto, HttpStatus.OK);
     }
 
     @Override
@@ -57,28 +62,28 @@ public class FriendServiceImpl implements FriendService{
         Optional<Member> friend = memberRepository.findMemberByNickname(friendRequestDto.getFriendNickname());
         if (friend.isPresent()) {
             FriendSearchResponseDto friendSearchResponseDto = new FriendSearchResponseDto(true, friend.get().getNickname(), friend.get().getHero());
-            return ResponseEntity.ok().body(friendSearchResponseDto);
+            return new ResponseEntity<>(friendSearchResponseDto, HttpStatus.OK);
         } else {
             FriendSearchResponseDto friendSearchResponseDto = new FriendSearchResponseDto(false, null, null);
-            return ResponseEntity.ok().body(friendSearchResponseDto);
+            return new ResponseEntity<>(friendSearchResponseDto, HttpStatus.OK);
         }
     }
 
     @Transactional
     @Override
-    public ResponseEntity<String> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember) {
+    public ResponseEntity<FriendPostResponse> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember) {
         Member friend = Optional
                 .of(memberRepository.findMemberByNickname(friendAlarmDto.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, friend, currentMember.getNickname()));
 
-        return ResponseEntity.ok().body("친구 요청 알람 보내기 완료");
+        return new ResponseEntity<>(new FriendPostResponse(), HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<String> postFriendAccept(Member currentMember, Long alarmId) {
+    public ResponseEntity<FriendAcceptResponse> postFriendAccept(Member currentMember, Long alarmId) {
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
@@ -92,7 +97,7 @@ public class FriendServiceImpl implements FriendService{
 
         alarmRepository.delete(alarm);
 
-        return ResponseEntity.ok().body("친구 요청을 수락하였습니다.");
+        return new ResponseEntity<>(new FriendAcceptResponse(), HttpStatus.OK);
     }
 
     @Transactional
@@ -104,7 +109,7 @@ public class FriendServiceImpl implements FriendService{
 
     @Transactional
     @Override
-    public ResponseEntity<String> postFriendRefuse(Member currentMember, Long alarmId) {
+    public ResponseEntity<FriendRefuseResponse> postFriendRefuse(Member currentMember, Long alarmId) {
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
@@ -116,12 +121,12 @@ public class FriendServiceImpl implements FriendService{
 
         alarmRepository.delete(alarm);
 
-        return ResponseEntity.ok().body("친구 요청을 거절하였습니다.");
+        return new ResponseEntity<>(new FriendRefuseResponse(), HttpStatus.OK) ;
     }
 
     @Transactional
     @Override
-    public ResponseEntity<String> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto) {
+    public ResponseEntity<FriendDeleteResponse> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto) {
         Member friend = Optional
                 .of(memberRepository.findMemberByNickname(friendRequestDto.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
@@ -129,6 +134,6 @@ public class FriendServiceImpl implements FriendService{
         friendRepository.delete(friendRepository.findByMemberAndFriend(currentMember, friend));
         friendRepository.delete(friendRepository.findByMemberAndFriend(friend, currentMember));
 
-        return ResponseEntity.ok().body("친구 삭제 완료");
+        return new ResponseEntity<>(new FriendDeleteResponse(), HttpStatus.OK);
     }
 }

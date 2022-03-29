@@ -5,6 +5,10 @@ import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
 import com.project.moabuja.dto.request.friend.FriendRequestDto;
 import com.project.moabuja.dto.response.friend.FriendListResponseDto;
 import com.project.moabuja.dto.response.friend.FriendSearchResponseDto;
+import com.project.moabuja.model.FriendAcceptResponse;
+import com.project.moabuja.model.FriendDeleteResponse;
+import com.project.moabuja.model.FriendPostResponse;
+import com.project.moabuja.model.FriendRefuseResponse;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.AlarmService;
 import com.project.moabuja.service.FriendService;
@@ -34,37 +38,36 @@ public class FriendController {
         return friendService.searchFriend(friendRequestDto);
     }
 
-    @ApiOperation(value = "친구 삭제")
-    @DeleteMapping("/friend")
-    public ResponseEntity<String> deleteFriend(@RequestBody FriendRequestDto friendRequestDto,
-                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Member currentUser = userDetails.getMember();
-        return friendService.deleteFriend(currentUser, friendRequestDto);
-    }
-
     @ApiOperation(value = "친구 요청")
     @PostMapping("/friend")
-    public ResponseEntity<String> postFriend(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                  @RequestBody FriendAlarmDto friendAlarmDto) {
+    public ResponseEntity<FriendPostResponse> postFriend(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                         @RequestBody FriendAlarmDto friendAlarmDto) {
         Member currentMember = userDetails.getMember();
         return friendService.postFriend(friendAlarmDto, currentMember);
     }
 
     @ApiOperation(value = "친구 수락")
     @PostMapping("/friend/{id}/accept")
-    public ResponseEntity<String> postFriendAccept(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                   @PathVariable Long alarmId) {
+    public ResponseEntity<FriendAcceptResponse> postFriendAccept(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                 @PathVariable Long alarmId) {
         Member currentMember = userDetails.getMember();
         return friendService.postFriendAccept(currentMember, alarmId);
     }
 
     @ApiOperation(value = "친구 거절")
     @PostMapping("/friend/{id}/refuse")
-    public ResponseEntity<String> postFriendRefuse(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                   @PathVariable Long alarmId) {
+    public ResponseEntity<FriendRefuseResponse> postFriendRefuse(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                 @PathVariable Long alarmId) {
         Member currentMember = userDetails.getMember();
         return friendService.postFriendRefuse(currentMember, alarmId);
     }
 
+    @ApiOperation(value = "친구 삭제")
+    @DeleteMapping("/friend")
+    public ResponseEntity<FriendDeleteResponse> deleteFriend(@RequestBody FriendRequestDto friendRequestDto,
+                                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Member currentUser = userDetails.getMember();
+        return friendService.deleteFriend(currentUser, friendRequestDto);
+    }
 
 }
