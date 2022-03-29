@@ -11,15 +11,15 @@ public interface FriendService {
 
     ResponseEntity<FriendListResponseDto> listFriend(Member currentMember);
 
-    void save(Member currentMember, FriendRequestDto friendRequestDto);
+    void save(Member currentMember, Member friend);
 
     ResponseEntity<FriendSearchResponseDto> searchFriend(FriendRequestDto friendRequestDto);
 
     ResponseEntity<String> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember);
 
-    ResponseEntity<String> postFriendAccept(Member currentMember, FriendRequestDto friendRequestDto);
+    ResponseEntity<String> postFriendAccept(Member currentMember, Long alarmId);
 
-    ResponseEntity<String> postFriendRefuse(Member currentMember, FriendRequestDto friendRequestDto);
+    ResponseEntity<String> postFriendRefuse(Member currentMember, Long alarmId);
 
     ResponseEntity<String> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto);
 }
