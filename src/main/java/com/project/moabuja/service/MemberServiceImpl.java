@@ -57,6 +57,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public ResponseEntity<CustomResponseEntity> kakaoLogin(String code) throws JsonProcessingException {
         KakaoUserInfoDto kakaoUserInfoDto = getKakaoUserInfo(getAccessToken(code));
+        log.info("서비스 확인 ----------------------");
         RegToLoginDto regToLoginDto = register(kakaoUserInfoDto);
         TokenDto dto = TokenDto.builder()
                 .nickname(regToLoginDto.getNickname())
