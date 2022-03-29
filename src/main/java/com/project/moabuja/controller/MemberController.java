@@ -61,6 +61,7 @@ public class MemberController {
     @ApiOperation(value = "access 토큰 재발급")
     @GetMapping("/member/reissue")
     public ResponseEntity<CustomResponseEntity> reissue(HttpServletRequest request){
+        System.out.println("===========컨트롤러 진입.");
         return memberService.reissue(request);
     }
 
