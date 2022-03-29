@@ -10,13 +10,11 @@ import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.request.alarm.GoalAlarmSaveDto;
-import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import com.project.moabuja.dto.request.goal.CreateGroupRequestDto;
 import com.project.moabuja.dto.request.goal.WaitingGoalSaveDto;
 import com.project.moabuja.dto.response.goal.*;
 import com.project.moabuja.exception.ErrorCode;
 import com.project.moabuja.exception.ErrorException;
-import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.project.moabuja.domain.alarm.AlarmType.CHALLENGE;
 import static com.project.moabuja.domain.alarm.AlarmType.GROUP;
-import static com.project.moabuja.exception.ErrorCode.*;
+import static com.project.moabuja.exception.ErrorCode.GOAL_NOT_EXIST;
+import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
@@ -344,7 +342,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     }
 
     //challengeGoalServiceImpl에서도 사용
-    static void inviteFriends(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto, WaitingGoal waitingGoal, MemberWaitingGoalRepository memberWaitingGoalRepository, MemberRepository memberRepository, AlarmRepository alarmRepository, AlarmType group) {
+    static void inviteFriends(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto, WaitingGoal waitingGoal, MemberWaitingGoalRepository memberWaitingGoalRepository, MemberRepository memberRepository, AlarmRepository alarmRepository, AlarmType GROUP) {
         memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, true));
 
         for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
