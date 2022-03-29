@@ -1,13 +1,7 @@
 package com.project.moabuja.exception;
 
-import com.project.moabuja.exception.exceptionClass.AlarmErrorException;
-import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
-import com.project.moabuja.exception.exceptionClass.LogoutJwtUseException;
-import com.project.moabuja.exception.exceptionClass.RecordErrorException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -17,9 +11,10 @@ public class ErrorHandler {
 
     @ExceptionHandler(value = {ErrorException.class})
     protected ResponseEntity<ErrorResponse> customException(ErrorException e) {
-        log.error("Error : " + e.getErrorManual());
-        return ErrorResponse.toResponseEntity(e.getErrorManual());
+        log.error("Error : " + e.getErrorCode());
+        return ErrorResponse.of(e.getErrorCode());
     }
+
 //
 //    @ExceptionHandler(MethodArgumentNotValidException.class)
 //    public ResponseEntity<ErrorResponse> methodArgumentNotValidException(MethodArgumentNotValidException e){

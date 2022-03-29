@@ -1,29 +1,36 @@
 package com.project.moabuja.exception;
 
 import lombok.*;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ErrorResponse {
 
-    private final LocalDateTime timestamp = LocalDateTime.now();
-    private final int status;
-    private final String error;
-    private final String errorCode;
-    private final String msg;
+    private int status;
+    private String errorName;
+    private String errorCode;
+    private String msg;
 
-    public static ResponseEntity<ErrorResponse> toResponseEntity(ErrorManual errorManual) {
+    @Builder
+    public ErrorResponse(int status, String errorName, String errorCode, String msg) {
+        this.status = status;
+        this.errorName = errorName;
+        this.errorCode = errorCode;
+        this.msg = msg;
+    }
+
+    public static ResponseEntity<ErrorResponse> of(ErrorCode errorCode) {
         return ResponseEntity
-                .status(errorManual.getHttpStatus().value())
+                .status(errorCode.getHttpStatus())
                 .body(ErrorResponse.builder()
-                    .error(errorManual.getHttpStatus().name())
-                    .errorCode(errorManual.getErrorCode())
-                    .msg(errorManual.getErrorMessage())
-                    .build()
+                        .status(errorCode.getHttpStatus().value())
+                        .errorName(errorCode.getHttpStatus().name())
+                        .errorCode(errorCode.getErrorCode())
+                        .msg(errorCode.getErrorMessage())
+                        .build()
                 );
     }
 }

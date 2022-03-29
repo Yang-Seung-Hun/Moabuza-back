@@ -1,17 +1,14 @@
 package com.project.moabuja.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.exception.ErrorException;
-import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.FCMServiceImpl;
 import com.project.moabuja.service.MemberService;
 import com.project.moabuja.util.CustomResponseEntity;
-import com.project.moabuja.util.Validation;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import static com.project.moabuja.exception.ErrorManual.*;
+import static com.project.moabuja.exception.ErrorCode.*;
 
 @RestController
 @RequiredArgsConstructor
