@@ -1,5 +1,6 @@
 package com.project.moabuja.security.filter;
 
+import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.exception.exceptionClass.JwtExpiredException;
 import com.project.moabuja.security.userdetails.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
@@ -17,10 +18,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
 
+import static com.project.moabuja.exception.ErrorCode.*;
+
 @Component
 public class JwtTokenProvider {
-    private long accessTokenTime = 1000 * 60 * 60 * 24; // 하루
-    private long refreshTokenTime = 1000 * 60 * 60 * 24; // 하루
+    private long accessTokenTime = 1000 * 20 * 1 * 1; // 하루
+    private long refreshTokenTime = 1000 * 60 * 1 * 1; // 하루
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
@@ -66,7 +69,7 @@ public class JwtTokenProvider {
         try {
             userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
         } catch (UsernameNotFoundException e) {
-            throw new UsernameNotFoundException("해당 유저가 없습니다");
+            throw new ErrorException(MEMBER_NOT_FOUND);
         }
         return new UsernamePasswordAuthenticationToken(userDetails, "", null);
     }

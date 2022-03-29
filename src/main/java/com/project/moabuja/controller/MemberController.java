@@ -1,18 +1,17 @@
 package com.project.moabuja.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
-import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
+import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.FCMServiceImpl;
 import com.project.moabuja.service.MemberService;
 import com.project.moabuja.util.CustomResponseEntity;
-import com.project.moabuja.util.Validation;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +19,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import static com.project.moabuja.exception.ErrorCode.*;
+
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
@@ -31,7 +33,7 @@ public class MemberController {
     @GetMapping("/home")
     public ResponseEntity<HomeResponseDto> getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
         if(userDetails == null){
-            throw  new MemberNotFoundException("컨트롤러 Move to Login Page");
+            throw new ErrorException(GEUST_TO_LOGIN);
         }
         return memberService.getHomeInfo(userDetails.getMember());
     }
@@ -39,6 +41,8 @@ public class MemberController {
     @ApiOperation(value = "카카오 로그인 api")
     @GetMapping("/user/kakao/callback")
     public ResponseEntity<CustomResponseEntity> kakaoLogin(@RequestParam String code) throws JsonProcessingException {
+
+        log.info("------------ 컨트롤러 확인");
         return memberService.kakaoLogin(code);
     }
 

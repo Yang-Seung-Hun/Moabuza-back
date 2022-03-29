@@ -4,7 +4,7 @@ import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.response.alarm.FriendAlarmResponseDto;
 import com.project.moabuja.dto.response.alarm.GoalAlarmResponseDto;
-import com.project.moabuja.exception.exceptionClass.AlarmErrorException;
+import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.repository.AlarmRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.project.moabuja.domain.alarm.AlarmType.*;
+import static com.project.moabuja.exception.ErrorCode.*;
 
 @Slf4j
 @Service
@@ -62,12 +63,12 @@ public class AlarmServiceImpl implements AlarmService {
     public ResponseEntity<String> deleteAlarm(Member currentMember, Long alarmId) {
         Optional<Alarm> alarm = Optional
                 .of(alarmRepository.findById(alarmId))
-                .orElseThrow(() -> new AlarmErrorException("해당 알람이 없습니다."));
+                .orElseThrow(() -> new ErrorException(ALARM_NOT_EXITS));
 
         if (Objects.equals(currentMember, alarm.get().getMember())) {
             alarmRepository.deleteById(alarmId);
             return ResponseEntity.ok().body("알람이 삭제되었습니다.");
-        } throw new AlarmErrorException("알람에 해당하는 사용자가 아닙니다.");
+        } throw new ErrorException(ALARM_MEMBER_NOT_MATCH);
     }
 
 }
