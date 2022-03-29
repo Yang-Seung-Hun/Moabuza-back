@@ -1,6 +1,5 @@
 package com.project.moabuja.service;
 
-import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.alarm.AlarmDetailType;
 import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.goal.DoneGoal;
@@ -189,8 +188,16 @@ public class RecordServiceImpl implements RecordService{
 
     public void sendRecordAlarm(List<Member> members,AlarmType alarmType, String goalName, int goalAmount,String friendNickname){
         for (Member member : members) {
-            Alarm alarm = new Alarm(alarmType, AlarmDetailType.record, goalName, goalAmount, null, friendNickname, member);
-            alarmRepository.save(alarm);
+            GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
+                    .alarmType(alarmType)
+                    .alarmDetailType(AlarmDetailType.record)
+                    .goalName(goalName)
+                    .goalAmount(goalAmount)
+                    .waitingGoalId(null)
+                    .friendNickname(friendNickname)
+                    .member(member)
+                    .build();
+            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
         }
     }
 
@@ -227,9 +234,16 @@ public class RecordServiceImpl implements RecordService{
 
     private void makeChallengeDoneGoal(RecordRequestDto recordRequestDto, Member currentMember, RecordResponseDto recordResponseDto, List<Member> members, int currentAmount) {
         for (Member member : members) {
-            Alarm alarm = new Alarm(CHALLENGE, AlarmDetailType.success, currentMember.getChallengeGoal().getChallengeGoalName(),
-                    recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
-            alarmRepository.save(alarm);
+            GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
+                    .alarmType(CHALLENGE)
+                    .alarmDetailType(AlarmDetailType.success)
+                    .goalName(currentMember.getChallengeGoal().getChallengeGoalName())
+                    .goalAmount(recordRequestDto.getRecordAmount())
+                    .waitingGoalId(null)
+                    .friendNickname(currentMember.getNickname())
+                    .member(member)
+                    .build();
+            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
         }
 
         //완료 로직
