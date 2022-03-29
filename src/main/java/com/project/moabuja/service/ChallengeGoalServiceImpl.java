@@ -52,7 +52,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
     @Transactional
     @Override
-    public void save(CreateChallengeRequestDto createChallengeRequestDto, Member currentMemberTemp) {
+    public ResponseEntity<String> save(CreateChallengeRequestDto createChallengeRequestDto, Member currentMemberTemp) {
 
         Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
@@ -61,6 +61,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         if (Optional.ofNullable(createChallengeRequestDto.getChallengeFriends()).isEmpty()) {
             ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
             savedGoal.addMember(currentMember);
+            return ResponseEntity.ok().body("도전해부자 생성 완료");
         }
 
         for(String name :createChallengeRequestDto.getChallengeFriends()){
@@ -71,6 +72,8 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         //member랑 challengegoal 연관관계 맺음
         ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
         savedGoal.addMember(currentMember);
+
+        return ResponseEntity.ok().body("도전해부자 생성 완료");
     }
 
     @Override
