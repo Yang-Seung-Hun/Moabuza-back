@@ -57,7 +57,6 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public ResponseEntity<CustomResponseEntity> kakaoLogin(String code) throws JsonProcessingException {
         KakaoUserInfoDto kakaoUserInfoDto = getKakaoUserInfo(getAccessToken(code));
-        log.info("서비스 확인 ----------------------");
         RegToLoginDto regToLoginDto = register(kakaoUserInfoDto);
         String access = jwtTokenProvider.createAccessToken(regToLoginDto.getPassword());
         String refresh = jwtTokenProvider.createRefreshToken(regToLoginDto.getPassword());
@@ -195,7 +194,7 @@ public class MemberServiceImpl implements MemberService{
         if (!jwtTokenProvider.validateToken(refresh)) {
             throw new ErrorException(REFRESH_NOT_VALID);
         }
-        Authentication authentication = jwtTokenProvider.getAuthentication(refresh);
+        Authentication authentication = jwtTokenProvider.getAuthentication(access);
         String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
 
         System.out.println("아이디 : " + authentication.getName());

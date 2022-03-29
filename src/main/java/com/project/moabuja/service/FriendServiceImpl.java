@@ -67,11 +67,11 @@ public class FriendServiceImpl implements FriendService{
     @Transactional
     @Override
     public ResponseEntity<String> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember) {
-        Optional<Member> friend = Optional
-                .ofNullable(memberRepository.findMemberByNickname(friendAlarmDto.getFriendNickname())
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND)));
+        Member friend = Optional
+                .of(memberRepository.findMemberByNickname(friendAlarmDto.getFriendNickname()).get())
+                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
-        alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, friend.get(), currentMember.getNickname()));
+        alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, friend, currentMember.getNickname()));
 
         return ResponseEntity.ok().body("친구 요청 알람 보내기 완료");
     }
@@ -79,18 +79,18 @@ public class FriendServiceImpl implements FriendService{
     @Transactional
     @Override
     public ResponseEntity<String> postFriendAccept(Member currentMember, Long alarmId) {
-        Optional<Alarm> alarm = Optional
-                .of(alarmRepository.findById(alarmId)
-                .orElseThrow(() -> new ErrorException(ALARM_NOT_EXITS)));
-        Optional<Member> friend = Optional
-                .of(memberRepository.findMemberByNickname(alarm.get().getFriendNickname()))
+        Alarm alarm = Optional
+                .of(alarmRepository.findById(alarmId)).get()
+                .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
+        Member friend = Optional
+                .of(memberRepository.findMemberByNickname(alarm.getFriendNickname()).get())
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
-        save(currentMember, friend.get());
+        save(currentMember, friend);
 
-        alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.accept, friend.get(), currentMember.getNickname()));
+        alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.accept, friend, currentMember.getNickname()));
 
-        alarmRepository.delete(alarm.get());
+        alarmRepository.delete(alarm);
 
         return ResponseEntity.ok().body("친구 요청을 수락하였습니다.");
     }
@@ -105,16 +105,16 @@ public class FriendServiceImpl implements FriendService{
     @Transactional
     @Override
     public ResponseEntity<String> postFriendRefuse(Member currentMember, Long alarmId) {
-        Optional<Alarm> alarm = Optional
-                .of(alarmRepository.findById(alarmId)
-                        .orElseThrow(() -> new ErrorException(ALARM_NOT_EXITS)));
-        Optional<Member> friend = Optional
-                .of(memberRepository.findMemberByNickname(alarm.get().getFriendNickname()))
+        Alarm alarm = Optional
+                .of(alarmRepository.findById(alarmId)).get()
+                .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
+        Member friend = Optional
+                .of(memberRepository.findMemberByNickname(alarm.getFriendNickname()).get())
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
-        alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.refuse, friend.get(), currentMember.getNickname()));
+        alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.refuse, friend, currentMember.getNickname()));
 
-        alarmRepository.delete(alarm.get());
+        alarmRepository.delete(alarm);
 
         return ResponseEntity.ok().body("친구 요청을 거절하였습니다.");
     }
@@ -122,12 +122,12 @@ public class FriendServiceImpl implements FriendService{
     @Transactional
     @Override
     public ResponseEntity<String> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto) {
-        Optional<Member> friend = Optional
-                .of(memberRepository.findMemberByNickname(friendRequestDto.getFriendNickname()))
+        Member friend = Optional
+                .of(memberRepository.findMemberByNickname(friendRequestDto.getFriendNickname()).get())
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
-        friendRepository.delete(friendRepository.findByMemberAndFriend(currentMember, friend.get()));
-        friendRepository.delete(friendRepository.findByMemberAndFriend(friend.get(), currentMember));
+        friendRepository.delete(friendRepository.findByMemberAndFriend(currentMember, friend));
+        friendRepository.delete(friendRepository.findByMemberAndFriend(friend, currentMember));
 
         return ResponseEntity.ok().body("친구 삭제 완료");
     }

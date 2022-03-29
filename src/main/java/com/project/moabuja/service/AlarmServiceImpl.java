@@ -61,11 +61,11 @@ public class AlarmServiceImpl implements AlarmService {
     @Transactional
     @Override
     public ResponseEntity<String> deleteAlarm(Member currentMember, Long alarmId) {
-        Optional<Alarm> alarm = Optional
-                .of(alarmRepository.findById(alarmId))
-                .orElseThrow(() -> new ErrorException(ALARM_NOT_EXITS));
+        Alarm alarm = Optional
+                .of(alarmRepository.findById(alarmId)).get()
+                .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
 
-        if (Objects.equals(currentMember, alarm.get().getMember())) {
+        if (Objects.equals(currentMember, alarm.getMember())) {
             alarmRepository.deleteById(alarmId);
             return ResponseEntity.ok().body("알람이 삭제되었습니다.");
         } throw new ErrorException(ALARM_MEMBER_NOT_MATCH);
