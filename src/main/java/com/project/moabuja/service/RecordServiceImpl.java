@@ -2,6 +2,7 @@ package com.project.moabuja.service;
 
 import com.project.moabuja.domain.alarm.AlarmDetailType;
 import com.project.moabuja.domain.alarm.AlarmType;
+import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.DoneGoal;
 import com.project.moabuja.domain.goal.GoalType;
 import com.project.moabuja.domain.goal.GroupGoal;
@@ -70,6 +71,10 @@ public class RecordServiceImpl implements RecordService{
 
         //type이 challenge일때
         else if(recordRequestDto.getRecordType() == RecordType.challenge){
+
+            //생성된 challenge있는지 확인
+            Optional.of(Optional.ofNullable(currentMember.getChallengeGoal())).get().orElseThrow(() -> new ErrorException(CHALLENGE_GOAL_NOT_EXIST));
+
             if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
             } else { throw new ErrorException(SAVINGS_LESS_THAN_WALLET); }
@@ -95,9 +100,13 @@ public class RecordServiceImpl implements RecordService{
 
         //group goal
         else if(recordRequestDto.getRecordType() == RecordType.group){
+
+            //생성된 같이해부자 있는지 확인
+            Optional.of(Optional.ofNullable(currentMember.getGroupGoal())).get().orElseThrow(() -> new ErrorException(GROUP_GOAL_NOT_EXIST));
+
             if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
-            } else { throw new RecordErrorException("지갑보다 큰 돈을 저금하는 것은 불가능 합니다."); }
+            } else { throw new ErrorException(SAVINGS_LESS_THAN_WALLET); }
 
             List<Member> members = currentMember.getGroupGoal().getMembers();
 

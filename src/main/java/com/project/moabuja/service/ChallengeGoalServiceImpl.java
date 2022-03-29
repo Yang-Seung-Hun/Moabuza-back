@@ -2,6 +2,7 @@ package com.project.moabuja.service;
 
 import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.alarm.AlarmDetailType;
+import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.goal.*;
 import com.project.moabuja.domain.member.Member;
@@ -16,6 +17,7 @@ import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,9 +49,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Override
     public ResponseEntity<String> save(CreateChallengeRequestDto createChallengeRequestDto, Member currentMemberTemp) {
 
-        Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         ChallengeGoal challengeGoal = new ChallengeGoal(createChallengeRequestDto.getCreateChallengeName(), createChallengeRequestDto.getCreateChallengeAmount(), 0);
 
@@ -60,12 +60,10 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         }
 
         for(String name :createChallengeRequestDto.getChallengeFriends()){
-            Member member = Optional
-                    .of(memberRepository.findMemberByNickname(name)).get()
-                    .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+            Member member = Optional.of(memberRepository.findMemberByNickname(name)).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
             challengeGoal.addMember(member);
-
         }
+
         //member랑 challengegoal 연관관계 맺음
         ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
         savedGoal.addMember(currentMember);
@@ -76,40 +74,21 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     public ResponseEntity<ChallengeResponseDto> getChallengeInfo(Member currentMemberTemp) {
 
         //여기는 프록시 생명주기 문제 땜에 필요
-        Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         Optional<ChallengeGoal> challengeGoal = Optional.ofNullable(currentMember.getChallengeGoal());
-        List<String> challengeDoneGoalNames = new ArrayList<>();
-        for (DoneGoal doneGoal : currentMember.getDoneGaols()) {
-            if (doneGoal.getGoalType() == GoalType.CHALLENGE) {
-                challengeDoneGoalNames.add(doneGoal.getDoneGoalName());
-            }
-        }
+
+        List<String> challengeDoneGoalNames = makeChallengeDoneNames(currentMember);
         List<MemberWaitingGoal> memberWaitingGoals = currentMember.getMemberWaitingGoals();
 
         //challengeGoal 있을때
         if (challengeGoal.isPresent()) {
             String goalStatus = "goal";
-            List<ChallengeMemberDto> challengeMembers = new ArrayList<>();
-            for (Member user : challengeGoal.get().getMembers()) {
-                int currentAmount = 0;
-                List<Record> records = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, user);
-                for (Record record : records) {
-                    currentAmount += record.getRecordAmount();
-                }
-                int leftAmount = challengeGoal.get().getChallengeGoalAmount() - currentAmount;
-                int percent = (int) (((double) currentAmount / (double) (challengeGoal.get().getChallengeGoalAmount())) * 100);
-                challengeMembers.add(ChallengeMemberDto.builder()
-                        .challengeMemberNickname(user.getNickname())
-                        .challengeMemberHero(user.getHero())
-                        .challengeMemberLeftAmount(leftAmount)
-                        .challengeMemberNowPercent(percent)
-                        .build());
-            }
+
+            List<ChallengeMemberDto> challengeMembers = makeChallengeMembers(challengeGoal);
 
             List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentMember);
+
             List<ChallengeListDto> challengeLists = challengeRecords.stream().map(record -> {
                 return new ChallengeListDto(record.getRecordDate(), record.getMemo(), record.getRecordAmount());
             }).collect(Collectors.toList());
@@ -124,14 +103,11 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                     .build();
 
             return ResponseEntity.ok().body(goalResponseDto);
-        } else {
+        } else {//challenge 없을때
             if (! memberWaitingGoals.isEmpty()) { //수락대기중
                 String goalStatus = "waiting";
 
-                List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
-                for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
-                    waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(),memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
-                }
+                List<WaitingGoalResponseDto> waitingGoals = makeWaitingGoals(memberWaitingGoals);
 
                 ChallengeResponseDto waitingResponseDto = ChallengeResponseDto.builder()
                         .goalStatus(goalStatus)
@@ -171,9 +147,8 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         for(Friend friend : friends){
             //친구의 챌린지 골을 확인
-            Member friendById = Optional
-                    .of(memberRepository.findById(friend.getFriend().getId())).get()
-                    .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+            Member friendById = Optional.of(memberRepository.findById(friend.getFriend().getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+
             Optional<ChallengeGoal> friendChallengeGoal = Optional.ofNullable(friendById.getChallengeGoal());
 
             //이미 진행중인 챌린지 있음
@@ -207,12 +182,10 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Transactional
     @Override
     public ResponseEntity<String> postChallengeAccept(Member currentMemberTemp, Long alarmId) {
-        Alarm alarm = Optional
-                .of(alarmRepository.findById(alarmId)).get()
-                .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
-        Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
+
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+
         WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
         MemberWaitingGoal currentMemberWaitingGoal = memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal);
         currentMemberWaitingGoal.changeIsAcceptedGoal();
@@ -261,6 +234,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                     alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
                 }
             }
+
             // ChallengeGoal 생성
             CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
             save(createChallengeRequestDto, currentMember);
@@ -299,6 +273,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                     .build();
             alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
         }
+
         alarmRepository.delete(alarm);
         waitingGoalRepository.delete(waitingGoal);
 
@@ -309,9 +284,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Transactional
     public ResponseEntity<String> exitChallenge(Member currentMemberTemp, Long id) {
 
-        Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         List<Member> memberList = currentMember.getChallengeGoal().getMembers();
 
@@ -327,9 +300,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Transactional
     public ResponseEntity<String> exitWaitingChallenge(Long id) {
 
-        WaitingGoal waitingGoalById = Optional
-                .of(waitingGoalRepository.findWaitingGoalById(id))
-                .orElseThrow(() -> new ErrorException(GOAL_NOT_EXIST));
+        WaitingGoal waitingGoalById = Optional.of(waitingGoalRepository.findWaitingGoalById(id)).orElseThrow(() -> new ErrorException(GOAL_NOT_EXIST));
         waitingGoalRepository.delete(waitingGoalById);
 
         return ResponseEntity.ok().body("도전해부자 나가기 완료");
@@ -343,6 +314,49 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                 result = false;
                 break; }}
         return result;
+    }
+
+    @NotNull
+    private List<String> makeChallengeDoneNames(Member currentMember) {
+        List<String> challengeDoneGoalNames = new ArrayList<>();
+        for (DoneGoal doneGoal : currentMember.getDoneGaols()) {
+            if (doneGoal.getGoalType() == GoalType.CHALLENGE) {
+                challengeDoneGoalNames.add(doneGoal.getDoneGoalName());
+            }
+        }
+        return challengeDoneGoalNames;
+    }
+
+    @NotNull
+    private List<ChallengeMemberDto> makeChallengeMembers(Optional<ChallengeGoal> challengeGoal) {
+        List<ChallengeMemberDto> challengeMembers = new ArrayList<>();
+        for (Member user : challengeGoal.get().getMembers()) {
+            int currentAmount = 0;
+            List<Record> records = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, user);
+            for (Record record : records) {
+                currentAmount += record.getRecordAmount();
+            }
+
+            int leftAmount = challengeGoal.get().getChallengeGoalAmount() - currentAmount;
+            int percent = (int) (((double) currentAmount / (double) (challengeGoal.get().getChallengeGoalAmount())) * 100);
+
+            challengeMembers.add(ChallengeMemberDto.builder()
+                    .challengeMemberNickname(user.getNickname())
+                    .challengeMemberHero(user.getHero())
+                    .challengeMemberLeftAmount(leftAmount)
+                    .challengeMemberNowPercent(percent)
+                    .build());
+        }
+        return challengeMembers;
+    }
+
+    @NotNull
+    private List<WaitingGoalResponseDto> makeWaitingGoals(List<MemberWaitingGoal> memberWaitingGoals) {
+        List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
+        for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
+            waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(),memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
+        }
+        return waitingGoals;
     }
 
 
