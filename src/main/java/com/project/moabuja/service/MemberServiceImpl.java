@@ -59,11 +59,18 @@ public class MemberServiceImpl implements MemberService{
         KakaoUserInfoDto kakaoUserInfoDto = getKakaoUserInfo(getAccessToken(code));
         log.info("서비스 확인 ----------------------");
         RegToLoginDto regToLoginDto = register(kakaoUserInfoDto);
+        String access = jwtTokenProvider.createAccessToken(regToLoginDto.getPassword());
+        String refresh = jwtTokenProvider.createRefreshToken(regToLoginDto.getPassword());
+
+        System.out.println("로그인 시 발급되는 토큰 리프래쉬 : " + refresh);
+        System.out.println("로그인 시 발급되는 토큰 어세스: " + access);
+
         TokenDto dto = TokenDto.builder()
                 .nickname(regToLoginDto.getNickname())
-                .access(jwtTokenProvider.createAccessToken(regToLoginDto.getPassword()))
-                .refresh(jwtTokenProvider.createRefreshToken(regToLoginDto.getPassword()))
+                .access(access)
+                .refresh(refresh)
                 .build();
+
         redisTemplate.opsForValue()
                 .set("RT:" + kakaoUserInfoDto.getEmail(), dto.getRefresh(), jwtTokenProvider.getExpiration(dto.getRefresh()), TimeUnit.MILLISECONDS);
 
@@ -192,8 +199,6 @@ public class MemberServiceImpl implements MemberService{
         String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
 
         System.out.println("아이디 : " + authentication.getName());
-        System.out.println("받아온 리프레쉬 : " + refresh);
-        System.out.println("꺼낸 리프래쉬 : " + refreshToken);
 
         if(ObjectUtils.isEmpty(refreshToken)) {
             throw new ErrorException(REFRESH_NOT_EXIST);
@@ -206,6 +211,8 @@ public class MemberServiceImpl implements MemberService{
                 .refresh(jwtTokenProvider.createRefreshToken(authentication.getName()))
                 .access(jwtTokenProvider.createAccessToken(authentication.getName()))
                 .build();
+
+        System.out.println("다시 만든 리프래쉬 : " + dto.getRefresh());
 
         redisTemplate.opsForValue()
                 .set("RT:" + authentication.getName(), dto.getRefresh(),
