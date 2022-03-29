@@ -24,10 +24,10 @@ public class ErrorResponse {
 
     public static ResponseEntity<ErrorResponse> of(ErrorCode errorCode) {
         return ResponseEntity
-                .status(errorCode.getHttpStatus())
+                .status(errorCode.getStatus())
                 .body(ErrorResponse.builder()
-                        .status(errorCode.getHttpStatus().value())
-                        .errorName(errorCode.getHttpStatus().name())
+                        .status(errorCode.getStatus())
+                        .errorName(errorCode.name())
                         .errorCode(errorCode.getErrorCode())
                         .msg(errorCode.getErrorMessage())
                         .build()
