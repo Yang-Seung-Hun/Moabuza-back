@@ -15,8 +15,6 @@ import com.project.moabuja.dto.response.record.DayListResponseDto;
 import com.project.moabuja.dto.response.record.DayRecordResponseDto;
 import com.project.moabuja.dto.response.record.RecordResponseDto;
 import com.project.moabuja.exception.ErrorException;
-import com.project.moabuja.exception.exceptionClass.AlarmErrorException;
-import com.project.moabuja.exception.exceptionClass.MemberNotFoundException;
 import com.project.moabuja.exception.exceptionClass.RecordErrorException;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.DoneGoalRepository;
@@ -29,10 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.project.moabuja.domain.alarm.AlarmType.*;
+import static com.project.moabuja.domain.alarm.AlarmType.CHALLENGE;
+import static com.project.moabuja.domain.alarm.AlarmType.GROUP;
 import static com.project.moabuja.exception.ErrorCode.*;
 
 @Service
@@ -50,7 +52,7 @@ public class RecordServiceImpl implements RecordService{
     public ResponseEntity<RecordResponseDto> save(RecordRequestDto recordRequestDto, Member currentMemberTemp) {
 
         Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId()).get())
+                .of(memberRepository.findById(currentMemberTemp.getId())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         RecordResponseDto recordResponseDto = new RecordResponseDto(false);
@@ -166,7 +168,7 @@ public class RecordServiceImpl implements RecordService{
 //        if (recordRepository.findRecordById(id).isEmpty()) { throw new RecordErrorException("해당 내역은 존재하지 않습니다."); }
 
         Record selectRecord = Optional
-                .of(recordRepository.findRecordById(id).get())
+                .of(recordRepository.findRecordById(id)).get()
                 .orElseThrow(() -> new ErrorException(RECORD_NOT_EXIST));
         Long selectId = selectRecord.getMember().getId();
 
