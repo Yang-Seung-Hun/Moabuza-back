@@ -9,6 +9,7 @@ import com.project.moabuja.dto.request.record.DayListRequestDto;
 import com.project.moabuja.dto.request.record.RecordRequestDto;
 import com.project.moabuja.dto.response.record.DayListResponseDto;
 import com.project.moabuja.dto.response.record.RecordResponseDto;
+import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.exception.exceptionClass.RecordErrorException;
 import com.project.moabuja.repository.MemberRepository;
 import org.assertj.core.api.Assertions;
@@ -52,7 +53,7 @@ class RecordServiceImplTest {
         recordService.save(recordRequestDto2, savedMember1);
 
         //then
-        org.junit.jupiter.api.Assertions.assertThrows(RecordErrorException.class, () -> {
+        org.junit.jupiter.api.Assertions.assertThrows(ErrorException.class, () -> {
             recordService.save(recordRequestDto3, savedMember1);
         });
     }
@@ -298,7 +299,7 @@ class RecordServiceImplTest {
         Long recordId = dayList1Tmp.getBody().getDayRecordList().get(1).getId();
 
         //then
-        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, ()->{
+        org.junit.jupiter.api.Assertions.assertThrows(ErrorException.class, ()->{
             recordService.deleteRecord(recordId, savedMember2);
         });
     }
@@ -323,7 +324,7 @@ class RecordServiceImplTest {
         Long recordId = 99L;
 
         //then
-        org.junit.jupiter.api.Assertions.assertThrows(RecordErrorException.class, ()->{
+        org.junit.jupiter.api.Assertions.assertThrows(ErrorException.class, ()->{
             recordService.deleteRecord(recordId, savedMember1);
         });
     }
