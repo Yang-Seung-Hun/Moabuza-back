@@ -1,29 +1,31 @@
 package com.project.moabuja.service;
 
-import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
 import com.project.moabuja.dto.response.goal.CreateChallengeResponseDto;
-import okhttp3.Response;
+import com.project.moabuja.model.ChallengeAcceptResponse;
+import com.project.moabuja.model.ChallengeExitResponse;
+import com.project.moabuja.model.ChallengePostResponse;
+import com.project.moabuja.model.ChallengeRefuseResponse;
 import org.springframework.http.ResponseEntity;
 
 public interface ChallengeGoalService {
 
-    ResponseEntity<String> save(CreateChallengeRequestDto challengeRequestDto, Member currentMember);
+    void save(CreateChallengeRequestDto challengeRequestDto, Member currentMember);
 
     ResponseEntity<ChallengeResponseDto> getChallengeInfo(Member currentMember);
 
     ResponseEntity<CreateChallengeResponseDto> getChallengeMemberCandidates(Member currentMember);
 
-    ResponseEntity<String> postChallenge(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto);
+    ResponseEntity<ChallengePostResponse> postChallenge(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto);
 
-    ResponseEntity<String> postChallengeAccept(Member currentMember, Long alarmId);
+    ResponseEntity<ChallengeAcceptResponse> postChallengeAccept(Member currentMember, Long alarmId);
 
-    ResponseEntity<String> postChallengeRefuse(Member currentMember, Long alarmId);
+    ResponseEntity<ChallengeRefuseResponse> postChallengeRefuse(Member currentMember, Long alarmId);
 
-    ResponseEntity<String> exitChallenge(Member currentMember, Long id);
+    ResponseEntity<ChallengeExitResponse> exitChallenge(Member currentMember, Long id);
 
-    ResponseEntity<String> exitWaitingChallenge(Long id);
+    ResponseEntity<ChallengeExitResponse> exitWaitingChallenge(Long id);
 }

@@ -5,6 +5,9 @@ import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.exception.ErrorException;
+import com.project.moabuja.model.LogoutResponse;
+import com.project.moabuja.model.NicknameValidResponse;
+import com.project.moabuja.model.UpdateInfoResponse;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.FCMServiceImpl;
 import com.project.moabuja.service.MemberService;
@@ -19,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import static com.project.moabuja.exception.ErrorCode.*;
+import static com.project.moabuja.exception.ErrorCode.GEUST_TO_LOGIN;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,18 +47,18 @@ public class MemberController {
         return memberService.kakaoLogin(code);
     }
 
-    @ApiOperation(value = "닉네임, 캐릭터 선택")
-    @PutMapping("/member/info")
-    public ResponseEntity<String> update(@Valid @RequestBody MemberUpdateRequestDto dto,
-                                 @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
-        fcmService.register(dto.getNickname(), dto.getFcmToken());
-        return memberService.updateMemberInfo(dto, userDetails.getMember().getEmail());
-    }
-
     @ApiOperation(value = "닉네임 중복체크")
     @PostMapping("/member/validation")
-    public ResponseEntity<String> nicknameValid(@Valid @RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
+    public ResponseEntity<NicknameValidResponse> nicknameValid(@Valid @RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
         return memberService.nicknameValid(nicknameValidationRequestDto);
+    }
+
+    @ApiOperation(value = "닉네임, 캐릭터 선택")
+    @PutMapping("/member/info")
+    public ResponseEntity<UpdateInfoResponse> update(@Valid @RequestBody MemberUpdateRequestDto dto,
+                                                     @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
+        fcmService.register(dto.getNickname(), dto.getFcmToken());
+        return memberService.updateMemberInfo(dto, userDetails.getMember().getEmail());
     }
 
     @ApiOperation(value = "access 토큰 재발급")
@@ -67,7 +70,7 @@ public class MemberController {
 
     @ApiOperation(value = "로그아웃")
     @GetMapping("/member/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request){
+    public ResponseEntity<LogoutResponse> logout(HttpServletRequest request){
         return memberService.logout(request);
     }
 }

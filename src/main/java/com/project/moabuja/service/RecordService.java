@@ -5,6 +5,7 @@ import com.project.moabuja.dto.request.record.DayListRequestDto;
 import com.project.moabuja.dto.request.record.RecordRequestDto;
 import com.project.moabuja.dto.response.record.DayListResponseDto;
 import com.project.moabuja.dto.response.record.RecordResponseDto;
+import com.project.moabuja.model.RecordDeleteResponse;
 import org.springframework.http.ResponseEntity;
 
 public interface RecordService {
@@ -15,5 +16,5 @@ public interface RecordService {
 
     ResponseEntity<DayListResponseDto> getDayList(DayListRequestDto dayListRequestDto, Member currentMember);
 
-    ResponseEntity<String> deleteRecord(Long id, Member currentMember);
+    ResponseEntity<RecordDeleteResponse> deleteRecord(Long id, Member currentMember);
 }

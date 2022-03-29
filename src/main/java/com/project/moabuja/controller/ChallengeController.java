@@ -2,9 +2,12 @@ package com.project.moabuja.controller;
 
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
-import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
 import com.project.moabuja.dto.response.goal.CreateChallengeResponseDto;
+import com.project.moabuja.model.ChallengeAcceptResponse;
+import com.project.moabuja.model.ChallengeExitResponse;
+import com.project.moabuja.model.ChallengePostResponse;
+import com.project.moabuja.model.ChallengeRefuseResponse;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.ChallengeGoalService;
 import io.swagger.annotations.ApiOperation;
@@ -37,38 +40,38 @@ public class ChallengeController {
 
     @ApiOperation(value = "도전해부자 요청")
     @PostMapping("/challenge")
-    public ResponseEntity<String> postChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                @RequestBody GoalAlarmRequestDto goalAlarmRequestDto) {
+    public ResponseEntity<ChallengePostResponse> postChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                               @RequestBody GoalAlarmRequestDto goalAlarmRequestDto) {
         Member currentMember = userDetails.getMember();
         return challengeGoalService.postChallenge(currentMember, goalAlarmRequestDto);
     }
 
     @ApiOperation(value = "도전해부자 수락")
     @PostMapping("/challenge/{id}/accept")
-    public ResponseEntity<String> postChallengeAccept(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                      @PathVariable Long alarmId) {
+    public ResponseEntity<ChallengeAcceptResponse> postChallengeAccept(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                       @PathVariable Long alarmId) {
         Member currentMember = userDetails.getMember();
         return challengeGoalService.postChallengeAccept(currentMember, alarmId);
     }
 
     @ApiOperation(value = "도전해부자 거절")
     @PostMapping("/challenge/{id}/refuse")
-    public ResponseEntity<String> postChallengeRefuse(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                      @PathVariable Long alarmId) {
+    public ResponseEntity<ChallengeRefuseResponse> postChallengeRefuse(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                       @PathVariable Long alarmId) {
         Member currentMember = userDetails.getMember();
         return challengeGoalService.postChallengeRefuse(currentMember, alarmId);
     }
 
     @ApiOperation(value = "도전해부자 나가기")
     @DeleteMapping("/challenge/{id}/doing")
-    public ResponseEntity<String> exitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
+    public ResponseEntity<ChallengeExitResponse> exitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
         Member currentMember = userDetails.getMember();
         return challengeGoalService.exitChallenge(currentMember, id);
     }
 
     @ApiOperation(value = "대기중인 도전해부자 나가기")
     @DeleteMapping("/challenge/{id}/waiting")
-    public ResponseEntity<String> exitWaitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
+    public ResponseEntity<ChallengeExitResponse> exitWaitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
         Member currentMember = userDetails.getMember();
         return challengeGoalService.exitWaitingChallenge(id);
     }

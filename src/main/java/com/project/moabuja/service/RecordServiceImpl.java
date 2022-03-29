@@ -2,7 +2,6 @@ package com.project.moabuja.service;
 
 import com.project.moabuja.domain.alarm.AlarmDetailType;
 import com.project.moabuja.domain.alarm.AlarmType;
-import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.DoneGoal;
 import com.project.moabuja.domain.goal.GoalType;
 import com.project.moabuja.domain.goal.GroupGoal;
@@ -16,12 +15,13 @@ import com.project.moabuja.dto.response.record.DayListResponseDto;
 import com.project.moabuja.dto.response.record.DayRecordResponseDto;
 import com.project.moabuja.dto.response.record.RecordResponseDto;
 import com.project.moabuja.exception.ErrorException;
-import com.project.moabuja.exception.exceptionClass.RecordErrorException;
+import com.project.moabuja.model.RecordDeleteResponse;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.DoneGoalRepository;
 import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,7 +132,7 @@ public class RecordServiceImpl implements RecordService{
                 makeGroupDoneGoal(recordRequestDto, currentMember, recordResponseDto, members, separateAmount);
             }
         }
-        return ResponseEntity.ok().body(recordResponseDto);
+        return new ResponseEntity<>(recordResponseDto, HttpStatus.OK);
     }
 
     @Override//wallet, totalAmount 보류
@@ -178,12 +178,12 @@ public class RecordServiceImpl implements RecordService{
                 .dayChallengeAmount(dayChallengeAmount)
                 .dayGroupAmount(dayGroupAmount)
                 .build();
-        return ResponseEntity.ok().body(dayListResponseDto);
+        return new ResponseEntity<>(dayListResponseDto, HttpStatus.OK);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<String> deleteRecord(Long id, Member currentMember) {
+    public ResponseEntity<RecordDeleteResponse> deleteRecord(Long id, Member currentMember) {
 //        if (recordRepository.findRecordById(id).isEmpty()) { throw new RecordErrorException("해당 내역은 존재하지 않습니다."); }
 
         Record selectRecord = Optional.of(recordRepository.findRecordById(id)).get().orElseThrow(() -> new ErrorException(RECORD_NOT_EXIST));
@@ -191,7 +191,7 @@ public class RecordServiceImpl implements RecordService{
 
         if (Objects.equals(currentMember.getId(), selectId)) {
             recordRepository.deleteRecordById(id);
-            return ResponseEntity.ok().body("내역 삭제 완료");
+            return new ResponseEntity<>(new RecordDeleteResponse(), HttpStatus.OK);
         } throw new ErrorException(RECORD_MEMBER_NOT_MATCH);
     }
 
