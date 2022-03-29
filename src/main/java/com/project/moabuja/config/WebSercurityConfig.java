@@ -43,7 +43,7 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/index.html").permitAll()
                 .antMatchers(HttpMethod.GET, "/user/kakao/callback").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/reissue").permitAll()
+                .antMatchers(HttpMethod.GET, "/member/reissue").permitAll()
                 .antMatchers(HttpMethod.GET, "/health").permitAll()
                 .antMatchers(HttpMethod.GET, "/home").permitAll()
                 .antMatchers("/").permitAll()
