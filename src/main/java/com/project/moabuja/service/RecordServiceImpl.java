@@ -142,7 +142,13 @@ public class RecordServiceImpl implements RecordService{
         List<Record> recordsByRecordDate = recordRepository.findRecordsByRecordDateAndMember(LocalDateTime.parse(dayListRequestDto.getRecordDate(),formatter),currentUser);
 
         List<DayRecordResponseDto> dayRecordList = recordsByRecordDate.stream().map(record -> {
-            return new DayRecordResponseDto(record.getId(),record.getRecordType(), record.getRecordDate(), record.getMemo(), record.getRecordAmount());
+            return DayRecordResponseDto.builder()
+                    .id(record.getId())
+                    .recordType(record.getRecordType())
+                    .recordDate(record.getRecordDate())
+                    .memos(record.getMemo())
+                    .recordAmount(record.getRecordAmount())
+                    .build();
         }).collect(Collectors.toList());
 
         for (DayRecordResponseDto dayRecordResponseDto : dayRecordList) {
@@ -159,7 +165,13 @@ public class RecordServiceImpl implements RecordService{
                 dayGroupAmount += dayRecordResponseDto.getRecordAmount();
             }
         }
-        DayListResponseDto dayListResponseDto = new DayListResponseDto(dayRecordList,dayIncomeAmount,dayExpenseAmount,dayChallengeAmount,dayGroupAmount);
+        DayListResponseDto dayListResponseDto = DayListResponseDto.builder()
+                .dayRecordList(dayRecordList)
+                .dayIncomeAmount(dayIncomeAmount)
+                .dayExpenseAmount(dayExpenseAmount)
+                .dayChallengeAmount(dayChallengeAmount)
+                .dayGroupAmount(dayGroupAmount)
+                .build();
         return ResponseEntity.ok().body(dayListResponseDto);
     }
 

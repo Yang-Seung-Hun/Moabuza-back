@@ -1,5 +1,6 @@
 package com.project.moabuja.dto.response.record;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +23,7 @@ public class DayListResponseDto {
     private int dayChallengeAmount;
     private int dayGroupAmount;
 
+    @Builder
     public DayListResponseDto(List<DayRecordResponseDto> dayRecordList, int dayIncomeAmount, int dayExpenseAmount, int dayChallengeAmount, int dayGroupAmount) {
         this.dayRecordList = dayRecordList;
         this.dayIncomeAmount = dayIncomeAmount;

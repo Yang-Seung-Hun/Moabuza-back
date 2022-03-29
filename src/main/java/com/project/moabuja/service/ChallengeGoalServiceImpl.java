@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.project.moabuja.domain.alarm.AlarmType.CHALLENGE;
-import static com.project.moabuja.domain.alarm.AlarmType.GROUP;
 import static com.project.moabuja.exception.ErrorCode.*;
 
 @Slf4j
@@ -102,7 +101,12 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                 }
                 int leftAmount = challengeGoal.get().getChallengeGoalAmount() - currentAmount;
                 int percent = (int) (((double) currentAmount / (double) (challengeGoal.get().getChallengeGoalAmount())) * 100);
-                challengeMembers.add(new ChallengeMemberDto(user.getNickname(), user.getHero(), leftAmount, percent));
+                challengeMembers.add(ChallengeMemberDto.builder()
+                        .challengeMemberNickname(user.getNickname())
+                        .challengeMemberHero(user.getHero())
+                        .challengeMemberLeftAmount(leftAmount)
+                        .challengeMemberNowPercent(percent)
+                        .build());
             }
 
             List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentMember);
