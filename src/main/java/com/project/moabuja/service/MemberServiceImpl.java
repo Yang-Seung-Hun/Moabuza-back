@@ -130,6 +130,7 @@ public class MemberServiceImpl implements MemberService{
                 .groupPercent(groupPercent)
                 .groupName(groupName)
                 .challengeCurrentAmount(challengeCurrentAmount)
+                .challengeNeedAmount(challengeNeedAmount)
                 .challengeNeedAmount(challengeAmount)
                 .challengePercent(challengePercent)
                 .challengeName(challengeName)
