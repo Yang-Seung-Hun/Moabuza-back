@@ -28,10 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.project.moabuja.domain.alarm.AlarmType.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -65,62 +68,46 @@ public class RecordServiceImpl implements RecordService{
             } else { throw new RecordErrorException("지갑보다 큰 돈을 사용할 수 없습니다."); }
         }
 
-        //type이 challenge일때 목표완료됐는지 확인
+        //type이 challenge일때
         else if(recordRequestDto.getRecordType() == RecordType.challenge){
             if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
             } else { throw new RecordErrorException("지갑보다 큰 돈을 저금하는 것은 불가능 합니다."); }
 
             List<Member> members = currentMember.getChallengeGoal().getMembers();
-            for (Member member : members) {
-                Alarm alarm = new Alarm(AlarmType.CHALLENGE, AlarmDetailType.record, currentMember.getChallengeGoal().getChallengeGoalName(),
-                        recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
-                alarmRepository.save(alarm);
-            }
+
+            sendRecordAlarm(members, CHALLENGE, currentMember.getChallengeGoal().getChallengeGoalName(), recordRequestDto.getRecordAmount(), currentMember.getNickname());
+
+//            for (Member member : members) {
+//                Alarm alarm = new Alarm(CHALLENGE, AlarmDetailType.record, currentMember.getChallengeGoal().getChallengeGoalName(),
+//                        recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
+//                alarmRepository.save(alarm);
+//            }
 
             int goalAmount = currentMember.getChallengeGoal().getChallengeGoalAmount();
             int currentAmount = countCurrentChallenge(currentMember);
 
+            //목표완료됐는지 확인
             if(currentAmount >= goalAmount){
-
-                for (Member member : members) {
-                    Alarm alarm = new Alarm(AlarmType.CHALLENGE, AlarmDetailType.success, currentMember.getChallengeGoal().getChallengeGoalName(),
-                            recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
-                    alarmRepository.save(alarm);
-                }
-
-                //완료 로직
-                RecordRequestDto dto1 = new RecordRequestDto(RecordType.challenge, recordRequestDto.getRecordDate(), "도전해부자 완료!!", -1 * currentAmount);
-                RecordRequestDto dto2 = new RecordRequestDto(RecordType.income, recordRequestDto.getRecordDate(), "도전해부자 완료!!", currentAmount);
-                Record minusRecord = new Record(dto1, currentMember);
-                Record plusRecord = new Record(dto2, currentMember);
-                recordRepository.save(minusRecord);
-                recordRepository.save(plusRecord);
-
-                //완료된 목표 저장
-                DoneGoal doneGoal = new DoneGoal(currentMember.getChallengeGoal().getChallengeGoalName(), currentMember.getChallengeGoal().getChallengeGoalAmount(), currentMember, GoalType.CHALLENGE);
-                doneGoalRepository.save(doneGoal);
-                currentMember.addDoneGoal(doneGoal);
-
-                //완료된 목표 삭제
-                currentMember.getChallengeGoal().removeMember(currentMember);
-
-                recordResponseDto.changeIsComplete();
+                makeChallengeDoneGoal(recordRequestDto, currentMember, recordResponseDto, members, currentAmount);
             }
         }
 
-        //group goal 완료 로직
+        //group goal
         else if(recordRequestDto.getRecordType() == RecordType.group){
             if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
             } else { throw new RecordErrorException("지갑보다 큰 돈을 저금하는 것은 불가능 합니다."); }
 
             List<Member> members = currentMember.getGroupGoal().getMembers();
-            for (Member member : members) {
-                Alarm alarm = new Alarm(AlarmType.GROUP, AlarmDetailType.record, currentMember.getGroupGoal().getGroupGoalName(),
-                        recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
-                alarmRepository.save(alarm);
-            }
+
+            sendRecordAlarm(members, GROUP, currentMember.getGroupGoal().getGroupGoalName(), recordRequestDto.getRecordAmount(), currentMember.getNickname());
+
+//            for (Member member : members) {
+//                Alarm alarm = new Alarm(GROUP, AlarmDetailType.record, currentMember.getGroupGoal().getGroupGoalName(),
+//                        recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
+//                alarmRepository.save(alarm);
+//            }
 
             int goalAmount = currentMember.getGroupGoal().getGroupGoalAmount();
             GroupGoal groupGoal = currentMember.getGroupGoal();
@@ -130,26 +117,10 @@ public class RecordServiceImpl implements RecordService{
                 currentAmount += separateAmount.get(member);
             }
 
+            //완료로직
             if(currentAmount >= goalAmount){
                 //완료 로직 => 각 사용자 저금통에서 각자 낸 만큼 빼주기(도전해부자랑 다름, 도전해부자는 다시 넣어주는것 까지 있음)
-
-                for (Member member : members) {
-                    Alarm alarm = new Alarm(AlarmType.GROUP, AlarmDetailType.success, currentMember.getGroupGoal().getGroupGoalName(),
-                            recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
-                    alarmRepository.save(alarm);
-                }
-
-                for (Member member : separateAmount.keySet()) {
-                    RecordRequestDto dto = new RecordRequestDto(RecordType.group, recordRequestDto.getRecordDate(), "같이해부자 완료!!", -1*separateAmount.get(member));
-                    Record minusRecord = new Record(dto, member);
-                    recordRepository.save(minusRecord);
-
-                    DoneGoal doneGoal = new DoneGoal(member.getGroupGoal().getGroupGoalName(),member.getGroupGoal().getGroupGoalAmount(),member, GoalType.GROUP);
-                    doneGoalRepository.save(doneGoal);
-                    member.addDoneGoal(doneGoal);
-                    member.getGroupGoal().removeMember(member);
-                }
-                recordResponseDto.changeIsComplete();
+                makeGroupDoneGoal(recordRequestDto, currentMember, recordResponseDto, members, separateAmount);
             }
         }
         return ResponseEntity.ok().body(recordResponseDto);
@@ -192,14 +163,24 @@ public class RecordServiceImpl implements RecordService{
     @Override
     @Transactional
     public ResponseEntity<String> deleteRecord(Long id, Member currentMember) {
-        Optional<Record> selectRecord = recordRepository.findRecordById(id);
-        Long selectId = selectRecord.get().getMember().getId();
+
+        if (recordRepository.findRecordById(id).isEmpty()) { throw new RecordErrorException("해당 내역은 존재하지 않습니다."); }
+        Record selectRecord = recordRepository.findRecordById(id).get();
+        Long selectId = selectRecord.getMember().getId();
+
         if (selectId.equals(currentMember.getId())) {
             recordRepository.deleteRecordById(id);
         } else {
             throw new IllegalArgumentException("게시물을 등록한 사용자가 아닙니다.");
         }
         return ResponseEntity.ok().body("내역 삭제 완료");
+    }
+
+    public void sendRecordAlarm(List<Member> members,AlarmType alarmType, String goalName, int goalAmount,String friendNickname){
+        for (Member member : members) {
+            Alarm alarm = new Alarm(alarmType, AlarmDetailType.record, goalName, goalAmount, null, friendNickname, member);
+            alarmRepository.save(alarm);
+        }
     }
 
     public int countCurrentChallenge(Member member){
@@ -231,6 +212,52 @@ public class RecordServiceImpl implements RecordService{
         int wallet = 0;
         wallet = getWallet(currentMember, wallet, recordRepository);
         return wallet;
+    }
+
+    private void makeChallengeDoneGoal(RecordRequestDto recordRequestDto, Member currentMember, RecordResponseDto recordResponseDto, List<Member> members, int currentAmount) {
+        for (Member member : members) {
+            Alarm alarm = new Alarm(CHALLENGE, AlarmDetailType.success, currentMember.getChallengeGoal().getChallengeGoalName(),
+                    recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
+            alarmRepository.save(alarm);
+        }
+
+        //완료 로직
+        RecordRequestDto dto1 = new RecordRequestDto(RecordType.challenge, recordRequestDto.getRecordDate(), "도전해부자 완료!!", -1 * currentAmount);
+        RecordRequestDto dto2 = new RecordRequestDto(RecordType.income, recordRequestDto.getRecordDate(), "도전해부자 완료!!", currentAmount);
+        Record minusRecord = new Record(dto1, currentMember);
+        Record plusRecord = new Record(dto2, currentMember);
+        recordRepository.save(minusRecord);
+        recordRepository.save(plusRecord);
+
+        //완료된 목표 저장
+        DoneGoal doneGoal = new DoneGoal(currentMember.getChallengeGoal().getChallengeGoalName(), currentMember.getChallengeGoal().getChallengeGoalAmount(), currentMember, GoalType.CHALLENGE);
+        doneGoalRepository.save(doneGoal);
+        currentMember.addDoneGoal(doneGoal);
+
+        //완료된 목표 삭제
+        currentMember.getChallengeGoal().removeMember(currentMember);
+
+        recordResponseDto.changeIsComplete();
+    }
+
+    private void makeGroupDoneGoal(RecordRequestDto recordRequestDto, Member currentMember, RecordResponseDto recordResponseDto, List<Member> members, HashMap<Member, Integer> separateAmount) {
+        for (Member member : members) {
+            Alarm alarm = new Alarm(GROUP, AlarmDetailType.success, currentMember.getGroupGoal().getGroupGoalName(),
+                    recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
+            alarmRepository.save(alarm);
+        }
+
+        for (Member member : separateAmount.keySet()) {
+            RecordRequestDto dto = new RecordRequestDto(RecordType.group, recordRequestDto.getRecordDate(), "같이해부자 완료!!", -1* separateAmount.get(member));
+            Record minusRecord = new Record(dto, member);
+            recordRepository.save(minusRecord);
+
+            DoneGoal doneGoal = new DoneGoal(member.getGroupGoal().getGroupGoalName(),member.getGroupGoal().getGroupGoalAmount(),member, GoalType.GROUP);
+            doneGoalRepository.save(doneGoal);
+            member.addDoneGoal(doneGoal);
+            member.getGroupGoal().removeMember(member);
+        }
+        recordResponseDto.changeIsComplete();
     }
 
     //memberServicImpl에서 중복 되는 부분이라 추출

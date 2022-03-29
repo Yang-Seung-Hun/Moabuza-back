@@ -106,6 +106,12 @@ class RecordServiceImplTest {
         Assertions.assertThat(result5.getBody().isComplete()).isTrue();
     }
 
+    @Test
+    @DisplayName("goal 생성전 입력하면 오류 발생")
+    public void save4(){
+
+    }
+
 //    @Test
 //    @DisplayName("group goal 완료 로직")
 //    public void save4(){
@@ -294,6 +300,31 @@ class RecordServiceImplTest {
         //then
         org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, ()->{
             recordService.deleteRecord(recordId, savedMember2);
+        });
+    }
+
+    @Test
+    @DisplayName("없는 기록 삭제 시 오류 생성")
+    public void deleteRecord3(){
+
+        //given
+        Member member = new Member("111111",111111L,"nonickname7","email7@gmail.com", Hero.tongki);
+        Member savedMember1 = memberRepository.save(member);
+
+        RecordRequestDto recordRequestDto1 = new RecordRequestDto(RecordType.income, "2022-03-05 00:00:00.000","3월용돈",50000);
+        RecordRequestDto recordRequestDto2 = new RecordRequestDto(RecordType.expense, "2022-03-05 00:00:00.000","편의점",5000);
+        RecordRequestDto recordRequestDto3 = new RecordRequestDto(RecordType.income, "2022-03-10 00:00:00.000","심부름",10000);
+
+        recordService.save(recordRequestDto1, savedMember1);
+        recordService.save(recordRequestDto2, savedMember1);
+        recordService.save(recordRequestDto3, savedMember1);
+
+        //when
+        Long recordId = 99L;
+
+        //then
+        org.junit.jupiter.api.Assertions.assertThrows(RecordErrorException.class, ()->{
+            recordService.deleteRecord(recordId, savedMember1);
         });
     }
 }
