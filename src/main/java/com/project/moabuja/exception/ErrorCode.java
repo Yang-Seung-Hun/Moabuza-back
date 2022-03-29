@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum ErrorManual {
+public enum ErrorCode {
 
     // Token Error
     REFRESH_NOT_VALID(HttpStatus.BAD_REQUEST, "400_Token_1", "Refresh Token이 유효하지 않습니다."),

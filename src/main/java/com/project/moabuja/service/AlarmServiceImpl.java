@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.project.moabuja.domain.alarm.AlarmType.*;
-import static com.project.moabuja.exception.ErrorManual.*;
+import static com.project.moabuja.exception.ErrorCode.*;
 
 @Slf4j
 @Service
