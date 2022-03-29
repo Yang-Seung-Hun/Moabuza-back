@@ -163,7 +163,6 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         return ResponseEntity.ok().body(challengeResponseDto);
     }
 
-
     @Transactional
     @Override
     public ResponseEntity<String> postChallenge(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
@@ -196,23 +195,6 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         // 전체 수락 전
         if (! checkAccepted(friends)) {
 
-//            List<String> friendList = new ArrayList<>();
-//            for (MemberWaitingGoal friend : friends) {
-//                if (friend.getMember() != currentMember) {
-//                    friendList.add(friend.getMember().getNickname());
-//                    GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
-//                            .alarmType(CHALLENGE)
-//                            .alarmDetailType(AlarmDetailType.accept)
-//                            .goalName(waitingGoal.getWaitingGoalName())
-//                            .goalAmount(waitingGoal.getWaitingGoalAmount())
-//                            .waitingGoalId(waitingGoal.getId())
-//                            .friendNickname(currentMember.getNickname())
-//                            .member(friend.getMember())
-//                            .build();
-//                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
-//                }
-//            }
-
             List<String> friendListTmp = new ArrayList<>();
             sendChallengeAlarm(friends, friendListTmp, currentMember, accept, waitingGoal);
 
@@ -221,23 +203,6 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         // 전체 수락 후 마지막 수락
         else if (checkAccepted(friends)) {
-//            List<String> friendList = new ArrayList<>();
-//
-//            for (MemberWaitingGoal friend : friends) {
-//                if (friend.getMember() != currentMember) {
-//                    friendList.add(friend.getMember().getNickname());
-//                    GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
-//                            .alarmType(CHALLENGE)
-//                            .alarmDetailType(AlarmDetailType.create)
-//                            .goalName(waitingGoal.getWaitingGoalName())
-//                            .goalAmount(waitingGoal.getWaitingGoalAmount())
-//                            .waitingGoalId(waitingGoal.getId())
-//                            .friendNickname(currentMember.getNickname())
-//                            .member(friend.getMember())
-//                            .build();
-//                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
-//                }
-//            }
 
             List<String> friendListTmp = new ArrayList<>();
             List<String> friendList = sendChallengeAlarm(friends, friendListTmp, currentMember, create, waitingGoal);
@@ -262,21 +227,6 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
         List<MemberWaitingGoal> friends = memberWaitingGoalRepository.findMemberWaitingGoalsByWaitingGoal(waitingGoal);
-
-//        List<String> friendList = new ArrayList<>();
-//        for (MemberWaitingGoal friend : friends) {
-//            friendList.add(friend.getMember().getNickname());
-//            GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
-//                    .alarmType(CHALLENGE)
-//                    .alarmDetailType(boom)
-//                    .goalName(waitingGoal.getWaitingGoalName())
-//                    .goalAmount(waitingGoal.getWaitingGoalAmount())
-//                    .waitingGoalId(waitingGoal.getId())
-//                    .friendNickname(currentMember.getNickname())
-//                    .member(friend.getMember())
-//                    .build();
-//            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
-//        }
 
         List<String> friendListTmp = new ArrayList<>();
         sendChallengeAlarm(friends, friendListTmp, currentMember, boom, waitingGoal);
