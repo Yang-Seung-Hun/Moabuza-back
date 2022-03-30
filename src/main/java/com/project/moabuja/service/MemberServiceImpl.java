@@ -268,6 +268,8 @@ public class MemberServiceImpl implements MemberService{
             throw new ErrorException(MEMBER_NOT_FOUND);
         }
         byEmail.updateInfo(dto);
+        String random = "abc12345";
+        dto.insertFcm(random);
         return new ResponseEntity<>(new Msg(UpdateInfo.getMsg()), HttpStatus.OK);
     }
 
