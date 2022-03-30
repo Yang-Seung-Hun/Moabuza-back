@@ -5,6 +5,7 @@ import com.project.moabuja.dto.Res;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
+import com.project.moabuja.exception.ErrorCode;
 import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.FCMServiceImpl;
@@ -48,7 +49,6 @@ public class MemberController {
     @ApiOperation(value = "닉네임 중복체크")
     @PostMapping("/member/validation")
     public ResponseEntity<Res.NicknameValidResponse> nicknameValid(@Valid @RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
-
         log.info("---------- 닉네임 들어오나요 : " + nicknameValidationRequestDto.getNickname());
         return memberService.nicknameValid(nicknameValidationRequestDto);
     }
@@ -72,4 +72,5 @@ public class MemberController {
     public ResponseEntity<Res.LogoutResponse> logout(HttpServletRequest request){
         return memberService.logout(request);
     }
+
 }
