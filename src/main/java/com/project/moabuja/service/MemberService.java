@@ -8,9 +8,6 @@ import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.request.member.RegToLoginDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
-import com.project.moabuja.model.LogoutResponse;
-import com.project.moabuja.model.NicknameValidResponse;
-import com.project.moabuja.model.UpdateInfoResponse;
 import com.project.moabuja.util.CustomResponseEntity;
 import org.springframework.http.ResponseEntity;
 
