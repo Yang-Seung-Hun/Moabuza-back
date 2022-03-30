@@ -5,15 +5,12 @@ import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
 import com.project.moabuja.dto.response.goal.CreateChallengeResponseDto;
-import com.project.moabuja.model.ChallengeAcceptResponse;
-import com.project.moabuja.model.ChallengeExitResponse;
-import com.project.moabuja.model.ChallengePostResponse;
-import com.project.moabuja.model.ChallengeRefuseResponse;
+import com.project.moabuja.model.*;
 import org.springframework.http.ResponseEntity;
 
 public interface ChallengeGoalService {
 
-    public ResponseEntity<String> save(CreateChallengeRequestDto challengeRequestDto, Member currentMember);
+    ResponseEntity<GroupCreateResponse> save(CreateChallengeRequestDto challengeRequestDto, Member currentMember);
 
     ResponseEntity<ChallengeResponseDto> getChallengeInfo(Member currentMember);
 
@@ -25,7 +22,7 @@ public interface ChallengeGoalService {
 
     ResponseEntity<ChallengeRefuseResponse> postChallengeRefuse(Member currentMember, Long alarmId);
 
-    ResponseEntity<ChallengeExitResponse> exitChallenge(Member currentMember, Long id);
+    ResponseEntity<ChallengeExitResponse> exitChallenge(Member currentMember);
 
     ResponseEntity<ChallengeExitResponse> exitWaitingChallenge(Long id);
 }
