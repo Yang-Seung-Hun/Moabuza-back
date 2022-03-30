@@ -287,7 +287,8 @@ public class MemberServiceImpl implements MemberService{
 
         String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
 
-        System.out.println("-------------refresh" + refreshToken);
+        System.out.println("-------------받아온 refresh : " + refresh);
+        System.out.println("-------------redis refresh : " + refreshToken);
 
         if(ObjectUtils.isEmpty(refreshToken)) {
             throw new ErrorException(REFRESH_NOT_EXIST);
