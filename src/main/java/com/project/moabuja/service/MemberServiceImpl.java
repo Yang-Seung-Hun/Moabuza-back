@@ -49,7 +49,6 @@ import static com.project.moabuja.exception.ErrorCode.*;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@Transactional
 public class MemberServiceImpl implements MemberService{
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
@@ -143,6 +142,7 @@ public class MemberServiceImpl implements MemberService{
         return new ResponseEntity<>(homeResponseDto, HttpStatus.OK);
     }
 
+    @Transactional
     @Override
     public ResponseEntity<CustomResponseEntity> kakaoLogin(String code) throws JsonProcessingException {
         KakaoUserInfoDto kakaoUserInfoDto = getKakaoUserInfo(getAccessToken(code));
@@ -167,6 +167,7 @@ public class MemberServiceImpl implements MemberService{
          return response.responseAll();
     }
 
+    @Transactional
     @Override
     public String getAccessToken(String code) throws JsonProcessingException {
         // HTTP Header 생성
@@ -199,6 +200,7 @@ public class MemberServiceImpl implements MemberService{
         return jsonNode.get("access_token").asText();
     }
 
+    @Transactional
     @Override
     public KakaoUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
         // HTTP Header 생성
@@ -271,6 +273,7 @@ public class MemberServiceImpl implements MemberService{
         return new ResponseEntity<>(new UpdateInfoResponse(), HttpStatus.OK);
     }
 
+    @Transactional
     @Override
     public ResponseEntity<CustomResponseEntity> reissue(HttpServletRequest request) {
         System.out.println("리이슈 메서드 : " + request.getHeader("A-AUTH-TOKEN").substring(7));
@@ -302,8 +305,7 @@ public class MemberServiceImpl implements MemberService{
         System.out.println("다시 만든 리프래쉬 : " + dto.getRefresh());
 
         redisTemplate.opsForValue()
-                .set("RT:" + authentication.getName(), dto.getRefresh(),
-                        jwtTokenProvider.getExpiration(dto.getRefresh()), TimeUnit.MILLISECONDS);
+                .set("RT:" + authentication.getName(), dto.getRefresh(), jwtTokenProvider.getExpiration(dto.getRefresh()), TimeUnit.MILLISECONDS);
 
         CustomResponseEntity response = CustomResponseEntity.builder()
                 .data(dto)
@@ -314,6 +316,7 @@ public class MemberServiceImpl implements MemberService{
         return response.responseAll();
     }
 
+    @Transactional
     @Override
     public ResponseEntity<LogoutResponse> logout(HttpServletRequest request) {
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);

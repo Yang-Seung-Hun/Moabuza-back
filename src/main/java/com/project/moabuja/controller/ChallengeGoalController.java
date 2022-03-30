@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class ChallengeController {
+public class ChallengeGoalController {
 
     private final ChallengeGoalService challengeGoalService;
 
@@ -63,10 +63,10 @@ public class ChallengeController {
     }
 
     @ApiOperation(value = "도전해부자 나가기")
-    @DeleteMapping("/challenge/{id}/doing")
-    public ResponseEntity<ChallengeExitResponse> exitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
+    @DeleteMapping("/challenge/doing")
+    public ResponseEntity<ChallengeExitResponse> exitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentMember = userDetails.getMember();
-        return challengeGoalService.exitChallenge(currentMember, id);
+        return challengeGoalService.exitChallenge(currentMember);
     }
 
     @ApiOperation(value = "대기중인 도전해부자 나가기")

@@ -13,10 +13,7 @@ import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import com.project.moabuja.dto.request.goal.WaitingGoalSaveDto;
 import com.project.moabuja.dto.response.goal.*;
 import com.project.moabuja.exception.ErrorException;
-import com.project.moabuja.model.ChallengeAcceptResponse;
-import com.project.moabuja.model.ChallengeExitResponse;
-import com.project.moabuja.model.ChallengePostResponse;
-import com.project.moabuja.model.ChallengeRefuseResponse;
+import com.project.moabuja.model.*;
 import com.project.moabuja.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +49,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
     @Transactional
     @Override
-    public ResponseEntity<String> save(CreateChallengeRequestDto createChallengeRequestDto, Member currentMemberTemp) {
+    public ResponseEntity<GroupCreateResponse> save(CreateChallengeRequestDto createChallengeRequestDto, Member currentMemberTemp) {
 
         Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
@@ -61,7 +58,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         if (Optional.ofNullable(createChallengeRequestDto.getChallengeFriends()).isEmpty()) {
             ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
             savedGoal.addMember(currentMember);
-            return ResponseEntity.ok().body("도전해부자 생성 완료");
+            return new ResponseEntity<>(new GroupCreateResponse(), HttpStatus.OK);
         }
 
         for(String name :createChallengeRequestDto.getChallengeFriends()){
@@ -73,7 +70,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
         savedGoal.addMember(currentMember);
 
-        return ResponseEntity.ok().body("도전해부자 생성 완료");
+        return new ResponseEntity<>(new GroupCreateResponse(), HttpStatus.OK);
     }
 
     @Override
@@ -247,7 +244,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
     @Override
     @Transactional
-    public ResponseEntity<ChallengeExitResponse> exitChallenge(Member currentMemberTemp, Long id) {
+    public ResponseEntity<ChallengeExitResponse> exitChallenge(Member currentMemberTemp) {
 
         Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
