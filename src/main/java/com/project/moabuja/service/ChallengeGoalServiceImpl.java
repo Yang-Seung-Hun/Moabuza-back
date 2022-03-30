@@ -23,8 +23,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -90,12 +92,15 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             String goalStatus = "goal";
 
             List<ChallengeMemberDto> challengeMembers = makeChallengeMembers(challengeGoal);
+            LocalDateTime challengeCreatedAt = currentMember.getChallengeGoal().getCreatedAt();
 
             List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentMember);
+            List<Record> filteredChallengeRecords = challengeRecords.stream().filter(record -> record.getCreatedAt().isAfter(challengeCreatedAt)).collect(Collectors.toList());
 
-            List<ChallengeListDto> challengeLists = challengeRecords.stream().map(record -> {
+            List<ChallengeListDto> challengeLists = filteredChallengeRecords.stream().map(record -> {
                 return new ChallengeListDto(record.getRecordDate(), record.getMemo(), record.getRecordAmount());
             }).collect(Collectors.toList());
+
 
             ChallengeResponseDto goalResponseDto = ChallengeResponseDto.builder()
                     .goalStatus(goalStatus)

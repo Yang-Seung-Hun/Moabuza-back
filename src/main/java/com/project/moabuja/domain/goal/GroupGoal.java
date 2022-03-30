@@ -1,5 +1,6 @@
 package com.project.moabuja.domain.goal;
 
+import com.project.moabuja.domain.Timestamped;
 import com.project.moabuja.domain.member.Member;
 import lombok.Getter;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Entity
-public class GroupGoal {
+public class GroupGoal extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

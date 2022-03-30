@@ -74,9 +74,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     @Override
     public ResponseEntity<GroupResponseDto> getGroupInfo(Member currentMemberTemp) {
 
-        Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         Optional<GroupGoal> groupGoal = Optional.ofNullable(currentMember.getGroupGoal());
         List<String> groupDoneGoalNames = new ArrayList<>();
