@@ -132,7 +132,8 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
                 List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
                 for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
-                    waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(),memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
+                    WaitingGoal waitingGoalData = waitingGoalRepository.findWaitingGoalByMemberWaitingGoalAndGoalType(memberWaitingGoal, GoalType.GROUP);
+                    waitingGoals.add(new WaitingGoalResponseDto(waitingGoalData.getId(),waitingGoalData.getWaitingGoalName()));
                 }
 
                 GroupResponseDto waiting = GroupResponseDto.builder()
