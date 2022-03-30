@@ -7,6 +7,7 @@ import com.project.moabuja.dto.response.alarm.GoalAlarmResponseDto;
 import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.model.AlarmDeleteResponse;
 import com.project.moabuja.repository.AlarmRepository;
+import com.project.moabuja.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ import static com.project.moabuja.exception.ErrorCode.*;
 public class AlarmServiceImpl implements AlarmService {
 
     private final AlarmRepository alarmRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public ResponseEntity<List<FriendAlarmResponseDto>> getFriendAlarm(Member currentMember) {
@@ -64,15 +66,16 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public ResponseEntity<AlarmDeleteResponse> deleteAlarm(Member currentMember, Long alarmId) {
 
+        Member member = Optional.of(memberRepository.findById(currentMember.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
         Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
 
         System.out.println("=========================================================");
-        System.out.println(currentMember.getId());
-        System.out.println(currentMember.getNickname());
+        System.out.println(member.getId());
+        System.out.println(member.getNickname());
         System.out.println(alarm.getMember().getId());
         System.out.println(alarm.getMember().getNickname());
 
-        if (Objects.equals(currentMember, alarm.getMember())) {
+        if (Objects.equals(member, alarm.getMember())) {
             alarmRepository.deleteById(alarmId);
             return new ResponseEntity<>(new AlarmDeleteResponse(), HttpStatus.OK);
         } throw new ErrorException(ALARM_MEMBER_NOT_MATCH);
