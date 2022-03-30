@@ -14,8 +14,6 @@ public enum ErrorCode {
     REFRESH_NOT_MATCH(400, "T004", "Refresh Token이 일치하지 않습니다."),
     LOGOUT_TOKEN_VALID(400, "T004", "로그아웃 되어 사용할 수 없는 토큰입니다."),
 
-
-
     // Member Error
     MEMBER_NOT_FOUND(404, "M001", "해당 사용자는 존재하지 않습니다."),
     GEUST_TO_LOGIN(403, "M002", "Move to Login Page"),
