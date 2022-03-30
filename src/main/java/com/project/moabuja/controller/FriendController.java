@@ -46,17 +46,17 @@ public class FriendController {
     @ApiOperation(value = "친구 수락")
     @PostMapping("/friend/{id}/accept")
     public ResponseEntity<Msg> postFriendAccept(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                                 @PathVariable Long alarmId) {
+                                                @PathVariable Long id) {
         Member currentMember = userDetails.getMember();
-        return friendService.postFriendAccept(currentMember, alarmId);
+        return friendService.postFriendAccept(currentMember, id);
     }
 
     @ApiOperation(value = "친구 거절")
     @PostMapping("/friend/{id}/refuse")
     public ResponseEntity<Msg> postFriendRefuse(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                                 @PathVariable Long alarmId) {
+                                                                 @PathVariable Long id) {
         Member currentMember = userDetails.getMember();
-        return friendService.postFriendRefuse(currentMember, alarmId);
+        return friendService.postFriendRefuse(currentMember, id);
     }
 
     @ApiOperation(value = "친구 삭제")
