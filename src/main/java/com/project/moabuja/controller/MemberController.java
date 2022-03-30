@@ -48,7 +48,6 @@ public class MemberController {
     @ApiOperation(value = "닉네임 중복체크")
     @PostMapping("/member/validation")
     public ResponseEntity<ResponseMsg> nicknameValid(@Valid @RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
-
         log.info("---------- 닉네임 들어오나요 : " + nicknameValidationRequestDto.getNickname());
         return memberService.nicknameValid(nicknameValidationRequestDto);
     }
@@ -56,7 +55,7 @@ public class MemberController {
     @ApiOperation(value = "닉네임, 캐릭터 선택")
     @PutMapping("/member/info")
     public ResponseEntity<ResponseMsg> update(@Valid @RequestBody MemberUpdateRequestDto dto,
-                                                     @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
+                                              @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
         fcmService.register(dto.getNickname(), dto.getFcmToken());
         return memberService.updateMemberInfo(dto, userDetails.getMember().getEmail());
     }
