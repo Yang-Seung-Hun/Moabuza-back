@@ -72,7 +72,7 @@ public class AlarmServiceImpl implements AlarmService {
 
         if (Objects.equals(member, alarm.getMember())) {
             alarmRepository.deleteById(alarmId);
-            return new ResponseEntity<>(AlarmDelete, HttpStatus.OK);
+            return new ResponseEntity<>(ResponseMsg.valueOf(AlarmDelete.getMsg()), HttpStatus.OK);
         } throw new ErrorException(ALARM_MEMBER_NOT_MATCH);
     }
 }

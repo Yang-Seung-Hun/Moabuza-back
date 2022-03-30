@@ -192,7 +192,7 @@ public class RecordServiceImpl implements RecordService{
 
         if (Objects.equals(currentMember.getId(), selectId)) {
             recordRepository.deleteRecordById(id);
-            return new ResponseEntity<>(RecordDelete, HttpStatus.OK);
+            return new ResponseEntity<>(ResponseMsg.valueOf(RecordDelete.getMsg()), HttpStatus.OK);
         } throw new ErrorException(RECORD_MEMBER_NOT_MATCH);
     }
 

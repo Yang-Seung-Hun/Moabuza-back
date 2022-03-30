@@ -255,12 +255,10 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public ResponseEntity<ResponseMsg> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
         String nickname = nicknameValidationRequestDto.getNickname();
-        log.info("----------- 여기는 서비스 : " + nickname);
         if(memberRepository.existsByNickname(nickname)){
-            log.info("------------------- 리턴 직전 값 : " + NicknameOK);
-            return new ResponseEntity<>(NicknameOverlap, HttpStatus.OK);
+            return new ResponseEntity<>(ResponseMsg.valueOf(NicknameOverlap.getMsg()), HttpStatus.OK);
         }
-        return new ResponseEntity<>(NicknameOK, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(NicknameOK.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
@@ -271,7 +269,7 @@ public class MemberServiceImpl implements MemberService{
             throw new ErrorException(MEMBER_NOT_FOUND);
         }
         byEmail.updateInfo(dto);
-        return new ResponseEntity<>(UpdateInfo, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(UpdateInfo.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
@@ -328,6 +326,6 @@ public class MemberServiceImpl implements MemberService{
         Long expiration = jwtTokenProvider.getExpiration(access);
         redisTemplate.opsForValue()
                 .set(access, "logout", expiration, TimeUnit.MILLISECONDS);
-        return new ResponseEntity<>(Logout, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(Logout.getMsg()), HttpStatus.OK);
     }
 }

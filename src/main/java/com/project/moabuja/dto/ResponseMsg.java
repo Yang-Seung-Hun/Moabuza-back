@@ -42,5 +42,5 @@ public enum ResponseMsg {
     // Logout
     Logout("로그아웃이 완료되었습니다.");
 
-    private final String responseMessage;
+    private final String msg;
 }
