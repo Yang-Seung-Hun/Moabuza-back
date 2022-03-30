@@ -74,6 +74,7 @@ public class AlarmServiceImpl implements AlarmService {
         System.out.println(member.getNickname());
         System.out.println(alarm.getMember().getId());
         System.out.println(alarm.getMember().getNickname());
+        System.out.println(Objects.equals(member, alarm.getMember()));
 
         if (Objects.equals(member, alarm.getMember())) {
             alarmRepository.deleteById(alarmId);
