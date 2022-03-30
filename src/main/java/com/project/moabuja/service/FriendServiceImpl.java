@@ -76,7 +76,7 @@ public class FriendServiceImpl implements FriendService{
 
         alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, friend, currentMember.getNickname()));
 
-        return new ResponseEntity<>(FriendPost, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(FriendPost.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
@@ -95,7 +95,7 @@ public class FriendServiceImpl implements FriendService{
 
         alarmRepository.delete(alarm);
 
-        return new ResponseEntity<>(FriendAccept, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(FriendAccept.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
@@ -119,7 +119,7 @@ public class FriendServiceImpl implements FriendService{
 
         alarmRepository.delete(alarm);
 
-        return new ResponseEntity<>(FriendRefuse, HttpStatus.OK) ;
+        return new ResponseEntity<>(ResponseMsg.valueOf(FriendRefuse.getMsg()), HttpStatus.OK) ;
     }
 
     @Transactional
@@ -132,6 +132,6 @@ public class FriendServiceImpl implements FriendService{
         friendRepository.delete(friendRepository.findByMemberAndFriend(currentMember, friend));
         friendRepository.delete(friendRepository.findByMemberAndFriend(friend, currentMember));
 
-        return new ResponseEntity<>(FriendDelete, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(FriendDelete.getMsg()), HttpStatus.OK);
     }
 }

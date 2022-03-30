@@ -68,7 +68,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                     .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
             memberByNickname.ifPresent(goal::addMember);
         }
-        return new ResponseEntity<>(GroupCreate, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(GroupCreate.getMsg()), HttpStatus.OK);
     }
 
     @Override
@@ -203,7 +203,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.GROUP));
         inviteFriends(currentMember, goalAlarmRequestDto, waitingGoal, memberWaitingGoalRepository, memberRepository, alarmRepository, GROUP);
 
-        return new ResponseEntity<>(GroupPost, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(GroupPost.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
@@ -267,7 +267,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             alarmRepository.delete(alarm);
         }
 
-        return new ResponseEntity<>(GroupAccept, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(GroupAccept.getMsg()), HttpStatus.OK);
     }
 
     public boolean checkAccepted(List<MemberWaitingGoal> memberWaitingGoals) {
@@ -307,7 +307,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         alarmRepository.delete(alarm);
         waitingGoalRepository.delete(waitingGoal);
 
-        return new ResponseEntity<>(GroupRefuse, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(GroupRefuse.getMsg()), HttpStatus.OK);
     }
 
     @Override
@@ -329,7 +329,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             currentMember.changeGroupGoal(null);
         }
 
-        return new ResponseEntity<>(GroupExit, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(GroupExit.getMsg()), HttpStatus.OK);
     }
 
     @Override
@@ -339,7 +339,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         WaitingGoal waitingGoalById = waitingGoalRepository.findWaitingGoalById(id);
         waitingGoalRepository.delete(waitingGoalById);
 
-        return new ResponseEntity<>(GroupExit, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(GroupExit.getMsg()), HttpStatus.OK);
     }
 
     //challengeGoalServiceImpl에서도 사용

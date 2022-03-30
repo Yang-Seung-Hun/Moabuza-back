@@ -59,7 +59,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         if (Optional.ofNullable(createChallengeRequestDto.getChallengeFriends()).isEmpty()) {
             ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
             savedGoal.addMember(currentMember);
-            return new ResponseEntity<>(ChallengeCreate, HttpStatus.OK);
+            return new ResponseEntity<>(ResponseMsg.valueOf(ChallengeCreate.getMsg()), HttpStatus.OK);
         }
 
         for(String name :createChallengeRequestDto.getChallengeFriends()){
@@ -71,7 +71,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
         savedGoal.addMember(currentMember);
 
-        return new ResponseEntity<>(ChallengeCreate, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(ChallengeCreate.getMsg()), HttpStatus.OK);
     }
 
     @Override
@@ -176,13 +176,13 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         if (Optional.ofNullable(goalAlarmRequestDto.getFriendNickname()).isEmpty()) {
             CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), null);
             save(createChallengeRequestDto, currentMember);
-            return new ResponseEntity<>(ChallengePost, HttpStatus.OK);
+            return new ResponseEntity<>(ResponseMsg.valueOf(ChallengePost.getMsg()), HttpStatus.OK);
         }
 
         WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.CHALLENGE));
         GroupGoalServiceImpl.inviteFriends(currentMember, goalAlarmRequestDto, waitingGoal, memberWaitingGoalRepository, memberRepository, alarmRepository, CHALLENGE);
 
-        return new ResponseEntity<>(ChallengePost, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(ChallengePost.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
@@ -220,7 +220,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             alarmRepository.delete(alarm);
         }
 
-        return new ResponseEntity<>(ChallengeAccept, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(ChallengeAccept.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
@@ -240,7 +240,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         alarmRepository.delete(alarm);
         waitingGoalRepository.delete(waitingGoal);
 
-        return new ResponseEntity<>(ChallengeRefuse, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(ChallengeRefuse.getMsg()), HttpStatus.OK);
     }
 
     @Override
@@ -256,7 +256,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         if (memberList.size() == 1) { challengeGoalRepository.delete(challengeGoal); }
 
-        return new ResponseEntity<>(ChallengeExit, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(ChallengeExit.getMsg()), HttpStatus.OK);
     }
 
     @Override
@@ -266,7 +266,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         WaitingGoal waitingGoalById = Optional.of(waitingGoalRepository.findWaitingGoalById(id)).orElseThrow(() -> new ErrorException(GOAL_NOT_EXIST));
         waitingGoalRepository.delete(waitingGoalById);
 
-        return new ResponseEntity<>(ChallengeExit, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(ChallengeExit.getMsg()), HttpStatus.OK);
     }
 
     public List<String> sendChallengeAlarm(List<MemberWaitingGoal> friends, List<String> friendList,Member currentMember, AlarmDetailType alarmDetailType, WaitingGoal waitingGoal){
