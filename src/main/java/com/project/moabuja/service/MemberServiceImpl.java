@@ -254,7 +254,9 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public ResponseEntity<Res.NicknameValidResponse> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
         String nickname = nicknameValidationRequestDto.getNickname();
+        log.info("----------- 여기는 서비스 : " + nickname);
         if(memberRepository.existsByNickname(nickname)){
+            log.info("------------------- 리턴 직전 값 : " + new Res.NicknameValidResponse(nickname));
             return new ResponseEntity<>(new Res.NicknameValidResponse(nickname), HttpStatus.OK);
         }
         return new ResponseEntity<>(new Res.NicknameValidResponse(), HttpStatus.OK);
