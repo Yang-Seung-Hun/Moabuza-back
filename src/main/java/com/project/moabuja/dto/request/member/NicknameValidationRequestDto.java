@@ -10,7 +10,6 @@ import javax.validation.constraints.Size;
 @Getter
 @NoArgsConstructor
 public class NicknameValidationRequestDto {
-
     @NotNull
     private String nickname;
 }
