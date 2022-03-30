@@ -4,6 +4,7 @@ import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.member.Hero;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
+import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
 import com.project.moabuja.repository.ChallengeGoalRepository;
 import com.project.moabuja.repository.MemberRepository;
 import org.assertj.core.api.Assertions;
@@ -94,6 +95,26 @@ class ChallengeGoalServiceImplTest {
 //    @DisplayName("생성된 challenge goal 있을때")
 //    public void getChallengeInfo(){
 //
+//        //given
+//        Member member = new Member("123456",123456L,"nickname1","email1@naver.com", Hero.tongki);
+//        Member savedMember1 = memberRepository.save(member);
+//
+//        Member friend1 = new Member("123457",123457L,"nickname2","email2@naver.com", Hero.bunny);
+//        Member savedFriend1 = memberRepository.save(friend1);
+//
+//        Member friend2 = new Member("123458",123458L,"nickname3","email3@naver.com", Hero.bunny);
+//        Member savedFriend2 = memberRepository.save(friend2);
+//
+//        List<String> friends = new ArrayList<>(Arrays.asList("nickname2", "nickname3"));
+//
+//        CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("5만원 모으기", 50000, friends);
+//        challengeGoalService.save(createChallengeRequestDto, savedMember1);
+//
+//        //when
+//        ResponseEntity<ChallengeResponseDto> challengeInfoTmp = challengeGoalService.getChallengeInfo(savedMember1);
+//        ChallengeResponseDto challengeInfo = challengeInfoTmp.getBody();
+//
+//        //then
 //
 //    }
 }
