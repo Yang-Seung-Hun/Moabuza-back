@@ -1,6 +1,7 @@
 package com.project.moabuja.dto;
 
 import lombok.Getter;
+
 @Getter
 public class Res {
 
