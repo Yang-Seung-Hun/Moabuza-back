@@ -16,5 +16,4 @@ public interface AlarmService {
 
     ResponseEntity<List<GoalAlarmResponseDto>> getChallengeGoalAlarm(Member currentMember);
 
-    ResponseEntity<Res.AlarmDeleteResponse> deleteAlarm(Member currentMember, Long alarmId);
 }
