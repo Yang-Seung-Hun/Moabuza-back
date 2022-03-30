@@ -221,8 +221,7 @@ public class MemberServiceImpl implements MemberService{
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         Long kakaoId = jsonNode.get("id").asLong();
-        String email = jsonNode.get("kakao_account")
-                .get("email").asText();
+        String email = jsonNode.get("kakao_account").get("email").asText();
 
         return new KakaoUserInfoDto(kakaoId, email);
     }
