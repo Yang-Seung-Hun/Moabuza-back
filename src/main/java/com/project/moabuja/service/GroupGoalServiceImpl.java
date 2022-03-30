@@ -74,9 +74,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     @Override
     public ResponseEntity<GroupResponseDto> getGroupInfo(Member currentMemberTemp) {
 
-        Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         Optional<GroupGoal> groupGoal = Optional.ofNullable(currentMember.getGroupGoal());
         List<String> groupDoneGoalNames = new ArrayList<>();
@@ -132,10 +130,15 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             if (!memberWaitingGoals.isEmpty()) { // 수락대기중
                 String goalStatus = "waiting";
 
+//                List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
+//                for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
+//                    waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(),memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
+//                }
                 List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
                 for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
-                    WaitingGoal waitingGoalData = waitingGoalRepository.findWaitingGoalByMemberWaitingGoalAndGoalType(memberWaitingGoal, GoalType.GROUP);
-                    waitingGoals.add(new WaitingGoalResponseDto(waitingGoalData.getId(),waitingGoalData.getWaitingGoalName()));
+                    if (memberWaitingGoal.getWaitingGoal().getGoalType() == GoalType.GROUP) {
+                        waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(), memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
+                    }
                 }
 
                 GroupResponseDto waiting = GroupResponseDto.builder()
