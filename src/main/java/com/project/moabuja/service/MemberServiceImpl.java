@@ -308,7 +308,6 @@ public class MemberServiceImpl implements MemberService{
                 .message("Redis 저장 성공")
                 .code(HttpStatus.OK)
                 .build();
-
         return response.responseAll();
     }
 
