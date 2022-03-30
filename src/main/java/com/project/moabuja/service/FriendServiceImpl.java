@@ -69,12 +69,23 @@ public class FriendServiceImpl implements FriendService{
 
     @Transactional
     @Override
-    public ResponseEntity<Msg> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember) {
+    public ResponseEntity<Msg> postFriend(FriendAlarmDto friendAlarmDto, Member currentMemberTemp) {
+        Member currentMember = Optional
+                .of(memberRepository.findById(currentMemberTemp.getId())).get()
+                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+
         Member friend = Optional
                 .of(memberRepository.findMemberByNickname(friendAlarmDto.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
-        alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, friend, currentMember.getNickname()));
+        Optional<Alarm> friendAlarmCheck = Optional
+                .ofNullable(alarmRepository.findAlarmByMemberAndFriendNicknameAndAlarmTypeAndAlarmDetailType(friend, currentMember.getNickname(), AlarmType.FRIEND, AlarmDetailType.request));
+
+        if (friendAlarmCheck.isEmpty()) {
+            alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, friend, currentMember.getNickname()));
+        } else {
+            return new ResponseEntity<>(new Msg(FriendPostValid.getMsg()), HttpStatus.OK);
+        }
 
         return new ResponseEntity<>(new Msg(FriendPost.getMsg()), HttpStatus.OK);
     }

@@ -21,6 +21,7 @@ public enum ResponseMsg {
 
     // Friend
     FriendPost("친구 요청을 보냈습니다."),
+    FriendPostValid("친구에게 요청을 보낸 상태입니다."),
     FriendAccept("친구 요청을 수락하였습니다."),
     FriendRefuse("친구 요청을 거절하였습니다."),
     FriendDelete("친구가 삭제 되었습니다."),

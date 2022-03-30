@@ -1,6 +1,7 @@
 package com.project.moabuja.repository;
 
 import com.project.moabuja.domain.alarm.Alarm;
+import com.project.moabuja.domain.alarm.AlarmDetailType;
 import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +19,9 @@ public interface AlarmRepository extends JpaRepository<Alarm,Long> {
     List<Alarm> findAlarmsByMemberAndAlarmTypeOrderByCreatedAtDesc(@Param("member") Member member, @Param("alarmType") AlarmType alarmType);
     List<Alarm> findAlarmsByFriendNicknameAndAlarmType(String friendNickname, AlarmType alarmType);
 
+    @Query ("select a from Alarm a where a.member = :member and a.friendNickname = :friendNickname and a.alarmType = :alarmType and a.alarmDetailType = :alarmDetailType")
+    Alarm findAlarmByMemberAndFriendNicknameAndAlarmTypeAndAlarmDetailType(@Param("member") Member member, @Param("friendNickname") String friendNickname,
+                                                                           @Param("alarmType") AlarmType alarmType, @Param("alarmDetailType") AlarmDetailType alarmDetailType);
     Alarm findByMemberAndFriendNickname(Member member, String friendNickname);
     Alarm findAlarmById(Long Id);
 }
