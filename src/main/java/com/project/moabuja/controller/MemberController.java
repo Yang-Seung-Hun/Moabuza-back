@@ -1,6 +1,7 @@
 package com.project.moabuja.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.project.moabuja.dto.Res;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
@@ -49,13 +50,13 @@ public class MemberController {
 
     @ApiOperation(value = "닉네임 중복체크")
     @PostMapping("/member/validation")
-    public ResponseEntity<NicknameValidResponse> nicknameValid(@Valid @RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
+    public ResponseEntity<Res.NicknameValidResponse> nicknameValid(@Valid @RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
         return memberService.nicknameValid(nicknameValidationRequestDto);
     }
 
     @ApiOperation(value = "닉네임, 캐릭터 선택")
     @PutMapping("/member/info")
-    public ResponseEntity<UpdateInfoResponse> update(@Valid @RequestBody MemberUpdateRequestDto dto,
+    public ResponseEntity<Res.UpdateInfoResponse> update(@Valid @RequestBody MemberUpdateRequestDto dto,
                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
         fcmService.register(dto.getNickname(), dto.getFcmToken());
         return memberService.updateMemberInfo(dto, userDetails.getMember().getEmail());
@@ -64,13 +65,12 @@ public class MemberController {
     @ApiOperation(value = "access 토큰 재발급")
     @GetMapping("/member/reissue")
     public ResponseEntity<CustomResponseEntity> reissue(HttpServletRequest request){
-        System.out.println("===========컨트롤러 진입.");
         return memberService.reissue(request);
     }
 
     @ApiOperation(value = "로그아웃")
     @GetMapping("/member/logout")
-    public ResponseEntity<LogoutResponse> logout(HttpServletRequest request){
+    public ResponseEntity<Res.LogoutResponse> logout(HttpServletRequest request){
         return memberService.logout(request);
     }
 }

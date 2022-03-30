@@ -1,7 +1,6 @@
 package com.project.moabuja.domain.goal;
 
 import com.project.moabuja.domain.member.Member;
-import lombok.Builder;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -25,7 +24,6 @@ public class ChallengeGoal {
     @OneToMany(mappedBy = "challengeGoal",cascade = CascadeType.ALL)
     private List<Member> members = new ArrayList<>();
 
-    @Builder
     public ChallengeGoal(String challengeGoalName, int challengeGoalAmount, int currentAmount) {
         this.challengeGoalName = challengeGoalName;
         this.challengeGoalAmount = challengeGoalAmount;

@@ -47,10 +47,8 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/home").permitAll()
                 .antMatchers("/").permitAll()
                 .anyRequest().authenticated();
-//                .anyRequest().permitAll();
 
         http    .addFilterBefore(new CustomAuthenticationFilter(jwtProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
-        // todo : exception을 핸들링 하기 위한 필터를 설치
         http    .addFilterBefore(new JwtExceptionFilter(), CustomAuthenticationFilter.class);
     }
 }
