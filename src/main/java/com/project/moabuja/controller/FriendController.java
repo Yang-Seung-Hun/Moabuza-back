@@ -2,13 +2,11 @@ package com.project.moabuja.controller;
 
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.Msg;
-import com.project.moabuja.dto.ResponseMsg;
 import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
 import com.project.moabuja.dto.request.friend.FriendRequestDto;
 import com.project.moabuja.dto.response.friend.FriendListResponseDto;
 import com.project.moabuja.dto.response.friend.FriendSearchResponseDto;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
-import com.project.moabuja.service.AlarmService;
 import com.project.moabuja.service.FriendService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +29,10 @@ public class FriendController {
 
     @ApiOperation(value = "친구 검색")
     @PostMapping("/friend/search")
-    public ResponseEntity<FriendSearchResponseDto> searchFriend(@RequestBody FriendRequestDto friendRequestDto) {
-        return friendService.searchFriend(friendRequestDto);
+    public ResponseEntity<FriendSearchResponseDto> searchFriend(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                @RequestBody FriendRequestDto friendRequestDto) {
+        Member currentMember = userDetails.getMember();
+        return friendService.searchFriend(friendRequestDto, currentMember);
     }
 
     @ApiOperation(value = "친구 요청")

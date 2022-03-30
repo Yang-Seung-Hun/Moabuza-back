@@ -14,7 +14,7 @@ public interface FriendService {
 
     void save(Member currentMember, Member friend);
 
-    ResponseEntity<FriendSearchResponseDto> searchFriend(FriendRequestDto friendRequestDto);
+    ResponseEntity<FriendSearchResponseDto> searchFriend(FriendRequestDto friendRequestDto, Member currentMember);
 
     ResponseEntity<Msg> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember);
 
