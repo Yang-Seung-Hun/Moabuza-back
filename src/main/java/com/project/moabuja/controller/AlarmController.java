@@ -46,10 +46,10 @@ public class AlarmController {
         return alarmService.getChallengeGoalAlarm(currentMember);
     }
 
-    @ApiOperation(value = "알람 삭제")
-    @DeleteMapping("/alarm/{id}")
-    public ResponseEntity<Res.AlarmDeleteResponse> deleteAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id) {
-        Member currentMember = userDetails.getMember();
-        return alarmService.deleteAlarm(currentMember, id);
-    }
+//    @ApiOperation(value = "알람 삭제")
+//    @DeleteMapping("/alarm/{id}")
+//    public ResponseEntity<Res.AlarmDeleteResponse> deleteAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id) {
+//        Member currentMember = userDetails.getMember();
+//        return alarmService.deleteAlarm(currentMember, id);
+//    }
 }
