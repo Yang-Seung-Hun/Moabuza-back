@@ -1,16 +1,11 @@
 package com.project.moabuja.dto.request.member;
 
 import com.project.moabuja.domain.member.Hero;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 @Getter
 @NoArgsConstructor
@@ -27,6 +22,10 @@ public class MemberUpdateRequestDto {
 
     @NotNull
     private Hero hero;
-    
-    
+
+    public void insertFcm(String random) {
+        this.fcmToken = random;
+    }
+
+
 }
