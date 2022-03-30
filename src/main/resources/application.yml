@@ -27,8 +27,5 @@ logging:
   level:
     root: error
 
-
-
-
 jwt:
   secret: abwieineprmdspowejropsadasdasdasdvsddvsdvasd
