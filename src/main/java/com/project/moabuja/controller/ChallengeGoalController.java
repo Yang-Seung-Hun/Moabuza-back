@@ -1,6 +1,7 @@
 package com.project.moabuja.controller;
 
 import com.project.moabuja.domain.member.Member;
+import com.project.moabuja.dto.Res;
 import com.project.moabuja.dto.ResponseMsg;
 import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
@@ -37,8 +38,8 @@ public class ChallengeGoalController {
 
     @ApiOperation(value = "도전해부자 요청")
     @PostMapping("/challenge")
-    public ResponseEntity<ResponseMsg> postChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                     @RequestBody GoalAlarmRequestDto goalAlarmRequestDto) {
+    public ResponseEntity<Res> postChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                             @RequestBody GoalAlarmRequestDto goalAlarmRequestDto) {
         Member currentMember = userDetails.getMember();
         return challengeGoalService.postChallenge(currentMember, goalAlarmRequestDto);
     }

@@ -1,6 +1,7 @@
 package com.project.moabuja.service;
 
 import com.project.moabuja.domain.member.Member;
+import com.project.moabuja.dto.Res;
 import com.project.moabuja.dto.ResponseMsg;
 import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
@@ -10,13 +11,13 @@ import org.springframework.http.ResponseEntity;
 
 public interface ChallengeGoalService {
 
-    ResponseEntity<ResponseMsg> save(CreateChallengeRequestDto challengeRequestDto, Member currentMember);
+    ResponseEntity<Res> save(CreateChallengeRequestDto challengeRequestDto, Member currentMember);
 
     ResponseEntity<ChallengeResponseDto> getChallengeInfo(Member currentMember);
 
     ResponseEntity<CreateChallengeResponseDto> getChallengeMemberCandidates(Member currentMember);
 
-    ResponseEntity<ResponseMsg> postChallenge(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto);
+    ResponseEntity<Res> postChallenge(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto);
 
     ResponseEntity<ResponseMsg> postChallengeAccept(Member currentMember, Long alarmId);
 
