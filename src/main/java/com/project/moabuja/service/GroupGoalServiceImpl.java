@@ -130,10 +130,6 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             if (!memberWaitingGoals.isEmpty()) { // 수락대기중
                 String goalStatus = "waiting";
 
-//                List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
-//                for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
-//                    waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(),memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
-//                }
                 List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
                 for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
                     if (memberWaitingGoal.getWaitingGoal().getGoalType() == GoalType.GROUP) {

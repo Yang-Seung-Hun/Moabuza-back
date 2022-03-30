@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -117,7 +116,12 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             if (! memberWaitingGoals.isEmpty()) { //수락대기중
                 String goalStatus = "waiting";
 
-                List<WaitingGoalResponseDto> waitingGoals = makeWaitingGoals(memberWaitingGoals);
+                List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
+                for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
+                    if (memberWaitingGoal.getWaitingGoal().getGoalType() == GoalType.CHALLENGE) {
+                        waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(), memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
+                    }
+                }
 
                 ChallengeResponseDto waitingResponseDto = ChallengeResponseDto.builder()
                         .goalStatus(goalStatus)
