@@ -11,7 +11,7 @@ import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.KakaoUserInfoDto;
-import com.project.moabuja.dto.Res;
+import com.project.moabuja.dto.ResponseMsg;
 import com.project.moabuja.dto.TokenDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
@@ -42,6 +42,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import static com.project.moabuja.dto.ResponseMsg.*;
 import static com.project.moabuja.exception.ErrorCode.*;
 
 @Slf4j
@@ -252,25 +253,25 @@ public class MemberServiceImpl implements MemberService{
 
     @Transactional
     @Override
-    public ResponseEntity<Res.NicknameValidResponse> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
+    public ResponseEntity<ResponseMsg> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
         String nickname = nicknameValidationRequestDto.getNickname();
         log.info("----------- 여기는 서비스 : " + nickname);
         if(memberRepository.existsByNickname(nickname)){
-            log.info("------------------- 리턴 직전 값 : " + new Res.NicknameValidResponse(nickname));
-            return new ResponseEntity<>(new Res.NicknameValidResponse(nickname), HttpStatus.OK);
+            log.info("------------------- 리턴 직전 값 : " + NicknameOK);
+            return new ResponseEntity<>(NicknameOverlap, HttpStatus.OK);
         }
-        return new ResponseEntity<>(new Res.NicknameValidResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(NicknameOK, HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Res.UpdateInfoResponse> updateMemberInfo(MemberUpdateRequestDto dto, String email) {
+    public ResponseEntity<ResponseMsg> updateMemberInfo(MemberUpdateRequestDto dto, String email) {
         Member byEmail = memberRepository.findByEmail(email);
         if(byEmail == null){
             throw new ErrorException(MEMBER_NOT_FOUND);
         }
         byEmail.updateInfo(dto);
-        return new ResponseEntity<>(new Res.UpdateInfoResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(UpdateInfo, HttpStatus.OK);
     }
 
     @Transactional
@@ -313,7 +314,7 @@ public class MemberServiceImpl implements MemberService{
 
     @Transactional
     @Override
-    public ResponseEntity<Res.LogoutResponse> logout(HttpServletRequest request) {
+    public ResponseEntity<ResponseMsg> logout(HttpServletRequest request) {
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         if (!jwtTokenProvider.validateToken(access)) {
             throw new ErrorException(ACCESS_NOT_VALID);
@@ -327,6 +328,6 @@ public class MemberServiceImpl implements MemberService{
         Long expiration = jwtTokenProvider.getExpiration(access);
         redisTemplate.opsForValue()
                 .set(access, "logout", expiration, TimeUnit.MILLISECONDS);
-        return new ResponseEntity<>(new Res.LogoutResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(Logout, HttpStatus.OK);
     }
 }

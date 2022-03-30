@@ -1,7 +1,7 @@
 package com.project.moabuja.controller;
 
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.Res;
+import com.project.moabuja.dto.ResponseMsg;
 import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.response.goal.CreateGroupResponseDto;
 import com.project.moabuja.dto.response.goal.GroupResponseDto;
@@ -35,15 +35,15 @@ public class GroupGoalController {
 
     @ApiOperation(value = "같이해부자 요청")
     @PostMapping("/group")
-    public ResponseEntity<Res.GroupPostResponse> postGroup(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                           @RequestBody GoalAlarmRequestDto goalAlarmRequestDto) {
+    public ResponseEntity<ResponseMsg> postGroup(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                 @RequestBody GoalAlarmRequestDto goalAlarmRequestDto) {
         Member currentMember = userDetails.getMember();
         return groupGoalService.postGroup(currentMember, goalAlarmRequestDto);
     }
 
     @ApiOperation(value = "같이해부자 수락")
     @PostMapping("/group/{id}/accept")
-    public ResponseEntity<Res.GroupAcceptResponse> postGroupAccept(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<ResponseMsg> postGroupAccept(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                                @PathVariable Long alarmId) {
         Member currentMember = userDetails.getMember();
         return groupGoalService.postGroupAccept(currentMember, alarmId);
@@ -51,7 +51,7 @@ public class GroupGoalController {
 
     @ApiOperation(value = "같이해부자 거절")
     @PostMapping("/group/{id}/refuse")
-    public ResponseEntity<Res.GroupRefuseResponse> postGroupRefuse(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<ResponseMsg> postGroupRefuse(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                                @PathVariable Long alarmId) {
         Member currentMember = userDetails.getMember();
         return groupGoalService.postGroupRefuse(currentMember, alarmId);
@@ -59,14 +59,14 @@ public class GroupGoalController {
 
     @ApiOperation(value = "같이해부자 나가기")
     @DeleteMapping("/group/{id}/doing")
-    public ResponseEntity<Res.GroupExitResponse> exitGroup(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
+    public ResponseEntity<ResponseMsg> exitGroup(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
         Member currentMember = userDetails.getMember();
         return groupGoalService.exitGroup(currentMember, id);
     }
 
     @ApiOperation(value = "대기중인 같이해부자 나가기")
     @DeleteMapping("/group/{id}/waiting")
-    public ResponseEntity<Res.GroupExitResponse> exitWaitGroup(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
+    public ResponseEntity<ResponseMsg> exitWaitGroup(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
         Member currentMember = userDetails.getMember();
         return groupGoalService.exitWaitingGroup(id);
     }

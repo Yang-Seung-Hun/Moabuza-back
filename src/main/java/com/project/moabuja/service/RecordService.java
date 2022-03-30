@@ -1,7 +1,7 @@
 package com.project.moabuja.service;
 
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.Res;
+import com.project.moabuja.dto.ResponseMsg;
 import com.project.moabuja.dto.request.record.DayListRequestDto;
 import com.project.moabuja.dto.request.record.RecordRequestDto;
 import com.project.moabuja.dto.response.record.DayListResponseDto;
@@ -16,5 +16,5 @@ public interface RecordService {
 
     ResponseEntity<DayListResponseDto> getDayList(DayListRequestDto dayListRequestDto, Member currentMember);
 
-    ResponseEntity<Res.RecordDeleteResponse> deleteRecord(Long id, Member currentMember);
+    ResponseEntity<ResponseMsg> deleteRecord(Long id, Member currentMember);
 }

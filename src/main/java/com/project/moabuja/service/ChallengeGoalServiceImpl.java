@@ -7,7 +7,7 @@ import com.project.moabuja.domain.goal.*;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
-import com.project.moabuja.dto.Res;
+import com.project.moabuja.dto.ResponseMsg;
 import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.request.alarm.GoalAlarmSaveDto;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import static com.project.moabuja.domain.alarm.AlarmDetailType.*;
 import static com.project.moabuja.domain.alarm.AlarmType.CHALLENGE;
 import static com.project.moabuja.exception.ErrorCode.*;
+import static com.project.moabuja.dto.ResponseMsg.*;
 
 @Slf4j
 @Service
@@ -49,7 +50,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
     @Transactional
     @Override
-    public ResponseEntity<Res.GroupCreateResponse> save(CreateChallengeRequestDto createChallengeRequestDto, Member currentMemberTemp) {
+    public ResponseEntity<ResponseMsg> save(CreateChallengeRequestDto createChallengeRequestDto, Member currentMemberTemp) {
 
         Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
@@ -58,7 +59,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         if (Optional.ofNullable(createChallengeRequestDto.getChallengeFriends()).isEmpty()) {
             ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
             savedGoal.addMember(currentMember);
-            return new ResponseEntity<>(new Res.GroupCreateResponse(), HttpStatus.OK);
+            return new ResponseEntity<>(ChallengeCreate, HttpStatus.OK);
         }
 
         for(String name :createChallengeRequestDto.getChallengeFriends()){
@@ -70,7 +71,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         ChallengeGoal savedGoal = challengeGoalRepository.save(challengeGoal);
         savedGoal.addMember(currentMember);
 
-        return new ResponseEntity<>(new Res.GroupCreateResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ChallengeCreate, HttpStatus.OK);
     }
 
     @Override
@@ -170,23 +171,23 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
     @Transactional
     @Override
-    public ResponseEntity<Res.ChallengePostResponse> postChallenge(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
+    public ResponseEntity<ResponseMsg> postChallenge(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
 
         if (Optional.ofNullable(goalAlarmRequestDto.getFriendNickname()).isEmpty()) {
             CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), null);
             save(createChallengeRequestDto, currentMember);
-            return new ResponseEntity<>(new Res.ChallengePostResponse(), HttpStatus.OK);
+            return new ResponseEntity<>(ChallengePost, HttpStatus.OK);
         }
 
         WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.CHALLENGE));
         GroupGoalServiceImpl.inviteFriends(currentMember, goalAlarmRequestDto, waitingGoal, memberWaitingGoalRepository, memberRepository, alarmRepository, CHALLENGE);
 
-        return new ResponseEntity<>(new Res.ChallengePostResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ChallengePost, HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Res.ChallengeAcceptResponse> postChallengeAccept(Member currentMemberTemp, Long alarmId) {
+    public ResponseEntity<ResponseMsg> postChallengeAccept(Member currentMemberTemp, Long alarmId) {
         Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
 
         Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
@@ -219,12 +220,12 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             alarmRepository.delete(alarm);
         }
 
-        return new ResponseEntity<>(new Res.ChallengeAcceptResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ChallengeAccept, HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Res.ChallengeRefuseResponse> postChallengeRefuse(Member currentMemberTemp, Long alarmId) {
+    public ResponseEntity<ResponseMsg> postChallengeRefuse(Member currentMemberTemp, Long alarmId) {
 
         Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
 
@@ -239,12 +240,12 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         alarmRepository.delete(alarm);
         waitingGoalRepository.delete(waitingGoal);
 
-        return new ResponseEntity<>(new Res.ChallengeRefuseResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ChallengeRefuse, HttpStatus.OK);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Res.ChallengeExitResponse> exitChallenge(Member currentMemberTemp) {
+    public ResponseEntity<ResponseMsg> exitChallenge(Member currentMemberTemp) {
 
         Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
@@ -255,17 +256,17 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         if (memberList.size() == 1) { challengeGoalRepository.delete(challengeGoal); }
 
-        return new ResponseEntity<>(new Res.ChallengeExitResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ChallengeExit, HttpStatus.OK);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Res.ChallengeExitResponse> exitWaitingChallenge(Long id) {
+    public ResponseEntity<ResponseMsg> exitWaitingChallenge(Long id) {
 
         WaitingGoal waitingGoalById = Optional.of(waitingGoalRepository.findWaitingGoalById(id)).orElseThrow(() -> new ErrorException(GOAL_NOT_EXIST));
         waitingGoalRepository.delete(waitingGoalById);
 
-        return new ResponseEntity<>(new Res.ChallengeExitResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ChallengeExit, HttpStatus.OK);
     }
 
     public List<String> sendChallengeAlarm(List<MemberWaitingGoal> friends, List<String> friendList,Member currentMember, AlarmDetailType alarmDetailType, WaitingGoal waitingGoal){
