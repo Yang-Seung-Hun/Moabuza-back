@@ -23,9 +23,4 @@ public class MemberUpdateRequestDto {
     @NotNull
     private Hero hero;
 
-    public void insertFcm(String random) {
-        this.fcmToken = random;
-    }
-
-
 }
