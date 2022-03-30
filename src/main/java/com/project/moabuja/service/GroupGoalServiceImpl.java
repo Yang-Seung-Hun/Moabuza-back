@@ -8,7 +8,7 @@ import com.project.moabuja.domain.goal.*;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
-import com.project.moabuja.dto.Res;
+import com.project.moabuja.dto.ResponseMsg;
 import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.request.alarm.GoalAlarmSaveDto;
 import com.project.moabuja.dto.request.goal.CreateGroupRequestDto;
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.project.moabuja.domain.alarm.AlarmType.GROUP;
+import static com.project.moabuja.dto.ResponseMsg.*;
 import static com.project.moabuja.exception.ErrorCode.GOAL_NOT_EXIST;
 import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
 
@@ -46,7 +47,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Override
     @Transactional
-    public ResponseEntity<Res.GroupCreateResponse> save(CreateGroupRequestDto groupRequestDto, Member currentMemberTemp) {
+    public ResponseEntity<ResponseMsg> save(CreateGroupRequestDto groupRequestDto, Member currentMemberTemp) {
 
         Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
@@ -67,7 +68,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                     .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
             memberByNickname.ifPresent(goal::addMember);
         }
-        return new ResponseEntity<>(new Res.GroupCreateResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(GroupCreate.getMsg()), HttpStatus.OK);
     }
 
     @Override
@@ -198,16 +199,16 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Transactional
     @Override
-    public ResponseEntity<Res.GroupPostResponse> postGroup(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
+    public ResponseEntity<ResponseMsg> postGroup(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
         WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.GROUP));
         inviteFriends(currentMember, goalAlarmRequestDto, waitingGoal, memberWaitingGoalRepository, memberRepository, alarmRepository, GROUP);
 
-        return new ResponseEntity<>(new Res.GroupPostResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(GroupPost.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Res.GroupAcceptResponse> postGroupAccept(Member currentMember, Long alarmId) {
+    public ResponseEntity<ResponseMsg> postGroupAccept(Member currentMember, Long alarmId) {
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ErrorCode.ALARM_NOT_EXIST));
@@ -266,7 +267,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             alarmRepository.delete(alarm);
         }
 
-        return new ResponseEntity<>(new Res.GroupAcceptResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(GroupAccept.getMsg()), HttpStatus.OK);
     }
 
     public boolean checkAccepted(List<MemberWaitingGoal> memberWaitingGoals) {
@@ -281,7 +282,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Transactional
     @Override
-    public ResponseEntity<Res.GroupRefuseResponse> postGroupRefuse(Member currentMember, Long alarmId) {
+    public ResponseEntity<ResponseMsg> postGroupRefuse(Member currentMember, Long alarmId) {
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ErrorCode.ALARM_NOT_EXIST));
@@ -306,12 +307,12 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         alarmRepository.delete(alarm);
         waitingGoalRepository.delete(waitingGoal);
 
-        return new ResponseEntity<>(new Res.GroupRefuseResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(GroupRefuse.getMsg()), HttpStatus.OK);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Res.GroupExitResponse> exitGroup(Member currentMemberTemp, Long id) {
+    public ResponseEntity<ResponseMsg> exitGroup(Member currentMemberTemp, Long id) {
 
         Member currentMember = Optional
                 .of(memberRepository.findById(currentMemberTemp.getId())).get()
@@ -328,17 +329,17 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             currentMember.changeGroupGoal(null);
         }
 
-        return new ResponseEntity<>(new Res.GroupExitResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(GroupExit.getMsg()), HttpStatus.OK);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Res.GroupExitResponse> exitWaitingGroup(Long id) {
+    public ResponseEntity<ResponseMsg> exitWaitingGroup(Long id) {
 
         WaitingGoal waitingGoalById = waitingGoalRepository.findWaitingGoalById(id);
         waitingGoalRepository.delete(waitingGoalById);
 
-        return new ResponseEntity<>(new Res.GroupExitResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(GroupExit.getMsg()), HttpStatus.OK);
     }
 
     //challengeGoalServiceImpl에서도 사용

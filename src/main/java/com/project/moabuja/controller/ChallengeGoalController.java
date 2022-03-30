@@ -1,7 +1,7 @@
 package com.project.moabuja.controller;
 
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.Res;
+import com.project.moabuja.dto.ResponseMsg;
 import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
 import com.project.moabuja.dto.response.goal.CreateChallengeResponseDto;
@@ -37,15 +37,15 @@ public class ChallengeGoalController {
 
     @ApiOperation(value = "도전해부자 요청")
     @PostMapping("/challenge")
-    public ResponseEntity<Res.ChallengePostResponse> postChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                                   @RequestBody GoalAlarmRequestDto goalAlarmRequestDto) {
+    public ResponseEntity<ResponseMsg> postChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                     @RequestBody GoalAlarmRequestDto goalAlarmRequestDto) {
         Member currentMember = userDetails.getMember();
         return challengeGoalService.postChallenge(currentMember, goalAlarmRequestDto);
     }
 
     @ApiOperation(value = "도전해부자 수락")
     @PostMapping("/challenge/{id}/accept")
-    public ResponseEntity<Res.ChallengeAcceptResponse> postChallengeAccept(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<ResponseMsg> postChallengeAccept(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                                        @PathVariable Long alarmId) {
         Member currentMember = userDetails.getMember();
         return challengeGoalService.postChallengeAccept(currentMember, alarmId);
@@ -53,7 +53,7 @@ public class ChallengeGoalController {
 
     @ApiOperation(value = "도전해부자 거절")
     @PostMapping("/challenge/{id}/refuse")
-    public ResponseEntity<Res.ChallengeRefuseResponse> postChallengeRefuse(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<ResponseMsg> postChallengeRefuse(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                                        @PathVariable Long alarmId) {
         Member currentMember = userDetails.getMember();
         return challengeGoalService.postChallengeRefuse(currentMember, alarmId);
@@ -61,14 +61,14 @@ public class ChallengeGoalController {
 
     @ApiOperation(value = "도전해부자 나가기")
     @DeleteMapping("/challenge/doing")
-    public ResponseEntity<Res.ChallengeExitResponse> exitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<ResponseMsg> exitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentMember = userDetails.getMember();
         return challengeGoalService.exitChallenge(currentMember);
     }
 
     @ApiOperation(value = "대기중인 도전해부자 나가기")
     @DeleteMapping("/challenge/{id}/waiting")
-    public ResponseEntity<Res.ChallengeExitResponse> exitWaitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
+    public ResponseEntity<ResponseMsg> exitWaitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
         Member currentMember = userDetails.getMember();
         return challengeGoalService.exitWaitingChallenge(id);
     }

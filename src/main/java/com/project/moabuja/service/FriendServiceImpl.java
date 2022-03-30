@@ -5,7 +5,7 @@ import com.project.moabuja.domain.alarm.AlarmDetailType;
 import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.Res;
+import com.project.moabuja.dto.ResponseMsg;
 import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
 import com.project.moabuja.dto.request.friend.FriendRequestDto;
 import com.project.moabuja.dto.response.friend.FriendListDto;
@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.project.moabuja.dto.ResponseMsg.*;
 import static com.project.moabuja.exception.ErrorCode.ALARM_NOT_EXIST;
 import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
 
@@ -68,19 +69,19 @@ public class FriendServiceImpl implements FriendService{
 
     @Transactional
     @Override
-    public ResponseEntity<Res.FriendPostResponse> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember) {
+    public ResponseEntity<ResponseMsg> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember) {
         Member friend = Optional
                 .of(memberRepository.findMemberByNickname(friendAlarmDto.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, friend, currentMember.getNickname()));
 
-        return new ResponseEntity<>(new Res.FriendPostResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(FriendPost.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Res.FriendAcceptResponse> postFriendAccept(Member currentMember, Long alarmId) {
+    public ResponseEntity<ResponseMsg> postFriendAccept(Member currentMember, Long alarmId) {
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
@@ -94,7 +95,7 @@ public class FriendServiceImpl implements FriendService{
 
         alarmRepository.delete(alarm);
 
-        return new ResponseEntity<>(new Res.FriendAcceptResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(FriendAccept.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
@@ -106,7 +107,7 @@ public class FriendServiceImpl implements FriendService{
 
     @Transactional
     @Override
-    public ResponseEntity<Res.FriendRefuseResponse> postFriendRefuse(Member currentMember, Long alarmId) {
+    public ResponseEntity<ResponseMsg> postFriendRefuse(Member currentMember, Long alarmId) {
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
@@ -118,12 +119,12 @@ public class FriendServiceImpl implements FriendService{
 
         alarmRepository.delete(alarm);
 
-        return new ResponseEntity<>(new Res.FriendRefuseResponse(), HttpStatus.OK) ;
+        return new ResponseEntity<>(ResponseMsg.valueOf(FriendRefuse.getMsg()), HttpStatus.OK) ;
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Res.FriendDeleteResponse> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto) {
+    public ResponseEntity<ResponseMsg> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto) {
         Member friend = Optional
                 .of(memberRepository.findMemberByNickname(friendRequestDto.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
@@ -131,6 +132,6 @@ public class FriendServiceImpl implements FriendService{
         friendRepository.delete(friendRepository.findByMemberAndFriend(currentMember, friend));
         friendRepository.delete(friendRepository.findByMemberAndFriend(friend, currentMember));
 
-        return new ResponseEntity<>(new Res.FriendDeleteResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMsg.valueOf(FriendDelete.getMsg()), HttpStatus.OK);
     }
 }

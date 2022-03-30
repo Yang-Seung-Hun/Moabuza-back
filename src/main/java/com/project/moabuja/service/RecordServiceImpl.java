@@ -8,7 +8,7 @@ import com.project.moabuja.domain.goal.GroupGoal;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
-import com.project.moabuja.dto.Res;
+import com.project.moabuja.dto.ResponseMsg;
 import com.project.moabuja.dto.request.alarm.GoalAlarmSaveDto;
 import com.project.moabuja.dto.request.record.DayListRequestDto;
 import com.project.moabuja.dto.request.record.RecordRequestDto;
@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 import static com.project.moabuja.domain.alarm.AlarmType.CHALLENGE;
 import static com.project.moabuja.domain.alarm.AlarmType.GROUP;
 import static com.project.moabuja.exception.ErrorCode.*;
+import static com.project.moabuja.dto.ResponseMsg.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -183,7 +184,7 @@ public class RecordServiceImpl implements RecordService{
 
     @Override
     @Transactional
-    public ResponseEntity<Res.RecordDeleteResponse> deleteRecord(Long id, Member currentMember) {
+    public ResponseEntity<ResponseMsg> deleteRecord(Long id, Member currentMember) {
 //        if (recordRepository.findRecordById(id).isEmpty()) { throw new RecordErrorException("해당 내역은 존재하지 않습니다."); }
 
         Record selectRecord = Optional.of(recordRepository.findRecordById(id)).get().orElseThrow(() -> new ErrorException(RECORD_NOT_EXIST));
@@ -191,7 +192,7 @@ public class RecordServiceImpl implements RecordService{
 
         if (Objects.equals(currentMember.getId(), selectId)) {
             recordRepository.deleteRecordById(id);
-            return new ResponseEntity<>(new Res.RecordDeleteResponse(), HttpStatus.OK);
+            return new ResponseEntity<>(ResponseMsg.valueOf(RecordDelete.getMsg()), HttpStatus.OK);
         } throw new ErrorException(RECORD_MEMBER_NOT_MATCH);
     }
 
