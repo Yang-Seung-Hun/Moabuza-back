@@ -5,7 +5,7 @@ import com.project.moabuja.domain.alarm.AlarmDetailType;
 import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.ResponseMsg;
+import com.project.moabuja.dto.Msg;
 import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
 import com.project.moabuja.dto.request.friend.FriendRequestDto;
 import com.project.moabuja.dto.response.friend.FriendListDto;
@@ -69,19 +69,19 @@ public class FriendServiceImpl implements FriendService{
 
     @Transactional
     @Override
-    public ResponseEntity<ResponseMsg> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember) {
+    public ResponseEntity<Msg> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember) {
         Member friend = Optional
                 .of(memberRepository.findMemberByNickname(friendAlarmDto.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, friend, currentMember.getNickname()));
 
-        return new ResponseEntity<>(ResponseMsg.valueOf(FriendPost.getMsg()), HttpStatus.OK);
+        return new ResponseEntity<>(new Msg(FriendPost.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<ResponseMsg> postFriendAccept(Member currentMember, Long alarmId) {
+    public ResponseEntity<Msg> postFriendAccept(Member currentMember, Long alarmId) {
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
@@ -95,7 +95,7 @@ public class FriendServiceImpl implements FriendService{
 
         alarmRepository.delete(alarm);
 
-        return new ResponseEntity<>(ResponseMsg.valueOf(FriendAccept.getMsg()), HttpStatus.OK);
+        return new ResponseEntity<>(new Msg(FriendAccept.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
@@ -107,7 +107,7 @@ public class FriendServiceImpl implements FriendService{
 
     @Transactional
     @Override
-    public ResponseEntity<ResponseMsg> postFriendRefuse(Member currentMember, Long alarmId) {
+    public ResponseEntity<Msg> postFriendRefuse(Member currentMember, Long alarmId) {
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
@@ -119,12 +119,12 @@ public class FriendServiceImpl implements FriendService{
 
         alarmRepository.delete(alarm);
 
-        return new ResponseEntity<>(ResponseMsg.valueOf(FriendRefuse.getMsg()), HttpStatus.OK) ;
+        return new ResponseEntity<>(new Msg(FriendRefuse.getMsg()), HttpStatus.OK) ;
     }
 
     @Transactional
     @Override
-    public ResponseEntity<ResponseMsg> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto) {
+    public ResponseEntity<Msg> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto) {
         Member friend = Optional
                 .of(memberRepository.findMemberByNickname(friendRequestDto.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
@@ -132,6 +132,6 @@ public class FriendServiceImpl implements FriendService{
         friendRepository.delete(friendRepository.findByMemberAndFriend(currentMember, friend));
         friendRepository.delete(friendRepository.findByMemberAndFriend(friend, currentMember));
 
-        return new ResponseEntity<>(ResponseMsg.valueOf(FriendDelete.getMsg()), HttpStatus.OK);
+        return new ResponseEntity<>(new Msg(FriendDelete.getMsg()), HttpStatus.OK);
     }
 }

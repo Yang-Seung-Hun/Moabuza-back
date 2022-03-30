@@ -11,7 +11,7 @@ import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.KakaoUserInfoDto;
-import com.project.moabuja.dto.ResponseMsg;
+import com.project.moabuja.dto.Msg;
 import com.project.moabuja.dto.TokenDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
@@ -253,23 +253,23 @@ public class MemberServiceImpl implements MemberService{
 
     @Transactional
     @Override
-    public ResponseEntity<ResponseMsg> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
+    public ResponseEntity<Msg> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
         String nickname = nicknameValidationRequestDto.getNickname();
         if(memberRepository.existsByNickname(nickname)){
-            return new ResponseEntity<>(ResponseMsg.valueOf(NicknameOverlap.getMsg()), HttpStatus.OK);
+            return new ResponseEntity<>(new Msg(NicknameOverlap.getMsg()), HttpStatus.OK);
         }
-        return new ResponseEntity<>(ResponseMsg.valueOf(NicknameOK.getMsg()), HttpStatus.OK);
+        return new ResponseEntity<>(new Msg(NicknameOK.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<ResponseMsg> updateMemberInfo(MemberUpdateRequestDto dto, String email) {
+    public ResponseEntity<Msg> updateMemberInfo(MemberUpdateRequestDto dto, String email) {
         Member byEmail = memberRepository.findByEmail(email);
         if(byEmail == null){
             throw new ErrorException(MEMBER_NOT_FOUND);
         }
         byEmail.updateInfo(dto);
-        return new ResponseEntity<>(ResponseMsg.valueOf(UpdateInfo.getMsg()), HttpStatus.OK);
+        return new ResponseEntity<>(new Msg(UpdateInfo.getMsg()), HttpStatus.OK);
     }
 
     @Transactional
@@ -311,7 +311,7 @@ public class MemberServiceImpl implements MemberService{
 
     @Transactional
     @Override
-    public ResponseEntity<ResponseMsg> logout(HttpServletRequest request) {
+    public ResponseEntity<Msg> logout(HttpServletRequest request) {
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         if (!jwtTokenProvider.validateToken(access)) {
             throw new ErrorException(ACCESS_NOT_VALID);
@@ -325,6 +325,6 @@ public class MemberServiceImpl implements MemberService{
         Long expiration = jwtTokenProvider.getExpiration(access);
         redisTemplate.opsForValue()
                 .set(access, "logout", expiration, TimeUnit.MILLISECONDS);
-        return new ResponseEntity<>(ResponseMsg.valueOf(Logout.getMsg()), HttpStatus.OK);
+        return new ResponseEntity<>(new Msg(Logout.getMsg()), HttpStatus.OK);
     }
 }
