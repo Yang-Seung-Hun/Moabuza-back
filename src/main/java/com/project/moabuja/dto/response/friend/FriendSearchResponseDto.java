@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FriendSearchResponseDto {
 
-    private boolean nicknameValid;
     private String nickname;
     private Hero hero;
+    private String msg;
 
-    public FriendSearchResponseDto(boolean nicknameValid, String nickname, Hero hero) {
-        this.nicknameValid = nicknameValid;
+    public FriendSearchResponseDto(String nickname, Hero hero, String msg) {
         this.nickname = nickname;
         this.hero = hero;
+        this.msg = msg;
     }
 }
