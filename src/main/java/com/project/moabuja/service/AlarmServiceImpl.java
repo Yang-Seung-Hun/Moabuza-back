@@ -69,13 +69,6 @@ public class AlarmServiceImpl implements AlarmService {
         Member member = Optional.of(memberRepository.findById(currentMember.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
         Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
 
-        System.out.println("=========================================================");
-        System.out.println(member.getId());
-        System.out.println(member.getNickname());
-        System.out.println(alarm.getMember().getId());
-        System.out.println(alarm.getMember().getNickname());
-        System.out.println(Objects.equals(member, alarm.getMember()));
-
         if (Objects.equals(member, alarm.getMember())) {
             alarmRepository.deleteById(alarmId);
             return new ResponseEntity<>(new AlarmDeleteResponse(), HttpStatus.OK);
