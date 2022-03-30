@@ -1,7 +1,7 @@
 package com.project.moabuja.service;
 
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.ResponseMsg;
+import com.project.moabuja.dto.Msg;
 import com.project.moabuja.dto.response.alarm.FriendAlarmResponseDto;
 import com.project.moabuja.dto.response.alarm.GoalAlarmResponseDto;
 import org.springframework.http.ResponseEntity;
@@ -16,5 +16,5 @@ public interface AlarmService {
 
     ResponseEntity<List<GoalAlarmResponseDto>> getChallengeGoalAlarm(Member currentMember);
 
-    ResponseEntity<ResponseMsg> deleteAlarm(Member currentMember, Long alarmId);
+    ResponseEntity<Msg> deleteAlarm(Member currentMember, Long alarmId);
 }

@@ -3,11 +3,11 @@ package com.project.moabuja.dto;
 import lombok.Getter;
 
 @Getter
-public class Res {
+public class Msg {
 
     private String msg;
 
-    public Res(String msg) {
+    public Msg(String msg) {
         this.msg = msg;
     }
 }
