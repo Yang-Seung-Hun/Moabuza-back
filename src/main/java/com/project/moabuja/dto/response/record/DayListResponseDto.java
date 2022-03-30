@@ -10,13 +10,6 @@ import java.util.List;
 @NoArgsConstructor
 public class DayListResponseDto {
 
-/**
- * [List] dayRecords : {
- * [enum]recordType(비고 기록),
- * [LocalDateTime] recordDate(날짜),
- * [string] memos(메모),
- * [int] recordAmount(금액) }
- */
     private List<DayRecordResponseDto> dayRecordList;
     private int dayIncomeAmount;
     private int dayExpenseAmount;

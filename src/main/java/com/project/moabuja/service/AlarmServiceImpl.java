@@ -5,7 +5,7 @@ import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.response.alarm.FriendAlarmResponseDto;
 import com.project.moabuja.dto.response.alarm.GoalAlarmResponseDto;
 import com.project.moabuja.exception.ErrorException;
-import com.project.moabuja.model.AlarmDeleteResponse;
+import com.project.moabuja.dto.Res;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -64,14 +64,14 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Transactional
     @Override
-    public ResponseEntity<AlarmDeleteResponse> deleteAlarm(Member currentMember, Long alarmId) {
+    public ResponseEntity<Res.AlarmDeleteResponse> deleteAlarm(Member currentMember, Long alarmId) {
 
         Member member = Optional.of(memberRepository.findById(currentMember.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
         Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
 
         if (Objects.equals(member, alarm.getMember())) {
             alarmRepository.deleteById(alarmId);
-            return new ResponseEntity<>(new AlarmDeleteResponse(), HttpStatus.OK);
+            return new ResponseEntity<>(new Res.AlarmDeleteResponse(), HttpStatus.OK);
         } throw new ErrorException(ALARM_MEMBER_NOT_MATCH);
     }
 }

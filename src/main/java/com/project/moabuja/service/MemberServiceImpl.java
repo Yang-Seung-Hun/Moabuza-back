@@ -11,6 +11,7 @@ import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.KakaoUserInfoDto;
+import com.project.moabuja.dto.Res;
 import com.project.moabuja.dto.TokenDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
@@ -18,9 +19,6 @@ import com.project.moabuja.dto.request.member.RegToLoginDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.dto.response.member.ReissueDto;
 import com.project.moabuja.exception.ErrorException;
-import com.project.moabuja.model.LogoutResponse;
-import com.project.moabuja.model.NicknameValidResponse;
-import com.project.moabuja.model.UpdateInfoResponse;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
@@ -254,29 +252,28 @@ public class MemberServiceImpl implements MemberService{
 
     @Transactional
     @Override
-    public ResponseEntity<NicknameValidResponse> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
+    public ResponseEntity<Res.NicknameValidResponse> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto) {
         String nickname = nicknameValidationRequestDto.getNickname();
         if(memberRepository.existsByNickname(nickname)){
-            return new ResponseEntity<>(new NicknameValidResponse(nickname), HttpStatus.OK);
+            return new ResponseEntity<>(new Res.NicknameValidResponse(nickname), HttpStatus.OK);
         }
-        return new ResponseEntity<>(new NicknameValidResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(new Res.NicknameValidResponse(), HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<UpdateInfoResponse> updateMemberInfo(MemberUpdateRequestDto dto, String email) {
+    public ResponseEntity<Res.UpdateInfoResponse> updateMemberInfo(MemberUpdateRequestDto dto, String email) {
         Member byEmail = memberRepository.findByEmail(email);
         if(byEmail == null){
             throw new ErrorException(MEMBER_NOT_FOUND);
         }
         byEmail.updateInfo(dto);
-        return new ResponseEntity<>(new UpdateInfoResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(new Res.UpdateInfoResponse(), HttpStatus.OK);
     }
 
     @Transactional
     @Override
     public ResponseEntity<CustomResponseEntity> reissue(HttpServletRequest request) {
-        System.out.println("리이슈 메서드 : " + request.getHeader("A-AUTH-TOKEN").substring(7));
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         String refresh = request.getHeader("R-AUTH-TOKEN").substring(7);
 
@@ -286,9 +283,6 @@ public class MemberServiceImpl implements MemberService{
         Authentication authentication = jwtTokenProvider.getAuthentication(access);
 
         String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
-
-        System.out.println("-------------받아온 refresh : " + refresh);
-        System.out.println("-------------redis refresh : " + refreshToken);
 
         if(ObjectUtils.isEmpty(refreshToken)) {
             throw new ErrorException(REFRESH_NOT_EXIST);
@@ -302,8 +296,6 @@ public class MemberServiceImpl implements MemberService{
                 .refresh(jwtTokenProvider.createRefreshToken(password))
                 .access(jwtTokenProvider.createAccessToken(password))
                 .build();
-
-        System.out.println("다시 만든 리프래쉬 : " + dto.getRefresh());
 
         redisTemplate.opsForValue()
                 .set("RT:" + authentication.getName(), dto.getRefresh(), jwtTokenProvider.getExpiration(dto.getRefresh()), TimeUnit.MILLISECONDS);
@@ -319,7 +311,7 @@ public class MemberServiceImpl implements MemberService{
 
     @Transactional
     @Override
-    public ResponseEntity<LogoutResponse> logout(HttpServletRequest request) {
+    public ResponseEntity<Res.LogoutResponse> logout(HttpServletRequest request) {
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         if (!jwtTokenProvider.validateToken(access)) {
             throw new ErrorException(ACCESS_NOT_VALID);
@@ -333,6 +325,6 @@ public class MemberServiceImpl implements MemberService{
         Long expiration = jwtTokenProvider.getExpiration(access);
         redisTemplate.opsForValue()
                 .set(access, "logout", expiration, TimeUnit.MILLISECONDS);
-        return new ResponseEntity<>(new LogoutResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(new Res.LogoutResponse(), HttpStatus.OK);
     }
 }

@@ -8,6 +8,7 @@ import com.project.moabuja.domain.goal.GroupGoal;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
+import com.project.moabuja.dto.Res;
 import com.project.moabuja.dto.request.alarm.GoalAlarmSaveDto;
 import com.project.moabuja.dto.request.record.DayListRequestDto;
 import com.project.moabuja.dto.request.record.RecordRequestDto;
@@ -15,7 +16,6 @@ import com.project.moabuja.dto.response.record.DayListResponseDto;
 import com.project.moabuja.dto.response.record.DayRecordResponseDto;
 import com.project.moabuja.dto.response.record.RecordResponseDto;
 import com.project.moabuja.exception.ErrorException;
-import com.project.moabuja.model.RecordDeleteResponse;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.DoneGoalRepository;
 import com.project.moabuja.repository.MemberRepository;
@@ -183,7 +183,7 @@ public class RecordServiceImpl implements RecordService{
 
     @Override
     @Transactional
-    public ResponseEntity<RecordDeleteResponse> deleteRecord(Long id, Member currentMember) {
+    public ResponseEntity<Res.RecordDeleteResponse> deleteRecord(Long id, Member currentMember) {
 //        if (recordRepository.findRecordById(id).isEmpty()) { throw new RecordErrorException("해당 내역은 존재하지 않습니다."); }
 
         Record selectRecord = Optional.of(recordRepository.findRecordById(id)).get().orElseThrow(() -> new ErrorException(RECORD_NOT_EXIST));
@@ -191,7 +191,7 @@ public class RecordServiceImpl implements RecordService{
 
         if (Objects.equals(currentMember.getId(), selectId)) {
             recordRepository.deleteRecordById(id);
-            return new ResponseEntity<>(new RecordDeleteResponse(), HttpStatus.OK);
+            return new ResponseEntity<>(new Res.RecordDeleteResponse(), HttpStatus.OK);
         } throw new ErrorException(RECORD_MEMBER_NOT_MATCH);
     }
 

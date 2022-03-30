@@ -5,16 +5,13 @@ import com.project.moabuja.domain.alarm.AlarmDetailType;
 import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.member.Member;
+import com.project.moabuja.dto.Res;
 import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
 import com.project.moabuja.dto.request.friend.FriendRequestDto;
 import com.project.moabuja.dto.response.friend.FriendListDto;
 import com.project.moabuja.dto.response.friend.FriendListResponseDto;
 import com.project.moabuja.dto.response.friend.FriendSearchResponseDto;
 import com.project.moabuja.exception.ErrorException;
-import com.project.moabuja.model.FriendAcceptResponse;
-import com.project.moabuja.model.FriendDeleteResponse;
-import com.project.moabuja.model.FriendPostResponse;
-import com.project.moabuja.model.FriendRefuseResponse;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.FriendRepository;
 import com.project.moabuja.repository.MemberRepository;
@@ -71,19 +68,19 @@ public class FriendServiceImpl implements FriendService{
 
     @Transactional
     @Override
-    public ResponseEntity<FriendPostResponse> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember) {
+    public ResponseEntity<Res.FriendPostResponse> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember) {
         Member friend = Optional
                 .of(memberRepository.findMemberByNickname(friendAlarmDto.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, friend, currentMember.getNickname()));
 
-        return new ResponseEntity<>(new FriendPostResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(new Res.FriendPostResponse(), HttpStatus.OK);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<FriendAcceptResponse> postFriendAccept(Member currentMember, Long alarmId) {
+    public ResponseEntity<Res.FriendAcceptResponse> postFriendAccept(Member currentMember, Long alarmId) {
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
@@ -97,7 +94,7 @@ public class FriendServiceImpl implements FriendService{
 
         alarmRepository.delete(alarm);
 
-        return new ResponseEntity<>(new FriendAcceptResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(new Res.FriendAcceptResponse(), HttpStatus.OK);
     }
 
     @Transactional
@@ -109,7 +106,7 @@ public class FriendServiceImpl implements FriendService{
 
     @Transactional
     @Override
-    public ResponseEntity<FriendRefuseResponse> postFriendRefuse(Member currentMember, Long alarmId) {
+    public ResponseEntity<Res.FriendRefuseResponse> postFriendRefuse(Member currentMember, Long alarmId) {
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
@@ -121,12 +118,12 @@ public class FriendServiceImpl implements FriendService{
 
         alarmRepository.delete(alarm);
 
-        return new ResponseEntity<>(new FriendRefuseResponse(), HttpStatus.OK) ;
+        return new ResponseEntity<>(new Res.FriendRefuseResponse(), HttpStatus.OK) ;
     }
 
     @Transactional
     @Override
-    public ResponseEntity<FriendDeleteResponse> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto) {
+    public ResponseEntity<Res.FriendDeleteResponse> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto) {
         Member friend = Optional
                 .of(memberRepository.findMemberByNickname(friendRequestDto.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
@@ -134,6 +131,6 @@ public class FriendServiceImpl implements FriendService{
         friendRepository.delete(friendRepository.findByMemberAndFriend(currentMember, friend));
         friendRepository.delete(friendRepository.findByMemberAndFriend(friend, currentMember));
 
-        return new ResponseEntity<>(new FriendDeleteResponse(), HttpStatus.OK);
+        return new ResponseEntity<>(new Res.FriendDeleteResponse(), HttpStatus.OK);
     }
 }

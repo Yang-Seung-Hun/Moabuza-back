@@ -1,9 +1,9 @@
 package com.project.moabuja.controller;
 
 import com.project.moabuja.domain.member.Member;
+import com.project.moabuja.dto.Res;
 import com.project.moabuja.dto.response.alarm.FriendAlarmResponseDto;
 import com.project.moabuja.dto.response.alarm.GoalAlarmResponseDto;
-import com.project.moabuja.model.AlarmDeleteResponse;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.AlarmService;
 import io.swagger.annotations.ApiOperation;
@@ -48,7 +48,7 @@ public class AlarmController {
 
     @ApiOperation(value = "알람 삭제")
     @DeleteMapping("/alarm/{id}")
-    public ResponseEntity<AlarmDeleteResponse> deleteAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id) {
+    public ResponseEntity<Res.AlarmDeleteResponse> deleteAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id) {
         Member currentMember = userDetails.getMember();
         return alarmService.deleteAlarm(currentMember, id);
     }

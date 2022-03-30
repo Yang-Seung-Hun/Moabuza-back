@@ -7,11 +7,9 @@ import com.project.moabuja.domain.goal.GroupGoal;
 import com.project.moabuja.domain.goal.MemberWaitingGoal;
 import com.project.moabuja.dto.KakaoUserInfoDto;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
-import com.project.moabuja.dto.request.member.RegisterRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -67,13 +65,6 @@ public class Member {
         this.nickname = dto.getNickname();
         this.hero = dto.getHero();
         return this;
-//        return Member.builder()
-//                .password(this.getPassword())
-//                .email(this.getEmail())
-//                .nickname(this.getNickname())
-//                .kakaoId(this.getKakaoId())
-//                .hero(this.getHero())
-//                .build();
     }
 
     public Member fromDto(KakaoUserInfoDto dto, String password) {
@@ -92,12 +83,6 @@ public class Member {
     //반대쪽에서 연관관계편의메소드에서 사용될 setter
     public void changeGroupGoal(GroupGoal groupGoal){
         this.groupGoal = groupGoal;
-    }
-
-    //연관관계 편의
-    public void addAlarm(Alarm alarm){
-        this.alarms.add(alarm);
-        alarm.changeMember(this);
     }
 
     public void addDoneGoal(DoneGoal doneGoal){
