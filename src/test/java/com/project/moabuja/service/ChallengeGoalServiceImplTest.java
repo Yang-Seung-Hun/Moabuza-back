@@ -3,10 +3,14 @@ package com.project.moabuja.service;
 import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.member.Hero;
 import com.project.moabuja.domain.member.Member;
+import com.project.moabuja.domain.record.Record;
+import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
+import com.project.moabuja.dto.request.record.RecordRequestDto;
 import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
 import com.project.moabuja.repository.ChallengeGoalRepository;
 import com.project.moabuja.repository.MemberRepository;
+import com.project.moabuja.repository.RecordRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +36,7 @@ class ChallengeGoalServiceImplTest {
     @Autowired private MemberRepository memberRepository;
     @Autowired private ChallengeGoalService challengeGoalService;
     @Autowired private ChallengeGoalRepository challengeGoalRepository;
+    @Autowired private RecordService recordService;
 
     @Test
     @DisplayName("1인 도전해부자 생성")
@@ -110,11 +115,42 @@ class ChallengeGoalServiceImplTest {
 //        CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("5만원 모으기", 50000, friends);
 //        challengeGoalService.save(createChallengeRequestDto, savedMember1);
 //
+//        RecordRequestDto recordRequestDto1 = new RecordRequestDto(RecordType.income, "2022-03-05 00:00:00.000","3월용돈",50000);
+//        recordService.save(recordRequestDto1,savedMember1);
+//
+//        RecordRequestDto recordRequestDto2 = new RecordRequestDto(RecordType.income, "2022-03-05 00:00:00.000","3월용돈",50000);
+//        recordService.save(recordRequestDto2,friend1);
+//
+//        RecordRequestDto recordRequestDto3 = new RecordRequestDto(RecordType.income, "2022-03-05 00:00:00.000","3월용돈",50000);
+//        recordService.save(recordRequestDto3,friend2);
+//
+//        RecordRequestDto recordRequestDto4 = new RecordRequestDto(RecordType.challenge, "2022-03-06 00:00:00.000","도전!!",10000);
+//        recordService.save(recordRequestDto4,savedMember1);
+//
+//        RecordRequestDto recordRequestDto5 = new RecordRequestDto(RecordType.challenge, "2022-03-06 00:00:00.000","도전!!",20000);
+//        recordService.save(recordRequestDto5,friend1);
+//
+//        RecordRequestDto recordRequestDto6 = new RecordRequestDto(RecordType.challenge, "2022-03-06 00:00:00.000","도전!!",30000);
+//        recordService.save(recordRequestDto6,friend2);
+//
+//        RecordRequestDto recordRequestDto7 = new RecordRequestDto(RecordType.challenge, "2022-03-06 00:00:00.000","도전!!",40000);
+//        recordService.save(recordRequestDto7,savedMember1);
+//
+//        CreateChallengeRequestDto createChallengeRequestDto2 = new CreateChallengeRequestDto("10만원 모으기", 100000, null);
+//        challengeGoalService.save(createChallengeRequestDto2, savedMember1);
+//
+//        RecordRequestDto recordRequestDto8 = new RecordRequestDto(RecordType.challenge, "2022-03-06 00:00:00.000","도전!!",40000);
+//        recordService.save(recordRequestDto8,savedMember1);
+//
+//
 //        //when
 //        ResponseEntity<ChallengeResponseDto> challengeInfoTmp = challengeGoalService.getChallengeInfo(savedMember1);
 //        ChallengeResponseDto challengeInfo = challengeInfoTmp.getBody();
 //
 //        //then
+//        Assertions.assertThat(challengeInfo.getChallengeLists().size()).isEqualTo(1);
+//        Assertions.assertThat(challengeInfo.getChallengeMembers().size()).isEqualTo(1);
+//        Assertions.assertThat(challengeInfo.getChallengeName()).isEqualTo("10만원 모으기");
 //
 //    }
 }
