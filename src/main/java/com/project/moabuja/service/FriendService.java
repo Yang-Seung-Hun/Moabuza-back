@@ -1,7 +1,7 @@
 package com.project.moabuja.service;
 
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.ResponseMsg;
+import com.project.moabuja.dto.Msg;
 import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
 import com.project.moabuja.dto.request.friend.FriendRequestDto;
 import com.project.moabuja.dto.response.friend.FriendListResponseDto;
@@ -16,11 +16,11 @@ public interface FriendService {
 
     ResponseEntity<FriendSearchResponseDto> searchFriend(FriendRequestDto friendRequestDto);
 
-    ResponseEntity<ResponseMsg> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember);
+    ResponseEntity<Msg> postFriend(FriendAlarmDto friendAlarmDto, Member currentMember);
 
-    ResponseEntity<ResponseMsg> postFriendAccept(Member currentMember, Long alarmId);
+    ResponseEntity<Msg> postFriendAccept(Member currentMember, Long alarmId);
 
-    ResponseEntity<ResponseMsg> postFriendRefuse(Member currentMember, Long alarmId);
+    ResponseEntity<Msg> postFriendRefuse(Member currentMember, Long alarmId);
 
-    ResponseEntity<ResponseMsg> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto);
+    ResponseEntity<Msg> deleteFriend(Member currentMember, FriendRequestDto friendRequestDto);
 }

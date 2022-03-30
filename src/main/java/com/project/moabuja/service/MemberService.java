@@ -3,6 +3,7 @@ package com.project.moabuja.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.KakaoUserInfoDto;
+import com.project.moabuja.dto.Msg;
 import com.project.moabuja.dto.ResponseMsg;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
 import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
@@ -25,12 +26,12 @@ public interface MemberService {
 
     RegToLoginDto register(KakaoUserInfoDto dto);
 
-    ResponseEntity<ResponseMsg> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto);
+    ResponseEntity<Msg> nicknameValid(NicknameValidationRequestDto nicknameValidationRequestDto);
 
-    ResponseEntity<ResponseMsg> updateMemberInfo(MemberUpdateRequestDto dto, String email);
+    ResponseEntity<Msg> updateMemberInfo(MemberUpdateRequestDto dto, String email);
 
     ResponseEntity<CustomResponseEntity> reissue(HttpServletRequest request);
 
-    ResponseEntity<ResponseMsg> logout(HttpServletRequest request);
+    ResponseEntity<Msg> logout(HttpServletRequest request);
 
 }

@@ -2,7 +2,7 @@ package com.project.moabuja.service;
 
 import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.ResponseMsg;
+import com.project.moabuja.dto.Msg;
 import com.project.moabuja.dto.response.alarm.FriendAlarmResponseDto;
 import com.project.moabuja.dto.response.alarm.GoalAlarmResponseDto;
 import com.project.moabuja.exception.ErrorException;
@@ -21,8 +21,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.project.moabuja.domain.alarm.AlarmType.*;
+import static com.project.moabuja.dto.ResponseMsg.AlarmDelete;
 import static com.project.moabuja.exception.ErrorCode.*;
-import static com.project.moabuja.dto.ResponseMsg.*;
 
 @Slf4j
 @Service
@@ -65,14 +65,14 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Transactional
     @Override
-    public ResponseEntity<ResponseMsg> deleteAlarm(Member currentMember, Long alarmId) {
+    public ResponseEntity<Msg> deleteAlarm(Member currentMember, Long alarmId) {
 
         Member member = Optional.of(memberRepository.findById(currentMember.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
         Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
 
         if (Objects.equals(member, alarm.getMember())) {
             alarmRepository.deleteById(alarmId);
-            return new ResponseEntity<>(ResponseMsg.valueOf(AlarmDelete.getMsg()), HttpStatus.OK);
+            return new ResponseEntity<>(new Msg(AlarmDelete.getMsg()), HttpStatus.OK);
         } throw new ErrorException(ALARM_MEMBER_NOT_MATCH);
     }
 }

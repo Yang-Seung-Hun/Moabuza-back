@@ -1,6 +1,7 @@
 package com.project.moabuja.controller;
 
 import com.project.moabuja.domain.member.Member;
+import com.project.moabuja.dto.Msg;
 import com.project.moabuja.dto.ResponseMsg;
 import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
 import com.project.moabuja.dto.request.friend.FriendRequestDto;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 public class FriendController {
 
     private final FriendService friendService;
-    private final AlarmService alarmService;
 
     @ApiOperation(value = "친구 목록")
     @GetMapping("/friend")
@@ -37,15 +37,15 @@ public class FriendController {
 
     @ApiOperation(value = "친구 요청")
     @PostMapping("/friend")
-    public ResponseEntity<ResponseMsg> postFriend(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                  @RequestBody FriendAlarmDto friendAlarmDto) {
+    public ResponseEntity<Msg> postFriend(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                          @RequestBody FriendAlarmDto friendAlarmDto) {
         Member currentMember = userDetails.getMember();
         return friendService.postFriend(friendAlarmDto, currentMember);
     }
 
     @ApiOperation(value = "친구 수락")
     @PostMapping("/friend/{id}/accept")
-    public ResponseEntity<ResponseMsg> postFriendAccept(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<Msg> postFriendAccept(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                                  @PathVariable Long alarmId) {
         Member currentMember = userDetails.getMember();
         return friendService.postFriendAccept(currentMember, alarmId);
@@ -53,7 +53,7 @@ public class FriendController {
 
     @ApiOperation(value = "친구 거절")
     @PostMapping("/friend/{id}/refuse")
-    public ResponseEntity<ResponseMsg> postFriendRefuse(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<Msg> postFriendRefuse(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                                  @PathVariable Long alarmId) {
         Member currentMember = userDetails.getMember();
         return friendService.postFriendRefuse(currentMember, alarmId);
@@ -61,7 +61,7 @@ public class FriendController {
 
     @ApiOperation(value = "친구 삭제")
     @DeleteMapping("/friend")
-    public ResponseEntity<ResponseMsg> deleteFriend(@RequestBody FriendRequestDto friendRequestDto,
+    public ResponseEntity<Msg> deleteFriend(@RequestBody FriendRequestDto friendRequestDto,
                                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member currentUser = userDetails.getMember();
         return friendService.deleteFriend(currentUser, friendRequestDto);
