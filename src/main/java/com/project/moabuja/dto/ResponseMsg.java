@@ -20,7 +20,7 @@ public enum ResponseMsg {
     RecordDelete("내역이 삭제 되었습니다."),
 
     // Friend
-    FriendPostValid("친구에게 요청을 보낸 상태입니다."),
+    FriendPostValid("친구요청을 보낸 상태입니다."),
     FriendNotExist("존재하지 않는 아이디입니다."),
     FriendShipExist("이미 친구로 저장되어 있습니다"),
     FriendSerchOK("친구 요청이 가능합니다."),
