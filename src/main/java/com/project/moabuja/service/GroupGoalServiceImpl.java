@@ -208,7 +208,11 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Transactional
     @Override
-    public ResponseEntity<Msg> postGroupAccept(Member currentMember, Long alarmId) {
+    public ResponseEntity<Msg> postGroupAccept(Member currentMemberTemp, Long alarmId) {
+        Member currentMember = Optional
+                .of(memberRepository.findById(currentMemberTemp.getId())).get()
+                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ErrorCode.ALARM_NOT_EXIST));
