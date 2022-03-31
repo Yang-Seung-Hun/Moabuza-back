@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,16 +40,28 @@ public class FriendServiceImpl implements FriendService{
     private final AlarmRepository alarmRepository;
 
     @Override
-    public ResponseEntity<FriendListResponseDto> listFriend(Member currentMember) {
+    public ResponseEntity<FriendListResponseDto> listFriend(Member currentMemberTemp) {
+        Member currentMember = Optional
+                .of(memberRepository.findById(currentMemberTemp.getId())).get()
+                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+
         List<Friend> friendList = friendRepository.findFriendsByMember(currentMember);
         List<FriendListDto> friendListDto = friendList.stream().map(friend -> {
             return new FriendListDto(friend.getFriend().getNickname(), friend.getFriend().getHero());
         }).collect(Collectors.toList());
 
-        List<Alarm> waitingFriendList = alarmRepository.findAlarmsByFriendNicknameAndAlarmType(currentMember.getNickname(), AlarmType.FRIEND);
-        List<FriendListDto> waitingFriendListDto = waitingFriendList.stream().map(friend -> {
-            return new FriendListDto(friend.getMember().getNickname(), friend.getMember().getHero());
-        }).collect(Collectors.toList());
+        List<Alarm> waitingFriendListPull = alarmRepository.findAlarmsByMemberAndAlarmType_FriendAndAlarmDetailType_Request(currentMember);
+        List<Alarm> waitingFriendListPush = alarmRepository.findAlarmsByFriendNicknameAndAlarmType_FriendAndAlarmDetailType_Request(currentMember.getNickname());
+
+        List<FriendListDto> waitingFriendListDto = new ArrayList<>();
+        for (Alarm waitingFriendPull : waitingFriendListPull) {
+            Optional<Member> friend = memberRepository.findMemberByNickname(waitingFriendPull.getFriendNickname());
+            waitingFriendListDto.add(new FriendListDto(friend.get().getNickname(), friend.get().getHero()));
+        }
+        for (Alarm waitingFriendPush : waitingFriendListPush) {
+            Member friend = waitingFriendPush.getMember();
+            waitingFriendListDto.add(new FriendListDto(friend.getNickname(), friend.getHero()));
+        }
 
         FriendListResponseDto friendListResponseDto = new FriendListResponseDto(waitingFriendListDto, friendListDto);
 
