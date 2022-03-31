@@ -185,7 +185,6 @@ public class RecordServiceImpl implements RecordService{
     @Override
     @Transactional
     public ResponseEntity<Msg> deleteRecord(Long id, Member currentMember) {
-//        if (recordRepository.findRecordById(id).isEmpty()) { throw new RecordErrorException("해당 내역은 존재하지 않습니다."); }
 
         Record selectRecord = Optional.of(recordRepository.findRecordById(id)).get().orElseThrow(() -> new ErrorException(RECORD_NOT_EXIST));
         Long selectId = selectRecord.getMember().getId();
