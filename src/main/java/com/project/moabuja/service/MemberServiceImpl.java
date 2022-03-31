@@ -87,7 +87,7 @@ public class MemberServiceImpl implements MemberService{
             for (Member member : members) {
                 List<Record> memberGroupRecord = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
                 for (Record record : memberGroupRecord) {
-                    groupCurrentAmount += record.getRecordAmount();
+                    if(record.getCreatedAt().isAfter(groupGoal.getCreatedAt())) groupCurrentAmount += record.getRecordAmount();
                 }
             }
             groupNeedAmount = groupGoal.getGroupGoalAmount() - groupCurrentAmount;
@@ -100,7 +100,7 @@ public class MemberServiceImpl implements MemberService{
 
             List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentMember);
             for (Record challengeRecord : challengeRecords) {
-                challengeCurrentAmount += challengeRecord.getRecordAmount();
+                if(challengeRecord.getCreatedAt().isAfter(challengeGoal.getCreatedAt())) challengeCurrentAmount += challengeRecord.getRecordAmount();
             }
             challengeNeedAmount = challengeGoal.getChallengeGoalAmount() - challengeCurrentAmount;
             challengePercent = (int) (((double) challengeCurrentAmount / (double) (challengeGoal.getChallengeGoalAmount())) * 100);
