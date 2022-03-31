@@ -29,8 +29,7 @@ import java.util.Optional;
 
 import static com.project.moabuja.domain.alarm.AlarmType.GROUP;
 import static com.project.moabuja.dto.ResponseMsg.*;
-import static com.project.moabuja.exception.ErrorCode.GOAL_NOT_EXIST;
-import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
+import static com.project.moabuja.exception.ErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -126,15 +125,18 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             return new ResponseEntity<>(haveGoal, HttpStatus.OK);
 
         } else {
+            List<MemberWaitingGoal> checkWaitingGoal = new ArrayList<>();
+            for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
+                GoalType goalType = memberWaitingGoal.getWaitingGoal().getGoalType();
+                if (goalType == GoalType.GROUP){ checkWaitingGoal.add(memberWaitingGoal); }
+            }
 
-            if (!memberWaitingGoals.isEmpty()) { // 수락대기중
+            if (!checkWaitingGoal.isEmpty()) { // 수락대기중
                 String goalStatus = "waiting";
 
                 List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
-                for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
-                    if (memberWaitingGoal.getWaitingGoal().getGoalType() == GoalType.GROUP) {
-                        waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(), memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
-                    }
+                for (MemberWaitingGoal memberWaitingGoal : checkWaitingGoal) {
+                    waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(), memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
                 }
 
                 GroupResponseDto waiting = GroupResponseDto.builder()
@@ -215,7 +217,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
-                .orElseThrow(() -> new ErrorException(ErrorCode.ALARM_NOT_EXIST));
+                .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
         WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
         MemberWaitingGoal currentMemberWaitingGoal = memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal);
         currentMemberWaitingGoal.changeIsAcceptedGoal();

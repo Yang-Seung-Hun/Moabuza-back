@@ -113,14 +113,18 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             return new ResponseEntity<>(goalResponseDto, HttpStatus.OK);
 
         } else {//challenge 없을때
-            if (! memberWaitingGoals.isEmpty()) { //수락대기중
+            List<MemberWaitingGoal> checkWaitingGoal = new ArrayList<>();
+            for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
+                GoalType goalType = memberWaitingGoal.getWaitingGoal().getGoalType();
+                if (goalType == GoalType.CHALLENGE){ checkWaitingGoal.add(memberWaitingGoal); }
+            }
+
+            if (! checkWaitingGoal.isEmpty()) { //수락대기중
                 String goalStatus = "waiting";
 
                 List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
-                for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
-                    if (memberWaitingGoal.getWaitingGoal().getGoalType() == GoalType.CHALLENGE) {
-                        waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(), memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
-                    }
+                for (MemberWaitingGoal memberWaitingGoal : checkWaitingGoal) {
+                    waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(), memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
                 }
 
                 ChallengeResponseDto waitingResponseDto = ChallengeResponseDto.builder()
