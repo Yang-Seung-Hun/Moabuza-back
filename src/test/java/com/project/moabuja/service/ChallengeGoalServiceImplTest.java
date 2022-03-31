@@ -226,4 +226,4 @@
 //        Assertions.assertThat(challengeInfo3.getChallengeName()).isNull();
 //        Assertions.assertThat(challengeInfo3.getWaitingGoals().size()).isEqualTo(1);
 //    }
-}
+//}
