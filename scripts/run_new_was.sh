@@ -1,5 +1,4 @@
 #!/bin/bash
-
 REPOSITORY1=/home/ubuntu
 REPOSITORY=/home/ubuntu/app
 PROJECT_NAME=moabuja
