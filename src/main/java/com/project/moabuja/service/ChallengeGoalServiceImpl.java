@@ -33,6 +33,7 @@ import static com.project.moabuja.domain.alarm.AlarmDetailType.*;
 import static com.project.moabuja.domain.alarm.AlarmType.CHALLENGE;
 import static com.project.moabuja.dto.ResponseMsg.*;
 import static com.project.moabuja.exception.ErrorCode.*;
+import static com.project.moabuja.service.GroupGoalServiceImpl.*;
 
 @Slf4j
 @Service
@@ -193,7 +194,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         }
 
         WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.CHALLENGE));
-        GroupGoalServiceImpl.inviteFriends(currentMember, goalAlarmRequestDto, waitingGoal, memberWaitingGoalRepository, memberRepository, alarmRepository, CHALLENGE);
+        inviteFriends(currentMember, goalAlarmRequestDto, waitingGoal, memberWaitingGoalRepository, memberRepository, alarmRepository, CHALLENGE);
 
         return new ResponseEntity<>(new Msg(ChallengePost.getMsg()), HttpStatus.OK);
     }
@@ -285,10 +286,8 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
     @Override
     @Transactional
-    public ResponseEntity<Msg> exitWaitingChallenge(Long id) {
-
-        WaitingGoal waitingGoalById = Optional.of(waitingGoalRepository.findWaitingGoalById(id)).orElseThrow(() -> new ErrorException(GOAL_NOT_EXIST));
-        waitingGoalRepository.delete(waitingGoalById);
+    public ResponseEntity<Msg> exitWaitingChallenge(Member currentMemberTemp, Long id) {
+        exitWaitingGoal(currentMemberTemp, id, memberRepository, waitingGoalRepository, memberWaitingGoalRepository);
 
         return new ResponseEntity<>(new Msg(ChallengeExit.getMsg()), HttpStatus.OK);
     }
