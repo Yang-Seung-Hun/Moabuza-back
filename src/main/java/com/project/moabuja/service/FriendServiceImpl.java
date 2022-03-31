@@ -50,8 +50,8 @@ public class FriendServiceImpl implements FriendService{
             return new FriendListDto(friend.getFriend().getNickname(), friend.getFriend().getHero());
         }).collect(Collectors.toList());
 
-        List<Alarm> waitingFriendListPull = alarmRepository.findAlarmsByMemberAndAlarmType_FriendAndAlarmDetailType_Request(currentMember);
-        List<Alarm> waitingFriendListPush = alarmRepository.findAlarmsByFriendNicknameAndAlarmType_FriendAndAlarmDetailType_Request(currentMember.getNickname());
+        List<Alarm> waitingFriendListPull = alarmRepository.findAlarmsByMemberAndAlarmTypeAndAlarmDetailType(currentMember, AlarmType.FRIEND, AlarmDetailType.request);
+        List<Alarm> waitingFriendListPush = alarmRepository.findAlarmsByFriendNicknameAndAlarmTypeAndAlarmDetailType(currentMember.getNickname(), AlarmType.FRIEND, AlarmDetailType.request);
 
         List<FriendListDto> waitingFriendListDto = new ArrayList<>();
         for (Alarm waitingFriendPull : waitingFriendListPull) {
