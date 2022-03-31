@@ -225,6 +225,17 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
             List<String> friendListTmp = new ArrayList<>();
             List<String> friendList = sendChallengeAlarm(friends, friendListTmp, currentMember, create, waitingGoal);
+            GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
+                    .alarmType(CHALLENGE)
+                    .alarmDetailType(create)
+                    .goalName(waitingGoal.getWaitingGoalName())
+                    .goalAmount(waitingGoal.getWaitingGoalAmount())
+                    .waitingGoalId(waitingGoal.getId())
+                    .friendNickname(currentMember.getNickname())
+                    .member(currentMember)
+                    .build();
+            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
+
 
             // ChallengeGoal 생성
             CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
@@ -265,7 +276,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         List<Member> memberList = currentMember.getChallengeGoal().getMembers();
 
         ChallengeGoal challengeGoal = currentMember.getChallengeGoal();
-        currentMember.changeGroupGoal(null);
+        currentMember.changeChallengeGoal(null);
 
         if (memberList.size() == 1) { challengeGoalRepository.delete(challengeGoal); }
 

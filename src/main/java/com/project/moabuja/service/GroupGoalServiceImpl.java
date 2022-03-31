@@ -151,7 +151,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                         .build();
 
                 return new ResponseEntity<>(waiting, HttpStatus.OK);
-            } else { //challengeGoal 없을때
+            } else { //GroupGoal 없을때
                 String goalStatus = "noGoal";
                 GroupResponseDto noGoal = GroupResponseDto.builder()
                         .goalStatus(goalStatus)
@@ -249,6 +249,16 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         // 전체 수락 후 마지막 수락
         else if (checkAccepted(friends)) {
             List<String> friendList = new ArrayList<>();
+            GoalAlarmSaveDto alarmSave = GoalAlarmSaveDto.builder()
+                    .alarmType(GROUP)
+                    .alarmDetailType(AlarmDetailType.create)
+                    .goalName(waitingGoal.getWaitingGoalName())
+                    .goalAmount(waitingGoal.getWaitingGoalAmount())
+                    .waitingGoalId(waitingGoal.getId())
+                    .friendNickname(currentMember.getNickname())
+                    .member(currentMember)
+                    .build();
+            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSave));
 
             for (MemberWaitingGoal friend : friends) {
                 if (friend.getMember() != currentMember) {
@@ -349,7 +359,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     }
 
     //challengeGoalServiceImpl에서도 사용
-    static void inviteFriends(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto, WaitingGoal waitingGoal, MemberWaitingGoalRepository memberWaitingGoalRepository, MemberRepository memberRepository, AlarmRepository alarmRepository, AlarmType GROUP) {
+    static void inviteFriends(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto, WaitingGoal waitingGoal, MemberWaitingGoalRepository memberWaitingGoalRepository, MemberRepository memberRepository, AlarmRepository alarmRepository, AlarmType alarmType) {
         memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, true));
 
         for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
@@ -359,7 +369,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             MemberWaitingGoal memberWaitingGoal = new MemberWaitingGoal(member, waitingGoal, false);
             memberWaitingGoalRepository.save(memberWaitingGoal);
             GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
-                    .alarmType(GROUP)
+                    .alarmType(alarmType)
                     .alarmDetailType(AlarmDetailType.invite)
                     .goalName(goalAlarmRequestDto.getGoalName())
                     .goalAmount(goalAlarmRequestDto.getGoalAmount())
