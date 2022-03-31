@@ -18,11 +18,11 @@ public interface AlarmRepository extends JpaRepository<Alarm,Long> {
     @Query ("select a from Alarm a where a.member = :member and a.alarmType = :alarmType order by a.createdAt desc")
     List<Alarm> findAlarmsByMemberAndAlarmTypeOrderByCreatedAtDesc(@Param("member") Member member, @Param("alarmType") AlarmType alarmType);
 
-    @Query ("select a from Alarm a where a.member = :member and a.friendNickname = :friendNickname and a.alarmType = :alarmType and a.alarmDetailType = :alarmDetailType")
+    @Query ("select a from Alarm a where a.friendNickname = :friendNickname and a.alarmType = :alarmType and a.alarmDetailType = :alarmDetailType")
     List<Alarm> findAlarmsByFriendNicknameAndAlarmTypeAndAlarmDetailType(@Param("friendNickname") String friendNickname,
                                                                          @Param("alarmType") AlarmType alarmType, @Param("alarmDetailType") AlarmDetailType alarmDetailType);
 
-    @Query ("select a from Alarm a where a.member = :member and a.member = :member and a.alarmType = :alarmType and a.alarmDetailType = :alarmDetailType")
+    @Query ("select a from Alarm a where a.member = :member and a.alarmType = :alarmType and a.alarmDetailType = :alarmDetailType")
     List<Alarm> findAlarmsByMemberAndAlarmTypeAndAlarmDetailType(@Param("member") Member member,
                                                                  @Param("alarmType") AlarmType alarmType, @Param("alarmDetailType") AlarmDetailType alarmDetailType);
 
