@@ -76,7 +76,7 @@ public class FriendServiceImpl implements FriendService{
                 .ofNullable(alarmRepository.findAlarmByMemberAndFriendNicknameAndAlarmTypeAndAlarmDetailType(friend.get(), currentMember.getNickname(), AlarmType.FRIEND, AlarmDetailType.request));
         Optional<Alarm> friendAlarmDoubleCheck = Optional
                 .ofNullable(alarmRepository.findAlarmByMemberAndFriendNicknameAndAlarmTypeAndAlarmDetailType(currentMember, friend.get().getNickname(), AlarmType.FRIEND, AlarmDetailType.request));
-        if (friendAlarmCheck.isPresent() && friendAlarmDoubleCheck.isPresent()) {
+        if (friendAlarmCheck.isPresent() || friendAlarmDoubleCheck.isPresent()) {
             FriendSearchResponseDto friendSearchResponseDto = new FriendSearchResponseDto(null, null, FriendPostValid.getMsg());
             return new ResponseEntity<>(friendSearchResponseDto, HttpStatus.OK);
         }
