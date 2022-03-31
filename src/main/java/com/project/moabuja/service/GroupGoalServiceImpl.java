@@ -328,7 +328,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Override
     @Transactional
-    public ResponseEntity<Msg> exitGroup(Member currentMemberTemp, Long id) {
+    public ResponseEntity<Msg> exitGroup(Member currentMemberTemp) {
 
         Member currentMember = Optional
                 .of(memberRepository.findById(currentMemberTemp.getId())).get()
@@ -350,10 +350,8 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Override
     @Transactional
-    public ResponseEntity<Msg> exitWaitingGroup(Long id) {
-
-        WaitingGoal waitingGoalById = waitingGoalRepository.findWaitingGoalById(id);
-        waitingGoalRepository.delete(waitingGoalById);
+    public ResponseEntity<Msg> exitWaitingGroup(Member currentMemberTemp, Long id) {
+        exitWaitingGoal(currentMemberTemp, id, memberRepository, waitingGoalRepository, memberWaitingGoalRepository);
 
         return new ResponseEntity<>(new Msg(GroupExit.getMsg()), HttpStatus.OK);
     }
@@ -379,5 +377,17 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                     .build();
             alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
         }
+    }
+
+    //challengeGoalServiceImpl에서도 사용
+    static void exitWaitingGoal(Member currentMemberTemp, Long id, MemberRepository memberRepository, WaitingGoalRepository waitingGoalRepository, MemberWaitingGoalRepository memberWaitingGoalRepository) {
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+
+        WaitingGoal waitingGoal = Optional.of(waitingGoalRepository.findWaitingGoalById(id)).orElseThrow(() -> new ErrorException(GOAL_NOT_EXIST));
+        MemberWaitingGoal memberWaitingGoal = Optional
+                .of(memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal))
+                .orElseThrow(() -> new ErrorException(GOAL_MEMBER_NOT_MATCH));
+
+        waitingGoalRepository.delete(waitingGoal);
     }
 }

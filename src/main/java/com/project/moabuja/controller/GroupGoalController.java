@@ -58,17 +58,17 @@ public class GroupGoalController {
     }
 
     @ApiOperation(value = "같이해부자 나가기")
-    @DeleteMapping("/group/{id}/doing")
-    public ResponseEntity<Msg> exitGroup(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
+    @PostMapping("/group/doing")
+    public ResponseEntity<Msg> exitGroup(@AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentMember = userDetails.getMember();
-        return groupGoalService.exitGroup(currentMember, id);
+        return groupGoalService.exitGroup(currentMember);
     }
 
     @ApiOperation(value = "대기중인 같이해부자 나가기")
     @DeleteMapping("/group/{id}/waiting")
     public ResponseEntity<Msg> exitWaitGroup(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
         Member currentMember = userDetails.getMember();
-        return groupGoalService.exitWaitingGroup(id);
+        return groupGoalService.exitWaitingGroup(currentMember, id);
     }
 
 }

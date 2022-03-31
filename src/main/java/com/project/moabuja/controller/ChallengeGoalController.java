@@ -60,7 +60,7 @@ public class ChallengeGoalController {
     }
 
     @ApiOperation(value = "도전해부자 나가기")
-    @DeleteMapping("/challenge/doing")
+    @PostMapping("/challenge/doing")
     public ResponseEntity<Msg> exitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentMember = userDetails.getMember();
         return challengeGoalService.exitChallenge(currentMember);
@@ -70,7 +70,7 @@ public class ChallengeGoalController {
     @DeleteMapping("/challenge/{id}/waiting")
     public ResponseEntity<Msg> exitWaitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
         Member currentMember = userDetails.getMember();
-        return challengeGoalService.exitWaitingChallenge(id);
+        return challengeGoalService.exitWaitingChallenge(currentMember, id);
     }
 
 }

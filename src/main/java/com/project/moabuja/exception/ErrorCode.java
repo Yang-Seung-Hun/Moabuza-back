@@ -12,7 +12,7 @@ public enum ErrorCode {
     REFRESH_NOT_VALID(400, "T002", "Refresh Token이 유효하지 않습니다."),
     REFRESH_NOT_EXIST(400, "T003", "Refresh Token이 존재하지 않습니다."),
     REFRESH_NOT_MATCH(400, "T004", "Refresh Token이 일치하지 않습니다."),
-    LOGOUT_TOKEN_VALID(400, "T004", "로그아웃 되어 사용할 수 없는 토큰입니다."),
+    LOGOUT_TOKEN_VALID(400, "T005", "로그아웃 되어 사용할 수 없는 토큰입니다."),
 
     // Member Error
     MEMBER_NOT_FOUND(404, "M001", "해당 사용자는 존재하지 않습니다."),
@@ -30,6 +30,7 @@ public enum ErrorCode {
 
     // Goal Error
     GOAL_NOT_EXIST(404, "G001", "해당 목표는 존재하지 않습니다."),
+    GOAL_MEMBER_NOT_MATCH(400, "G002", "해당 목표의 사용자가 아닙니다."),
 
     // Alarm Error
     ALARM_NOT_EXIST(404, "A001", "해당 알람은 존재하지 않습니다."),
