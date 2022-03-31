@@ -8,6 +8,9 @@ spring:
     username: admin
     password: moabuza123
 
+  profiles:
+    active: local
+
   reids:
     host: #여기 부분은 자신의 ip에 맞춰서 바꾸기 -> ec2 redis 설치 후 연결 ip
       127.0.0.1
@@ -16,7 +19,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
 logging:
   pattern:
@@ -26,9 +29,6 @@ logging:
     name: /log/abc.log
   level:
     root: error
-
-
-
 
 jwt:
   secret: abwieineprmdspowejropsadasdasdasdvsddvsdvasd

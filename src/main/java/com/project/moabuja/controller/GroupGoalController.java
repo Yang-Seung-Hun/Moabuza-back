@@ -44,31 +44,31 @@ public class GroupGoalController {
     @ApiOperation(value = "같이해부자 수락")
     @PostMapping("/group/{id}/accept")
     public ResponseEntity<Msg> postGroupAccept(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                               @PathVariable Long alarmId) {
+                                                               @PathVariable Long id) {
         Member currentMember = userDetails.getMember();
-        return groupGoalService.postGroupAccept(currentMember, alarmId);
+        return groupGoalService.postGroupAccept(currentMember, id);
     }
 
     @ApiOperation(value = "같이해부자 거절")
     @PostMapping("/group/{id}/refuse")
     public ResponseEntity<Msg> postGroupRefuse(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                               @PathVariable Long alarmId) {
+                                                               @PathVariable Long id) {
         Member currentMember = userDetails.getMember();
-        return groupGoalService.postGroupRefuse(currentMember, alarmId);
+        return groupGoalService.postGroupRefuse(currentMember, id);
     }
 
     @ApiOperation(value = "같이해부자 나가기")
-    @DeleteMapping("/group/{id}/doing")
-    public ResponseEntity<Msg> exitGroup(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
+    @PostMapping("/group/doing")
+    public ResponseEntity<Msg> exitGroup(@AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentMember = userDetails.getMember();
-        return groupGoalService.exitGroup(currentMember, id);
+        return groupGoalService.exitGroup(currentMember);
     }
 
     @ApiOperation(value = "대기중인 같이해부자 나가기")
     @DeleteMapping("/group/{id}/waiting")
     public ResponseEntity<Msg> exitWaitGroup(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
         Member currentMember = userDetails.getMember();
-        return groupGoalService.exitWaitingGroup(id);
+        return groupGoalService.exitWaitingGroup(currentMember, id);
     }
 
 }

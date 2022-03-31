@@ -22,9 +22,9 @@ public interface GroupGoalService {
 
     ResponseEntity<Msg> postGroupRefuse(Member currentMember, Long alarmId);
 
-    ResponseEntity<Msg> exitGroup(Member currentMember, Long id);
+    ResponseEntity<Msg> exitGroup(Member currentMember);
 
-    ResponseEntity<Msg> exitWaitingGroup(Long id);
+    ResponseEntity<Msg> exitWaitingGroup(Member currentMember, Long id);
 
 
 }

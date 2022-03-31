@@ -1,4 +1,6 @@
 #!/bin/bash
+
+#===========
 REPOSITORY1=/home/ubuntu
 REPOSITORY=/home/ubuntu/app
 PROJECT_NAME=moabuja
@@ -8,7 +10,6 @@ echo "> Build 파일 복사"
 echo "> 현재 구동중인 애플리케이션 pid 확인"
 
 CURRENT_PID=$(pgrep -fl $PROJECT_NAME | grep java | awk '{print $1}')
-
 
 echo "$CURRENT_PID"
 
@@ -32,6 +33,12 @@ chmod +x $JAR_NAME
 echo "> $JAR_NAME 실행"
 
 nohup java -jar $JAR_NAME > $REPOSITORY1/nohup.out 2>&1 &
+
+#===========
+
+
+
+
 # shellcheck disable=SC2261
 #nohup java -jar $JAR_NAME  1 > $REPOSITORY1/stdout.out 2 > $REPOSITORY1/stderr.out &
 #nohup java -jar $JAR_NAME > /dev/null 2> /dev/null < /dev/null &

@@ -191,7 +191,6 @@ public class MemberServiceImpl implements MemberService{
                 kakaoTokenRequest,
                 String.class
         );
-
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();

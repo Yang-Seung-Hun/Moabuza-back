@@ -29,8 +29,7 @@ import java.util.Optional;
 
 import static com.project.moabuja.domain.alarm.AlarmType.GROUP;
 import static com.project.moabuja.dto.ResponseMsg.*;
-import static com.project.moabuja.exception.ErrorCode.GOAL_NOT_EXIST;
-import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
+import static com.project.moabuja.exception.ErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -126,19 +125,18 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             return new ResponseEntity<>(haveGoal, HttpStatus.OK);
 
         } else {
+            List<MemberWaitingGoal> checkWaitingGoal = new ArrayList<>();
+            for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
+                GoalType goalType = memberWaitingGoal.getWaitingGoal().getGoalType();
+                if (goalType == GoalType.GROUP){ checkWaitingGoal.add(memberWaitingGoal); }
+            }
 
-            if (!memberWaitingGoals.isEmpty()) { // 수락대기중
+            if (!checkWaitingGoal.isEmpty()) { // 수락대기중
                 String goalStatus = "waiting";
 
-//                List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
-//                for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
-//                    waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(),memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
-//                }
                 List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
-                for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
-                    if (memberWaitingGoal.getWaitingGoal().getGoalType() == GoalType.GROUP) {
-                        waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(), memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
-                    }
+                for (MemberWaitingGoal memberWaitingGoal : checkWaitingGoal) {
+                    waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(), memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
                 }
 
                 GroupResponseDto waiting = GroupResponseDto.builder()
@@ -153,7 +151,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                         .build();
 
                 return new ResponseEntity<>(waiting, HttpStatus.OK);
-            } else { //challengeGoal 없을때
+            } else { //GroupGoal 없을때
                 String goalStatus = "noGoal";
                 GroupResponseDto noGoal = GroupResponseDto.builder()
                         .goalStatus(goalStatus)
@@ -212,10 +210,14 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Transactional
     @Override
-    public ResponseEntity<Msg> postGroupAccept(Member currentMember, Long alarmId) {
+    public ResponseEntity<Msg> postGroupAccept(Member currentMemberTemp, Long alarmId) {
+        Member currentMember = Optional
+                .of(memberRepository.findById(currentMemberTemp.getId())).get()
+                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
-                .orElseThrow(() -> new ErrorException(ErrorCode.ALARM_NOT_EXIST));
+                .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
         WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
         MemberWaitingGoal currentMemberWaitingGoal = memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal);
         currentMemberWaitingGoal.changeIsAcceptedGoal();
@@ -247,6 +249,16 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         // 전체 수락 후 마지막 수락
         else if (checkAccepted(friends)) {
             List<String> friendList = new ArrayList<>();
+            GoalAlarmSaveDto alarmSave = GoalAlarmSaveDto.builder()
+                    .alarmType(GROUP)
+                    .alarmDetailType(AlarmDetailType.create)
+                    .goalName(waitingGoal.getWaitingGoalName())
+                    .goalAmount(waitingGoal.getWaitingGoalAmount())
+                    .waitingGoalId(waitingGoal.getId())
+                    .friendNickname(currentMember.getNickname())
+                    .member(currentMember)
+                    .build();
+            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSave));
 
             for (MemberWaitingGoal friend : friends) {
                 if (friend.getMember() != currentMember) {
@@ -316,7 +328,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Override
     @Transactional
-    public ResponseEntity<Msg> exitGroup(Member currentMemberTemp, Long id) {
+    public ResponseEntity<Msg> exitGroup(Member currentMemberTemp) {
 
         Member currentMember = Optional
                 .of(memberRepository.findById(currentMemberTemp.getId())).get()
@@ -338,16 +350,14 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Override
     @Transactional
-    public ResponseEntity<Msg> exitWaitingGroup(Long id) {
-
-        WaitingGoal waitingGoalById = waitingGoalRepository.findWaitingGoalById(id);
-        waitingGoalRepository.delete(waitingGoalById);
+    public ResponseEntity<Msg> exitWaitingGroup(Member currentMemberTemp, Long id) {
+        exitWaitingGoal(currentMemberTemp, id, memberRepository, waitingGoalRepository, memberWaitingGoalRepository);
 
         return new ResponseEntity<>(new Msg(GroupExit.getMsg()), HttpStatus.OK);
     }
 
     //challengeGoalServiceImpl에서도 사용
-    static void inviteFriends(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto, WaitingGoal waitingGoal, MemberWaitingGoalRepository memberWaitingGoalRepository, MemberRepository memberRepository, AlarmRepository alarmRepository, AlarmType GROUP) {
+    static void inviteFriends(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto, WaitingGoal waitingGoal, MemberWaitingGoalRepository memberWaitingGoalRepository, MemberRepository memberRepository, AlarmRepository alarmRepository, AlarmType alarmType) {
         memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, true));
 
         for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
@@ -357,7 +367,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             MemberWaitingGoal memberWaitingGoal = new MemberWaitingGoal(member, waitingGoal, false);
             memberWaitingGoalRepository.save(memberWaitingGoal);
             GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
-                    .alarmType(GROUP)
+                    .alarmType(alarmType)
                     .alarmDetailType(AlarmDetailType.invite)
                     .goalName(goalAlarmRequestDto.getGoalName())
                     .goalAmount(goalAlarmRequestDto.getGoalAmount())
@@ -367,5 +377,17 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                     .build();
             alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
         }
+    }
+
+    //challengeGoalServiceImpl에서도 사용
+    static void exitWaitingGoal(Member currentMemberTemp, Long id, MemberRepository memberRepository, WaitingGoalRepository waitingGoalRepository, MemberWaitingGoalRepository memberWaitingGoalRepository) {
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+
+        WaitingGoal waitingGoal = Optional.of(waitingGoalRepository.findWaitingGoalById(id)).orElseThrow(() -> new ErrorException(GOAL_NOT_EXIST));
+        MemberWaitingGoal memberWaitingGoal = Optional
+                .of(memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal))
+                .orElseThrow(() -> new ErrorException(GOAL_MEMBER_NOT_MATCH));
+
+        waitingGoalRepository.delete(waitingGoal);
     }
 }

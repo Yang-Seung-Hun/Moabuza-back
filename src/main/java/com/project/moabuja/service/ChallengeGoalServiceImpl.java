@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,6 +33,7 @@ import static com.project.moabuja.domain.alarm.AlarmDetailType.*;
 import static com.project.moabuja.domain.alarm.AlarmType.CHALLENGE;
 import static com.project.moabuja.dto.ResponseMsg.*;
 import static com.project.moabuja.exception.ErrorCode.*;
+import static com.project.moabuja.service.GroupGoalServiceImpl.*;
 
 @Slf4j
 @Service
@@ -114,10 +114,19 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             return new ResponseEntity<>(goalResponseDto, HttpStatus.OK);
 
         } else {//challenge 없을때
-            if (! memberWaitingGoals.isEmpty()) { //수락대기중
+            List<MemberWaitingGoal> checkWaitingGoal = new ArrayList<>();
+            for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
+                GoalType goalType = memberWaitingGoal.getWaitingGoal().getGoalType();
+                if (goalType == GoalType.CHALLENGE){ checkWaitingGoal.add(memberWaitingGoal); }
+            }
+
+            if (! checkWaitingGoal.isEmpty()) { //수락대기중
                 String goalStatus = "waiting";
 
-                List<WaitingGoalResponseDto> waitingGoals = makeWaitingGoals(memberWaitingGoals);
+                List<WaitingGoalResponseDto> waitingGoals = new ArrayList<>();
+                for (MemberWaitingGoal memberWaitingGoal : checkWaitingGoal) {
+                    waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(), memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
+                }
 
                 ChallengeResponseDto waitingResponseDto = ChallengeResponseDto.builder()
                         .goalStatus(goalStatus)
@@ -185,7 +194,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         }
 
         WaitingGoal waitingGoal = waitingGoalRepository.save(WaitingGoalSaveDto.toEntity(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), GoalType.CHALLENGE));
-        GroupGoalServiceImpl.inviteFriends(currentMember, goalAlarmRequestDto, waitingGoal, memberWaitingGoalRepository, memberRepository, alarmRepository, CHALLENGE);
+        inviteFriends(currentMember, goalAlarmRequestDto, waitingGoal, memberWaitingGoalRepository, memberRepository, alarmRepository, CHALLENGE);
 
         return new ResponseEntity<>(new Msg(ChallengePost.getMsg()), HttpStatus.OK);
     }
@@ -217,6 +226,17 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
             List<String> friendListTmp = new ArrayList<>();
             List<String> friendList = sendChallengeAlarm(friends, friendListTmp, currentMember, create, waitingGoal);
+            GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
+                    .alarmType(CHALLENGE)
+                    .alarmDetailType(create)
+                    .goalName(waitingGoal.getWaitingGoalName())
+                    .goalAmount(waitingGoal.getWaitingGoalAmount())
+                    .waitingGoalId(waitingGoal.getId())
+                    .friendNickname(currentMember.getNickname())
+                    .member(currentMember)
+                    .build();
+            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
+
 
             // ChallengeGoal 생성
             CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
@@ -257,7 +277,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         List<Member> memberList = currentMember.getChallengeGoal().getMembers();
 
         ChallengeGoal challengeGoal = currentMember.getChallengeGoal();
-        currentMember.changeGroupGoal(null);
+        currentMember.changeChallengeGoal(null);
 
         if (memberList.size() == 1) { challengeGoalRepository.delete(challengeGoal); }
 
@@ -266,10 +286,8 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
     @Override
     @Transactional
-    public ResponseEntity<Msg> exitWaitingChallenge(Long id) {
-
-        WaitingGoal waitingGoalById = Optional.of(waitingGoalRepository.findWaitingGoalById(id)).orElseThrow(() -> new ErrorException(GOAL_NOT_EXIST));
-        waitingGoalRepository.delete(waitingGoalById);
+    public ResponseEntity<Msg> exitWaitingChallenge(Member currentMemberTemp, Long id) {
+        exitWaitingGoal(currentMemberTemp, id, memberRepository, waitingGoalRepository, memberWaitingGoalRepository);
 
         return new ResponseEntity<>(new Msg(ChallengeExit.getMsg()), HttpStatus.OK);
     }

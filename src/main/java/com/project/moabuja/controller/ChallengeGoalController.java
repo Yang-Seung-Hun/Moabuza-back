@@ -46,21 +46,21 @@ public class ChallengeGoalController {
     @ApiOperation(value = "도전해부자 수락")
     @PostMapping("/challenge/{id}/accept")
     public ResponseEntity<Msg> postChallengeAccept(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                                       @PathVariable Long alarmId) {
+                                                                       @PathVariable Long id) {
         Member currentMember = userDetails.getMember();
-        return challengeGoalService.postChallengeAccept(currentMember, alarmId);
+        return challengeGoalService.postChallengeAccept(currentMember, id);
     }
 
     @ApiOperation(value = "도전해부자 거절")
     @PostMapping("/challenge/{id}/refuse")
     public ResponseEntity<Msg> postChallengeRefuse(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                                       @PathVariable Long alarmId) {
+                                                                       @PathVariable Long id) {
         Member currentMember = userDetails.getMember();
-        return challengeGoalService.postChallengeRefuse(currentMember, alarmId);
+        return challengeGoalService.postChallengeRefuse(currentMember, id);
     }
 
     @ApiOperation(value = "도전해부자 나가기")
-    @DeleteMapping("/challenge/doing")
+    @PostMapping("/challenge/doing")
     public ResponseEntity<Msg> exitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails){
         Member currentMember = userDetails.getMember();
         return challengeGoalService.exitChallenge(currentMember);
@@ -70,7 +70,7 @@ public class ChallengeGoalController {
     @DeleteMapping("/challenge/{id}/waiting")
     public ResponseEntity<Msg> exitWaitChallenge(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id){
         Member currentMember = userDetails.getMember();
-        return challengeGoalService.exitWaitingChallenge(id);
+        return challengeGoalService.exitWaitingChallenge(currentMember, id);
     }
 
 }
