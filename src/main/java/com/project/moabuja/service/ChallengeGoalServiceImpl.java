@@ -195,11 +195,6 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Override
     public ResponseEntity<Msg> postChallenge(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto) {
 
-//        List<String> friendList = goalAlarmRequestDto.getFriendNickname();
-//        for (String friend : friendList) {
-//            challengeGoalRepository.findBy
-//        }
-
         if (Optional.ofNullable(goalAlarmRequestDto.getFriendNickname()).isEmpty()) {
             CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), null);
             save(createChallengeRequestDto, currentMember);
@@ -289,8 +284,8 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         ChallengeGoal challengeGoal = currentMember.getChallengeGoal();
 
-        List<Alarm> alarmList = alarmRepository.findAlarmsByGoalNameAndMember(challengeGoal.getChallengeGoalName(), currentMember);
-        alarmRepository.deleteAll(alarmList);
+//        List<Alarm> alarmList = alarmRepository.findAlarmsByGoalNameAndMember(challengeGoal.getChallengeGoalName(), currentMember);
+//        alarmRepository.deleteAll(alarmList);
 
         List<Member> members = challengeGoal.getMembers();
         if(members.size() == 1) {
