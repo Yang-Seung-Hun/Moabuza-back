@@ -343,6 +343,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         GroupGoal groupGoal = currentMember.getGroupGoal();
+        Long id = groupGoal.getId();
 
         List<Alarm> alarmList = alarmRepository.findAlarmsByGoalNameAndMember(groupGoal.getGroupGoalName(), currentMember);
         alarmRepository.deleteAll(alarmList);
@@ -351,7 +352,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         if (memberList.size() == 2) {
             for (Member member : memberList) {
                 member.changeGroupGoal(null);
-            }groupGoalRepository.deleteById(groupGoal.getId());
+            }groupGoalRepository.deleteById(id);
         } else currentMember.changeGroupGoal(null);
 
         return new ResponseEntity<>(new Msg(GroupExit.getMsg()), HttpStatus.OK);
