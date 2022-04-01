@@ -274,11 +274,14 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
-        List<Member> memberList = currentMember.getChallengeGoal().getMembers();
-
         ChallengeGoal challengeGoal = currentMember.getChallengeGoal();
+
+        List<Alarm> alarmList = alarmRepository.findAlarmsByGoalNameAndMember(challengeGoal.getChallengeGoalName(), currentMember);
+        alarmRepository.deleteAll(alarmList);
+
         currentMember.changeChallengeGoal(null);
 
+        List<Member> memberList = currentMember.getChallengeGoal().getMembers();
         if (memberList.size() == 1) { challengeGoalRepository.delete(challengeGoal); }
 
         return new ResponseEntity<>(new Msg(ChallengeExit.getMsg()), HttpStatus.OK);

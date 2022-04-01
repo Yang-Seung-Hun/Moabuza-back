@@ -1,12 +1,10 @@
 package com.project.moabuja.security.filter;
 
 import com.project.moabuja.exception.ErrorException;
-import com.project.moabuja.exception.exceptionClass.JwtExpiredException;
 import com.project.moabuja.security.userdetails.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,15 +12,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
 
-import static com.project.moabuja.exception.ErrorCode.*;
+import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
 
 @Component
 public class JwtTokenProvider {
-    private long accessTokenTime = 1000 * 60 * 60 * 1; // 1시간
+    private long accessTokenTime = 1000 * 60 * 60 * 24; // 1시간
     private long refreshTokenTime = 1000 * 60 * 60 * 24; // 하루
 
     @Autowired
