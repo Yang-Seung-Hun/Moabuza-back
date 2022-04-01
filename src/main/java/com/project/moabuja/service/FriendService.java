@@ -1,5 +1,6 @@
 package com.project.moabuja.service;
 
+import com.project.moabuja.domain.friend.FriendStatus;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.Msg;
 import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
@@ -13,6 +14,8 @@ public interface FriendService {
     ResponseEntity<FriendListResponseDto> listFriend(Member currentMember);
 
     void save(Member currentMember, Member friend);
+
+    FriendStatus friendCheck(Member currentMember, Member friend);
 
     ResponseEntity<FriendSearchResponseDto> searchFriend(FriendRequestDto friendRequestDto, Member currentMember);
 

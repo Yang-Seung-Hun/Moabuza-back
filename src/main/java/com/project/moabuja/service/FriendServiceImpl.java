@@ -2,8 +2,8 @@ package com.project.moabuja.service;
 
 import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.alarm.AlarmDetailType;
-import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.friend.Friend;
+import com.project.moabuja.domain.friend.FriendStatus;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.Msg;
 import com.project.moabuja.dto.request.alarm.FriendAlarmDto;
@@ -24,8 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import static com.project.moabuja.domain.friend.FriendStatus.*;
 import static com.project.moabuja.dto.ResponseMsg.*;
 import static com.project.moabuja.exception.ErrorCode.ALARM_NOT_EXIST;
 import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
@@ -46,21 +46,19 @@ public class FriendServiceImpl implements FriendService{
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         List<Friend> friendList = friendRepository.findFriendsByMember(currentMember);
-        List<FriendListDto> friendListDto = friendList.stream().map(friend -> {
-            return new FriendListDto(friend.getFriend().getNickname(), friend.getFriend().getHero());
-        }).collect(Collectors.toList());
-
-        List<Alarm> waitingFriendListPull = alarmRepository.findAlarmsByMemberAndAlarmTypeAndAlarmDetailType(currentMember, AlarmType.FRIEND, AlarmDetailType.request);
-        List<Alarm> waitingFriendListPush = alarmRepository.findAlarmsByFriendNicknameAndAlarmTypeAndAlarmDetailType(currentMember.getNickname(), AlarmType.FRIEND, AlarmDetailType.request);
 
         List<FriendListDto> waitingFriendListDto = new ArrayList<>();
-        for (Alarm waitingFriendPull : waitingFriendListPull) {
-            Optional<Member> friend = memberRepository.findMemberByNickname(waitingFriendPull.getFriendNickname());
-            waitingFriendListDto.add(new FriendListDto(friend.get().getNickname(), friend.get().getHero()));
+        for (Friend friend : friendList) {
+            if (friendCheck(friend.getMember(), friend.getFriend()).equals(WAITING)) {
+                waitingFriendListDto.add(new FriendListDto(friend.getFriend().getNickname(), friend.getFriend().getHero()));
+            }
         }
-        for (Alarm waitingFriendPush : waitingFriendListPush) {
-            Member friend = waitingFriendPush.getMember();
-            waitingFriendListDto.add(new FriendListDto(friend.getNickname(), friend.getHero()));
+
+        List<FriendListDto> friendListDto = new ArrayList<>();
+        for (Friend friend : friendList) {
+            if (friendCheck(friend.getMember(), friend.getFriend()).equals(FRIEND)) {
+                friendListDto.add(new FriendListDto(friend.getFriend().getNickname(), friend.getFriend().getHero()));
+            }
         }
 
         FriendListResponseDto friendListResponseDto = new FriendListResponseDto(waitingFriendListDto, friendListDto);
@@ -79,20 +77,15 @@ public class FriendServiceImpl implements FriendService{
             FriendSearchResponseDto friendSearchResponseDto = new FriendSearchResponseDto(null, null, FriendNotExist.getMsg());
             return new ResponseEntity<>(friendSearchResponseDto, HttpStatus.OK);
         }
-        Optional<Friend> friendCheck = Optional
-                .ofNullable(friendRepository.findByMemberAndFriend(currentMember, friend.get()));
-        if (friendCheck.isPresent()) {
+        if (friendCheck(currentMember, friend.get()).equals(FRIEND)) {
             FriendSearchResponseDto friendSearchResponseDto = new FriendSearchResponseDto(null, null, FriendShipExist.getMsg());
             return new ResponseEntity<>(friendSearchResponseDto, HttpStatus.OK);
         }
-        Optional<Alarm> friendAlarmCheck = Optional
-                .ofNullable(alarmRepository.findAlarmByMemberAndFriendNicknameAndAlarmTypeAndAlarmDetailType(friend.get(), currentMember.getNickname(), AlarmType.FRIEND, AlarmDetailType.request));
-        Optional<Alarm> friendAlarmDoubleCheck = Optional
-                .ofNullable(alarmRepository.findAlarmByMemberAndFriendNicknameAndAlarmTypeAndAlarmDetailType(currentMember, friend.get().getNickname(), AlarmType.FRIEND, AlarmDetailType.request));
-        if (friendAlarmCheck.isPresent() || friendAlarmDoubleCheck.isPresent()) {
+        if (friendCheck(currentMember, friend.get()).equals(WAITING)) {
             FriendSearchResponseDto friendSearchResponseDto = new FriendSearchResponseDto(null, null, FriendPostValid.getMsg());
             return new ResponseEntity<>(friendSearchResponseDto, HttpStatus.OK);
         }
+
         FriendSearchResponseDto friendSearchResponseDto = new FriendSearchResponseDto(friend.get().getNickname(), friend.get().getHero(), FriendSerchOK.getMsg());
         return new ResponseEntity<>(friendSearchResponseDto, HttpStatus.OK);
     }
@@ -108,18 +101,13 @@ public class FriendServiceImpl implements FriendService{
         if (friend.isEmpty()) {
             return new ResponseEntity<>(new Msg(FriendNotExist.getMsg()), HttpStatus.OK);
         }
-        Optional<Friend> friendCheck = Optional
-                .ofNullable(friendRepository.findByMemberAndFriend(currentMember, friend.get()));
-        if (friendCheck.isPresent()) {
+        if (friendCheck(currentMember, friend.get()).equals(FRIEND)) {
             return new ResponseEntity<>(new Msg(FriendShipExist.getMsg()), HttpStatus.OK);
         }
-        Optional<Alarm> friendAlarmCheck = Optional
-                .ofNullable(alarmRepository.findAlarmByMemberAndFriendNicknameAndAlarmTypeAndAlarmDetailType(friend.get(), currentMember.getNickname(), AlarmType.FRIEND, AlarmDetailType.request));
-        Optional<Alarm> friendAlarmDoubleCheck = Optional
-                .ofNullable(alarmRepository.findAlarmByMemberAndFriendNicknameAndAlarmTypeAndAlarmDetailType(currentMember, friend.get().getNickname(), AlarmType.FRIEND, AlarmDetailType.request));
-        if (friendAlarmCheck.isPresent() && friendAlarmDoubleCheck.isPresent()) {
+        if (friendCheck(currentMember, friend.get()).equals(WAITING)) {
             return new ResponseEntity<>(new Msg(FriendPostValid.getMsg()), HttpStatus.OK);
         }
+        save(currentMember, friend.get());
         alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, friend.get(), currentMember.getNickname()));
         return new ResponseEntity<>(new Msg(FriendPost.getMsg()), HttpStatus.OK);
     }
@@ -134,7 +122,8 @@ public class FriendServiceImpl implements FriendService{
                 .of(memberRepository.findMemberByNickname(alarm.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
-        save(currentMember, friend);
+        Friend friendship = friendRepository.findByMemberAndFriend(currentMember, friend);
+        friendship.changeIsAcceptedFriend();
 
         alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.accept, friend, currentMember.getNickname()));
 
@@ -146,13 +135,32 @@ public class FriendServiceImpl implements FriendService{
     @Transactional
     @Override
     public void save(Member currentMember, Member friend) {
-        friendRepository.save(new Friend(currentMember, friend));
-        friendRepository.save(new Friend(friend, currentMember));
+        friendRepository.save(new Friend(currentMember, friend, true));
+        friendRepository.save(new Friend(friend, currentMember, false));
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Msg> postFriendRefuse(Member currentMember, Long alarmId) {
+    public FriendStatus friendCheck(Member currentMember, Member friend) {
+        Optional<Friend> friendship1 = Optional.ofNullable(friendRepository.findByMemberAndFriend(currentMember, friend));
+        Optional<Friend> friendship2 = Optional.ofNullable(friendRepository.findByMemberAndFriend(friend, currentMember));
+
+        if (friendship1.isPresent() && friendship2.isPresent()) {
+            if (!friendship1.get().isAcceptedFriend() || !friendship2.get().isAcceptedFriend()) {
+                return WAITING;
+            } else if (friendship1.get().isAcceptedFriend() && friendship2.get().isAcceptedFriend()) {
+                return FRIEND;
+            }
+        }
+        return NOT_FRIEND;
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<Msg> postFriendRefuse(Member currentMemberTemp, Long alarmId) {
+        Member currentMember = Optional
+                .of(memberRepository.findById(currentMemberTemp.getId())).get()
+                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
         Alarm alarm = Optional
                 .of(alarmRepository.findById(alarmId)).get()
                 .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
@@ -160,8 +168,12 @@ public class FriendServiceImpl implements FriendService{
                 .of(memberRepository.findMemberByNickname(alarm.getFriendNickname())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
-        alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.refuse, friend, currentMember.getNickname()));
+        Friend friendship1 = friendRepository.findByMemberAndFriend(currentMember, friend);
+        Friend friendship2 = friendRepository.findByMemberAndFriend(friend, currentMember);
+        friendRepository.delete(friendship1);
+        friendRepository.delete(friendship2);
 
+        alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.refuse, friend, currentMember.getNickname()));
         alarmRepository.delete(alarm);
 
         return new ResponseEntity<>(new Msg(FriendRefuse.getMsg()), HttpStatus.OK) ;
