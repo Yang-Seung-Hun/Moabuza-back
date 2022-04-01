@@ -289,9 +289,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         List<Member> members = challengeGoal.getMembers();
         if(members.size() == 1) {
-            for (Member member : members) {
-                member.changeChallengeGoal(null);
-            }challengeGoalRepository.delete(challengeGoal);
+           challengeGoalRepository.delete(challengeGoal);
         } else currentMember.changeChallengeGoal(null);
 
        return new ResponseEntity<>(new Msg(ChallengeExit.getMsg()), HttpStatus.OK);
