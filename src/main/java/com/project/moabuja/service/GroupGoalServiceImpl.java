@@ -335,7 +335,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         List<Member> memberList = currentMember.getGroupGoal().getMembers();
-        if (memberList.size() <= 2) {
+        if (memberList.size() == 2) {
             GroupGoal groupGoal = currentMember.getGroupGoal();
             for (Member member : memberList) {
                 member.changeGroupGoal(null);
