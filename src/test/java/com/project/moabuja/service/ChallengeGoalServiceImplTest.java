@@ -152,11 +152,15 @@
 //        RecordRequestDto recordRequestDto7 = new RecordRequestDto(RecordType.challenge, "2022-03-06 00:00:00.000", "도전!!", 40000);
 //        recordService.save(recordRequestDto7, savedMember1);
 //
+//
 //        CreateChallengeRequestDto createChallengeRequestDto2 = new CreateChallengeRequestDto("10만원 모으기", 100000, null);
 //        challengeGoalService.save(createChallengeRequestDto2, savedMember1);
 //
 //        RecordRequestDto recordRequestDto8 = new RecordRequestDto(RecordType.challenge, "2022-03-06 00:00:00.000", "도전!!", 40000);
 //        recordService.save(recordRequestDto8, savedMember1);
+//
+////        ResponseEntity<HomeResponseDto> homeInfo = memberService.getHomeInfo(savedMember1);
+////        homeInfo.getBody().
 //
 //        //when
 //        ResponseEntity<ChallengeResponseDto> challengeInfoTmp1 = challengeGoalService.getChallengeInfo(savedMember1);

@@ -344,17 +344,15 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         GroupGoal groupGoal = currentMember.getGroupGoal();
 
-        List<Alarm> alarmList = alarmRepository.findAlarmsByGoalNameAndMember(groupGoal.getGroupGoalName(), currentMember);
-        alarmRepository.deleteAll(alarmList);
-
         List<Member> memberList = currentMember.getGroupGoal().getMembers();
         if (memberList.size() == 2) {
             for (Member member : memberList) {
                 member.changeGroupGoal(null);
             } groupGoalRepository.delete(groupGoal);
-        } else {
-            currentMember.changeGroupGoal(null);
-        }
+        } else currentMember.changeGroupGoal(null);
+
+        List<Alarm> alarmList = alarmRepository.findAlarmsByGoalNameAndMember(groupGoal.getGroupGoalName(), currentMember);
+        alarmRepository.deleteAll(alarmList);
 
         return new ResponseEntity<>(new Msg(GroupExit.getMsg()), HttpStatus.OK);
     }
