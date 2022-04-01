@@ -48,7 +48,6 @@ public class MemberController {
     @ApiOperation(value = "닉네임 중복체크")
     @PostMapping("/member/validation")
     public ResponseEntity<Msg> nicknameValid(@Valid @RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
-        log.info("---------- 닉네임 들어오나요 : " + nicknameValidationRequestDto.getNickname());
         return memberService.nicknameValid(nicknameValidationRequestDto);
     }
 
