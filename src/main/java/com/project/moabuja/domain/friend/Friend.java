@@ -14,6 +14,8 @@ public class Friend {
     @Column(name = "friend_id")
     private Long id;
 
+    private boolean isAcceptedFriend;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
@@ -22,9 +24,14 @@ public class Friend {
     @JoinColumn(name = "friend_user")
     private Member friend;
 
-    public Friend(Member member, Member friend) {
+    public Friend(Member member, Member friend, boolean isAcceptedFriend) {
         this.member = member;
         this.friend = friend;
+        this.isAcceptedFriend = isAcceptedFriend;
+    }
+
+    public void changeIsAcceptedFriend() {
+        this.isAcceptedFriend = true;
     }
 
     protected Friend () {}
