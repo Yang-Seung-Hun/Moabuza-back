@@ -3,6 +3,7 @@ package com.project.moabuja.service;
 import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.alarm.AlarmDetailType;
 import com.project.moabuja.domain.friend.Friend;
+import com.project.moabuja.domain.friend.FriendStatus;
 import com.project.moabuja.domain.goal.*;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
@@ -49,6 +50,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     private final AlarmRepository alarmRepository;
     private final WaitingGoalRepository waitingGoalRepository;
     private final MemberWaitingGoalRepository memberWaitingGoalRepository;
+    private final FriendServiceImpl friendService;
 
     @Transactional
     @Override
@@ -158,7 +160,13 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Override
     public ResponseEntity<CreateChallengeResponseDto> getChallengeMemberCandidates(Member currentMember) {
 
-        List<Friend> friends = friendRepository.findFriendsByMember(currentMember);
+        List<Friend> friendsTemp = friendRepository.findFriendsByMember(currentMember);
+        List<Friend> friends = new ArrayList<>();
+        for (Friend friend : friendsTemp) {
+            if (friendService.friendCheck(friend.getMember(), friend.getFriend()).equals(FriendStatus.FRIEND)) {
+                friends.add(new Friend(friend.getMember(), friend.getFriend(), true));
+            }
+        }
         List<CreateChallengeMemberDto> challengeMembers = new ArrayList<>();
 
         if (friends.size() == 0){
