@@ -284,16 +284,15 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         ChallengeGoal challengeGoal = currentMember.getChallengeGoal();
 
+        List<Alarm> alarmList = alarmRepository.findAlarmsByGoalNameAndMember(challengeGoal.getChallengeGoalName(), currentMember);
+        alarmRepository.deleteAll(alarmList);
+
         List<Member> members = challengeGoal.getMembers();
         if(members.size() == 1) {
             for (Member member : members) {
                 member.changeChallengeGoal(null);
             }challengeGoalRepository.delete(challengeGoal);
         } else currentMember.changeChallengeGoal(null);
-
-
-        List<Alarm> alarmList = alarmRepository.findAlarmsByGoalNameAndMember(challengeGoal.getChallengeGoalName(), currentMember);
-        alarmRepository.deleteAll(alarmList);
 
        return new ResponseEntity<>(new Msg(ChallengeExit.getMsg()), HttpStatus.OK);
     }
