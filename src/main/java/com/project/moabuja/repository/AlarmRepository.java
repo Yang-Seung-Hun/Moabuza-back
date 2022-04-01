@@ -26,6 +26,8 @@ public interface AlarmRepository extends JpaRepository<Alarm,Long> {
     List<Alarm> findAlarmsByMemberAndAlarmTypeAndAlarmDetailType(@Param("member") Member member,
                                                                  @Param("alarmType") AlarmType alarmType, @Param("alarmDetailType") AlarmDetailType alarmDetailType);
 
+    List<Alarm> findAlarmsByGoalNameAndMember(String goalName, Member member);
+
     @Query ("select a from Alarm a where a.member = :member and a.friendNickname = :friendNickname and a.alarmType = :alarmType and a.alarmDetailType = :alarmDetailType")
     Alarm findAlarmByMemberAndFriendNicknameAndAlarmTypeAndAlarmDetailType(@Param("member") Member member, @Param("friendNickname") String friendNickname,
                                                                            @Param("alarmType") AlarmType alarmType, @Param("alarmDetailType") AlarmDetailType alarmDetailType);
