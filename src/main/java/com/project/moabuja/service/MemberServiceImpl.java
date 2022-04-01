@@ -58,6 +58,7 @@ public class MemberServiceImpl implements MemberService{
     @Transactional
     @Override
     public ResponseEntity<HomeResponseDto> getHomeInfo(Member currentMemberTemp) {
+        log.info("----------엔진엑스 배포된건가?: ");
         Member currentMember = Optional
                 .of(memberRepository.findById(currentMemberTemp.getId())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
