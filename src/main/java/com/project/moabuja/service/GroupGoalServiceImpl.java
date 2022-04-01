@@ -352,7 +352,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         if (memberList.size() == 2) {
             for (Member member : memberList) {
                 member.changeGroupGoal(null);
-            }groupGoalRepository.deleteById(id);
+            }//groupGoalRepository.deleteById(id);
         } else currentMember.changeGroupGoal(null);
 
         return new ResponseEntity<>(new Msg(GroupExit.getMsg()), HttpStatus.OK);
