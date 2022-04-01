@@ -98,14 +98,16 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                 List<Record> memberGroupRecord = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
                 int tempAmount = 0;
                 for (Record record : memberGroupRecord) {
-                    groupList.add(GroupListDto.builder()
-                            .groupDate(record.getRecordDate())
-                            .hero(member.getHero())
-                            .nickname(member.getNickname())
-                            .groupMemo(record.getMemo())
-                            .groupAmount(record.getRecordAmount())
-                            .build());
-                    tempAmount = tempAmount+record.getRecordAmount();
+                    if(record.getCreatedAt().isAfter(groupGoal.get().getCreatedAt())){
+                        groupList.add(GroupListDto.builder()
+                                .groupDate(record.getRecordDate())
+                                .hero(member.getHero())
+                                .nickname(member.getNickname())
+                                .groupMemo(record.getMemo())
+                                .groupAmount(record.getRecordAmount())
+                                .build());
+                        tempAmount = tempAmount+record.getRecordAmount();
+                    }
                 }
                 currentAmount += tempAmount;
             }
@@ -330,9 +332,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     @Transactional
     public ResponseEntity<Msg> exitGroup(Member currentMemberTemp) {
 
-        Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         GroupGoal groupGoal = currentMember.getGroupGoal();
 
