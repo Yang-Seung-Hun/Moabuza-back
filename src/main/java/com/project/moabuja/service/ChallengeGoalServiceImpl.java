@@ -343,7 +343,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             int currentAmount = 0;
             List<Record> records = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, user);
             for (Record record : records) {
-                currentAmount += record.getRecordAmount();
+                if(record.getCreatedAt().isAfter(challengeGoal.get().getCreatedAt())) currentAmount += record.getRecordAmount();
             }
 
             int leftAmount = challengeGoal.get().getChallengeGoalAmount() - currentAmount;
