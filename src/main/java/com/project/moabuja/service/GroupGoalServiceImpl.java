@@ -330,9 +330,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     @Transactional
     public ResponseEntity<Msg> exitGroup(Member currentMemberTemp) {
 
-        Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         GroupGoal groupGoal = currentMember.getGroupGoal();
 
