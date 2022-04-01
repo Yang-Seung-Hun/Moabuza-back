@@ -100,9 +100,6 @@ public class MemberServiceImpl implements MemberService{
         if (challengeGoal != null) { //  && challengeGoal.isAcceptedChallenge()
 
             List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentMember);
-            for (Record challengeRecord : challengeRecords) {
-                if(challengeRecord.getCreatedAt().isAfter(challengeGoal.getCreatedAt())) challengeCurrentAmount += challengeRecord.getRecordAmount();
-            }
             challengeNeedAmount = challengeGoal.getChallengeGoalAmount() - challengeCurrentAmount;
             challengePercent = (int) (((double) challengeCurrentAmount / (double) (challengeGoal.getChallengeGoalAmount())) * 100);
             challengeName = challengeGoal.getChallengeGoalName();

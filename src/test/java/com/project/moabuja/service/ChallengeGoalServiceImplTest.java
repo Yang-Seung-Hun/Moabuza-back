@@ -11,6 +11,7 @@
 //import com.project.moabuja.dto.request.record.RecordRequestDto;
 //import com.project.moabuja.dto.response.goal.ChallengeMemberDto;
 //import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
+//import com.project.moabuja.dto.response.member.HomeResponseDto;
 //import com.project.moabuja.repository.ChallengeGoalRepository;
 //import com.project.moabuja.repository.MemberRepository;
 //import com.project.moabuja.repository.RecordRepository;
@@ -25,6 +26,7 @@
 //import org.springframework.transaction.annotation.Transactional;
 //
 //import javax.persistence.EntityManager;
+//import java.time.LocalDateTime;
 //import java.util.ArrayList;
 //import java.util.Arrays;
 //import java.util.List;
@@ -48,6 +50,8 @@
 //    private RecordService recordService;
 //    @Autowired
 //    private EntityManager em;
+//    @Autowired
+//    private MemberService memberService;
 //
 //    @Test
 //    @DisplayName("1인 도전해부자 생성")
@@ -107,6 +111,7 @@
 //        Assertions.assertThat(challengeById.getMembers().size()).isEqualTo(3);
 //    }
 //
+//    @Autowired RecordRepository recordRepository;
 //    @Test
 //    @DisplayName("생성된 challenge goal 있을때")
 //    public void getChallengeInfo() {
@@ -153,7 +158,6 @@
 //        RecordRequestDto recordRequestDto8 = new RecordRequestDto(RecordType.challenge, "2022-03-06 00:00:00.000", "도전!!", 40000);
 //        recordService.save(recordRequestDto8, savedMember1);
 //
-//
 //        //when
 //        ResponseEntity<ChallengeResponseDto> challengeInfoTmp1 = challengeGoalService.getChallengeInfo(savedMember1);
 //        ChallengeResponseDto challengeInfo1 = challengeInfoTmp1.getBody();
@@ -170,6 +174,8 @@
 //        for (ChallengeMemberDto challengeMember : challengeMembers2) {
 //            challengeInfo2PercentSum += challengeMember.getChallengeMemberNowPercent();
 //        }
+//
+//
 //
 //        //then
 //        Assertions.assertThat(challengeInfo1.getGoalStatus()).isEqualTo("goal");
