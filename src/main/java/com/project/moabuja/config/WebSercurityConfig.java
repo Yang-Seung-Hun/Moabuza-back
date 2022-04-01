@@ -47,7 +47,8 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/home").permitAll()
                 .antMatchers(HttpMethod.GET, "/profile").permitAll()
                 .antMatchers("/").permitAll()
-                .anyRequest().authenticated();
+                .anyRequest().permitAll();
+//                .anyRequest().authenticated();
 
         http    .addFilterBefore(new CustomAuthenticationFilter(jwtProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
         http    .addFilterBefore(new JwtExceptionFilter(), CustomAuthenticationFilter.class);
