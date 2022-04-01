@@ -10,10 +10,12 @@ import com.project.moabuja.security.userdetails.UserDetailsImpl;
 import com.project.moabuja.service.FriendService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class FriendController {
@@ -24,6 +26,7 @@ public class FriendController {
     @GetMapping("/friend")
     public ResponseEntity<FriendListResponseDto> getListFriend(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member currentUser = userDetails.getMember();
+        log.info("---------------------------------------- 찍어줘");
         return friendService.listFriend(currentUser);
     }
 

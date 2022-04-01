@@ -36,6 +36,7 @@ public class MemberController {
         if(userDetails == null){
             throw new ErrorException(GEUST_TO_LOGIN);
         }
+        log.info("=================== 작동중");
         return memberService.getHomeInfo(userDetails.getMember());
     }
 
