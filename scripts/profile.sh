@@ -9,7 +9,7 @@ function find_idle_profile()
     then
         CURRENT_PROFILE=real2
     else
-        CURRENT_PROFILE=$(curl -s http://localhost/profile)
+        CURRENT_PROFILE=$(curl -s http://localhost:8080/profile)
     fi
 
     # IDLE_PROFILE : nginx와 연결되지 않은 profile
@@ -33,6 +33,6 @@ function find_idle_port()
     then
       echo "8081"
     else
-      echo "8080"
+      echo "8082"
     fi
 }
