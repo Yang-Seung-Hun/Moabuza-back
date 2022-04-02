@@ -47,7 +47,6 @@ public class JwtTokenProvider {
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
-
     // refresh 토큰 생성
     public String createRefreshToken(String password) {
         Claims claims = Jwts.claims().setSubject(password);
