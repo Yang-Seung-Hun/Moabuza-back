@@ -8,14 +8,12 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://moabuza.cyvpzdbrywmx.ap-northeast-2.rds.amazonaws.com/moabuzaDB
-    username: admin
-    password: moabuza123
+    url: ${spring.datasource.url}
+    username: ${spring.datasource.username}
+    password: ${spring.datasource.password}
 
-  profiles:
-    active: local
 
-  reids:
+  redis:
     host: #여기 부분은 자신의 ip에 맞춰서 바꾸기 -> ec2 redis 설치 후 연결 ip
       127.0.0.1
     port:
@@ -30,5 +28,6 @@ logging:
     root: error
 
 jwt:
-  secret: abwieineprmdspowejropsadasdasdasdvsddvsdvasd
+  secret: ${jwt.secret}
 
+이게 yml이 2개 입니다 ==> 근데
