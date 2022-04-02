@@ -8,6 +8,7 @@
 //import com.project.moabuja.domain.record.RecordType;
 //import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 //import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
+//import com.project.moabuja.dto.request.goal.CreateGroupRequestDto;
 //import com.project.moabuja.dto.request.record.RecordRequestDto;
 //import com.project.moabuja.dto.response.goal.ChallengeMemberDto;
 //import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
@@ -293,6 +294,7 @@
 //
 //    }
 //
+//    @Autowired private GroupGoalService groupGoalService;
 //    @Test
 //    @DisplayName("도전중이 challenge 나오기")
 //    public void exitChallenge() {
@@ -301,17 +303,17 @@
 //        Member member = new Member("123456", 123456L, "nickname1", "email1@naver.com", Hero.tongki);
 //        Member savedMember1 = memberRepository.save(member);
 //
-////        Member friend1 = new Member("123457", 123457L, "nickname2", "email2@naver.com", Hero.bunny);
-////        Member savedFriend1 = memberRepository.save(friend1);
+//        Member friend1 = new Member("123457", 123457L, "nickname2", "email2@naver.com", Hero.bunny);
+//        Member savedFriend1 = memberRepository.save(friend1);
 ////
 ////        Member friend2 = new Member("123458", 123458L, "nickname3", "email3@naver.com", Hero.bunny);
 ////        Member savedFriend2 = memberRepository.save(friend2);
 //
-////        List<String> friends = new ArrayList<>(Arrays.asList("nickname2", "nickname3"));
+//        List<String> friends = new ArrayList<>(Arrays.asList("nickname2"));
 //
-//        CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("5만원 모으기", 50000, null);
-//        challengeGoalService.save(createChallengeRequestDto, savedMember1);
+//        CreateGroupRequestDto createGroupRequestDto = new CreateGroupRequestDto("5만원 모으기", 50000, friends);
+//        groupGoalService.save(createGroupRequestDto, savedMember1);
 //
-//        challengeGoalService.exitChallenge(savedMember1);
+//        groupGoalService.exitGroup(savedMember1);
 //    }
 //}
