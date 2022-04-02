@@ -164,7 +164,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         List<Friend> friends = new ArrayList<>();
         for (Friend friend : friendsTemp) {
             if (friendService.friendCheck(friend.getMember(), friend.getFriend()).equals(FriendStatus.FRIEND)) {
-                friends.add(new Friend(friend.getMember(), friend.getFriend(), true));
+                friends.add(friend);
             }
         }
         List<CreateChallengeMemberDto> challengeMembers = new ArrayList<>();
@@ -177,7 +177,6 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         for(Friend friend : friends){
             //친구의 챌린지 골을 확인
             Member friendById = Optional.of(memberRepository.findById(friend.getFriend().getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
-
             Optional<ChallengeGoal> friendChallengeGoal = Optional.ofNullable(friendById.getChallengeGoal());
 
             //이미 진행중인 챌린지 있음
