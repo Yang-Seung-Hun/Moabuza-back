@@ -1,26 +1,22 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Crawl current connected port of WAS
-CURRENT_PORT=$(cat /home/ec2-user/service_url.inc | grep -Po '[0-9]+' | tail -1)
-TARGET_PORT=0
+# switch.sh
+# nginx 연결 설정 스위치
 
-echo "> Nginx currently proxies to ${CURRENT_PORT}."
+ABSPATH=$(readlink -f $0)
+ABSDIR=$(dirname $ABSPATH)
+source ${ABSDIR}/profile.sh
 
-# Toggle port number
-if [ ${CURRENT_PORT} -eq 8080 ]; then
-	TARGET_PORT=8081
-elif [ ${CURRENT_PORT} -eq 8081 ]; then
-	TARGET_PORT=8080
-else
-	echo "> No WAS is connected to nginx"
-	exit 1
-fi
+function switch_proxy() {
+    IDLE_PORT=$(find_idle_port)
 
-# Change proxying port into target port
-echo "> set \$service_url http://127.0.0.1:${TARGET_PORT};" | tee /home/ubuntu/service_url.inc
+    echo "> 전환할 Port: $IDLE_PORT"
+    echo "> Port 전환"
+    # nginx와 연결한 주소 생성
+    # | sudo tee ~ : 앞에서 넘긴 문장을 service-url.inc에 덮어씀
+    echo "set \$service_url http://127.0.0.1:${IDLE_PORT};" | sudo tee /home/ubuntu/service_url.inc
 
-echo "> Now Nginx proxies to ${TARGET_PORT}."
-
-# Reload nginx
-sudo service nginx reload
-echo "> Nginx reloaded."
+    echo "> 엔진엑스 Reload"
+    # nignx reload. restart와는 다르게 설정 값만 불러옴
+    sudo service nginx reload
+}

@@ -1,7 +1,11 @@
 server:
-  port: 8081  # Sp
+  port: 8082  # Sp
 
 spring:
+  config:
+    activate:
+      on-profile: real2
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://moabuza.cyvpzdbrywmx.ap-northeast-2.rds.amazonaws.com/moabuzaDB
@@ -22,13 +26,9 @@ spring:
       ddl-auto: update
 
 logging:
-  pattern:
-    dateformat: yyyy-MM-dd HH:mm:ss.SSS
-    file: "[%d{HH:mm:ss.SSS}][%-5level][%logger.%method:line%line] - %msg%n"
-  file:
-    name: /log/abc.log
   level:
     root: error
 
 jwt:
   secret: abwieineprmdspowejropsadasdasdasdvsddvsdvasd
+
