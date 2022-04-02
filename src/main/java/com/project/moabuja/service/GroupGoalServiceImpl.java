@@ -351,9 +351,9 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         List<Member> memberList = currentMember.getGroupGoal().getMembers();
         if (memberList.size() == 2) {
             for (Member member : memberList) {
-                member.changeGroupGoal(null);
-            }//groupGoalRepository.deleteById(id);
-        } else currentMember.changeGroupGoal(null);
+                groupGoal.removeMember(member);
+            }groupGoalRepository.deleteById(id);
+        } else groupGoal.removeMember(currentMember);
 
         return new ResponseEntity<>(new Msg(GroupExit.getMsg()), HttpStatus.OK);
     }
@@ -371,9 +371,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, true));
 
         for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
-            Member member = Optional
-                    .of(memberRepository.findMemberByNickname(friendNickname)).get()
-                    .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+            Member member = Optional.of(memberRepository.findMemberByNickname(friendNickname)).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
             MemberWaitingGoal memberWaitingGoal = new MemberWaitingGoal(member, waitingGoal, false);
             memberWaitingGoalRepository.save(memberWaitingGoal);
             GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
