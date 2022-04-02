@@ -1,7 +1,10 @@
+server:
+  port: 8081  # Sp
+
 spring:
   config:
     activate:
-      on-profile: set1
+      on-profile: real1
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -28,6 +31,3 @@ logging:
 
 jwt:
   secret: abwieineprmdspowejropsadasdasdasdvsddvsdvasd
-
-server:
-  port: 8081  # Sp
