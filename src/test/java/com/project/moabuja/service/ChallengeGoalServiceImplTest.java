@@ -159,9 +159,6 @@
 //        RecordRequestDto recordRequestDto8 = new RecordRequestDto(RecordType.challenge, "2022-03-06 00:00:00.000", "도전!!", 40000);
 //        recordService.save(recordRequestDto8, savedMember1);
 //
-////        ResponseEntity<HomeResponseDto> homeInfo = memberService.getHomeInfo(savedMember1);
-////        homeInfo.getBody().
-//
 //        //when
 //        ResponseEntity<ChallengeResponseDto> challengeInfoTmp1 = challengeGoalService.getChallengeInfo(savedMember1);
 //        ChallengeResponseDto challengeInfo1 = challengeInfoTmp1.getBody();
@@ -178,8 +175,6 @@
 //        for (ChallengeMemberDto challengeMember : challengeMembers2) {
 //            challengeInfo2PercentSum += challengeMember.getChallengeMemberNowPercent();
 //        }
-//
-//
 //
 //        //then
 //        Assertions.assertThat(challengeInfo1.getGoalStatus()).isEqualTo("goal");
@@ -306,19 +301,16 @@
 //        Member member = new Member("123456", 123456L, "nickname1", "email1@naver.com", Hero.tongki);
 //        Member savedMember1 = memberRepository.save(member);
 //
-//        Member friend1 = new Member("123457", 123457L, "nickname2", "email2@naver.com", Hero.bunny);
-//        Member savedFriend1 = memberRepository.save(friend1);
+////        Member friend1 = new Member("123457", 123457L, "nickname2", "email2@naver.com", Hero.bunny);
+////        Member savedFriend1 = memberRepository.save(friend1);
+////
+////        Member friend2 = new Member("123458", 123458L, "nickname3", "email3@naver.com", Hero.bunny);
+////        Member savedFriend2 = memberRepository.save(friend2);
 //
-//        Member friend2 = new Member("123458", 123458L, "nickname3", "email3@naver.com", Hero.bunny);
-//        Member savedFriend2 = memberRepository.save(friend2);
+////        List<String> friends = new ArrayList<>(Arrays.asList("nickname2", "nickname3"));
 //
-//        List<String> friends = new ArrayList<>(Arrays.asList("nickname2", "nickname3"));
-//
-//        CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("5만원 모으기", 50000, friends);
+//        CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto("5만원 모으기", 50000, null);
 //        challengeGoalService.save(createChallengeRequestDto, savedMember1);
-//
-//        System.out.println("====================================================");
-//        System.out.println(savedMember1.getChallengeGoal().getChallengeGoalName());
 //
 //        challengeGoalService.exitChallenge(savedMember1);
 //    }
