@@ -29,5 +29,3 @@ logging:
 
 jwt:
   secret: ${jwt.secret}
-
-이게 yml이 2개 입니다 ==> 근데

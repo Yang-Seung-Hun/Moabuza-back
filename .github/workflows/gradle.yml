@@ -42,6 +42,11 @@ jobs:
       with:
           files: "./src/main/resources/application-real1.yml"
 
+    - name: Set Yaml-2
+      uses: microsoft/variable-substitution@v1
+      with:
+          files: "./src/main/resources/application-real2.yml"
+
 
     - name: Build with Gradle
       uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
