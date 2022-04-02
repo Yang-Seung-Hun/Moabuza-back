@@ -350,10 +350,10 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         List<Member> memberList = currentMember.getGroupGoal().getMembers();
         if (memberList.size() == 2) {
-            for (Member member : memberList) {
-                groupGoal.removeMember(member);
+            while (memberList.size() > 0) {
+                groupGoal.removeMember(memberList.get(0));
             }groupGoalRepository.deleteById(id);
-        } else groupGoal.removeMember(currentMember);
+        }else groupGoal.removeMember(currentMember);
 
         return new ResponseEntity<>(new Msg(GroupExit.getMsg()), HttpStatus.OK);
     }
