@@ -36,7 +36,7 @@ jobs:
     - name: Set Yaml-1
       uses: microsoft/variable-substitution@v1
       with:
-          files: ./src/main/resources/application-real1.yml
+          files: "./src/main/resources/application-real1.yml"
       env:
           spring.datasource.url: ${{ secrets.RDS_ENDPOINT}}
           spring.datasource.username: ${{ secrets.RDS_USERNAME }}
@@ -46,7 +46,7 @@ jobs:
     - name: Set Yaml-2
       uses: microsoft/variable-substitution@v1
       with:
-          files: ./src/main/resources/application-real2.yml
+          files: "./src/main/resources/application-real2.yml"
       env:
           spring.datasource.url: ${{ secrets.RDS_ENDPOINT}}
           spring.datasource.username: ${{ secrets.RDS_USERNAME }}
