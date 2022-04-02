@@ -15,7 +15,7 @@ on:
     
 env:
   S3_BUCKET_NAME: moamoa-bucket
-  spring.datasource.url: ${{ secrets.RDS_ENDPOINT}}
+  spring.datasource.url: ${{ secrets.RDS_ENDPOINT }}
   spring.datasource.username: ${{ secrets.RDS_USERNAME }}
   spring.datasource.password: ${{ secrets.RDS_PASSWORD }}
   jwt.secret: ${{ secrets.JWT_SECRET }}
