@@ -343,7 +343,6 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         GroupGoal groupGoal = currentMember.getGroupGoal();
-        Long id = groupGoal.getId();
 
         List<Alarm> alarmList = alarmRepository.findAlarmsByGoalNameAndMember(groupGoal.getGroupGoalName(), currentMember);
         alarmRepository.deleteAll(alarmList);
