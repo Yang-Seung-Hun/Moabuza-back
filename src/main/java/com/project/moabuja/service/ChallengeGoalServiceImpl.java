@@ -288,11 +288,12 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 //        alarmRepository.deleteAll(alarmList);
 
         List<Member> members = challengeGoal.getMembers();
-        if(members.size() == 1) {
+        if (members.size() == 1) {
             for (Member member : members) {
                 member.changeChallengeGoal(null);
-            }challengeGoalRepository.delete(challengeGoal);
-        } else currentMember.changeChallengeGoal(null);
+            }
+            challengeGoalRepository.delete(challengeGoal);
+        } else { currentMember.changeChallengeGoal(null); }
 
        return new ResponseEntity<>(new Msg(ChallengeExit.getMsg()), HttpStatus.OK);
     }
