@@ -21,11 +21,11 @@ echo "> $JAR_NAME 에 실행권한 추가"
 
 chmod +x $JAR_NAME
 
-echo "> $JAR_NAME 실행 -==== 바뀐건가?"
+echo "> $JAR_NAME 실행"
 
 IDLE_PROFILE=$(find_idle_profile)
 
-echo "> $JAR_NAME 를 profile=$IDLE_PROFILE ====이거 모냐==== 로 실행합니다."
+echo "> $JAR_NAME 를 profile=$IDLE_PROFILE 로 실행합니다. ==== start 쉘 스크립트"
 nohup java -jar \
     -Dspring.config.location=classpath:/application-$IDLE_PROFILE.yml \
     -Dspring.profiles.active=$IDLE_PROFILE $JAR_NAME > $REPOSITORY1/nohup.out 2>&1 &
