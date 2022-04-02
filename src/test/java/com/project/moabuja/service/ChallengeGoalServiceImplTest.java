@@ -2,25 +2,20 @@
 //
 //import com.project.moabuja.domain.friend.Friend;
 //import com.project.moabuja.domain.goal.ChallengeGoal;
-//import com.project.moabuja.domain.goal.GoalType;
 //import com.project.moabuja.domain.member.Hero;
 //import com.project.moabuja.domain.member.Member;
-//import com.project.moabuja.domain.record.Record;
 //import com.project.moabuja.domain.record.RecordType;
 //import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 //import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
-//import com.project.moabuja.dto.request.goal.CreateGroupRequestDto;
 //import com.project.moabuja.dto.request.record.RecordRequestDto;
 //import com.project.moabuja.dto.response.goal.ChallengeMemberDto;
 //import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
 //import com.project.moabuja.dto.response.goal.CreateChallengeResponseDto;
-//import com.project.moabuja.dto.response.member.HomeResponseDto;
 //import com.project.moabuja.repository.ChallengeGoalRepository;
 //import com.project.moabuja.repository.FriendRepository;
 //import com.project.moabuja.repository.MemberRepository;
 //import com.project.moabuja.repository.RecordRepository;
 //import org.assertj.core.api.Assertions;
-//import org.junit.jupiter.api.Disabled;
 //import org.junit.jupiter.api.DisplayName;
 //import org.junit.jupiter.api.Test;
 //import org.springframework.beans.factory.annotation.Autowired;
@@ -30,17 +25,15 @@
 //import org.springframework.transaction.annotation.Transactional;
 //
 //import javax.persistence.EntityManager;
-//import java.time.LocalDateTime;
 //import java.util.ArrayList;
 //import java.util.Arrays;
 //import java.util.List;
 //import java.util.Optional;
 //
-//import static com.project.moabuja.domain.goal.GoalType.*;
-//import static org.junit.jupiter.api.Assertions.*;
+//import static com.project.moabuja.domain.goal.GoalType.CHALLENGE;
 //
 //@SpringBootTest
-//@Rollback(value = false)
+//@Rollback(value = true)
 //@Transactional
 //class ChallengeGoalServiceImplTest {
 //
@@ -313,19 +306,19 @@
 //        Member friend4 = new Member("123460", 123460L, "nickname5", "email5@naver.com", Hero.bunny);
 //        Member savedFriend4 = memberRepository.save(friend4);
 //
-//        Friend relate1 = new Friend(savedMember1,savedFriend1,true);
-//        Friend relate2 = new Friend(friend1,savedMember1,true);
+//        Friend relate1 = new Friend(savedMember1,savedFriend1);
+//        Friend relate2 = new Friend(friend1,savedMember1);
 //        friendRepository.save(relate1);
 //        friendRepository.save(relate2);
 //
 //
-//        Friend relate3 = new Friend(savedMember1,savedFriend2, true);
-//        Friend relate4 = new Friend(savedFriend2,savedMember1, true);
+//        Friend relate3 = new Friend(savedMember1,savedFriend2);
+//        Friend relate4 = new Friend(savedFriend2,savedMember1);
 //        friendRepository.save(relate3);
 //        friendRepository.save(relate4);
 //
-//        Friend relate5 = new Friend(savedMember1,savedFriend3, true);
-//        Friend relate6 = new Friend(savedFriend3,savedMember1, false);
+//        Friend relate5 = new Friend(savedMember1,savedFriend3);
+//        Friend relate6 = new Friend(savedFriend3,savedMember1);
 //        friendRepository.save(relate5);
 //        friendRepository.save(relate6);
 //

@@ -24,14 +24,9 @@ public class Friend {
     @JoinColumn(name = "friend_user")
     private Member friend;
 
-    public Friend(Member member, Member friend, boolean isAcceptedFriend) {
+    public Friend(Member member, Member friend) {
         this.member = member;
         this.friend = friend;
-        this.isAcceptedFriend = isAcceptedFriend;
-    }
-
-    public void changeIsAcceptedFriend() {
-        this.isAcceptedFriend = true;
     }
 
     protected Friend () {}
