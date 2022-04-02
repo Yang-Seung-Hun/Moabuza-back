@@ -25,10 +25,11 @@ public class JwtTokenProvider {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    private String secretKey;
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
-        this.secretKey = secretKey;
-    }
+    private String secretKey = "abwieineprmdspowejropsadasdasdasdvsddvsdvasd";
+//    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
+//        this.secretKey = secretKey;
+//    }
+
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
