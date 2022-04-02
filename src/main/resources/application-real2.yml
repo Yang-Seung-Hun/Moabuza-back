@@ -8,9 +8,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://moabuza.cyvpzdbrywmx.ap-northeast-2.rds.amazonaws.com/moabuzaDB
-    username: admin
-    password: moabuza123
+    url: ${spring.datasource.url}
+    username: ${spring.datasource.username}
+    password: ${spring.datasource.password}
 
 
   redis:
@@ -28,6 +28,6 @@ logging:
     root: error
 
 jwt:
-  secret: abwieineprmdspowejropsadasdasdasdvsddvsdvasd
+  secret: ${jwt.secret}
 
 이게 yml이 2개 입니다 ==> 근데
