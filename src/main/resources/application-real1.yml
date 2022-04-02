@@ -1,0 +1,33 @@
+server:
+  port: 8081  # Sp
+
+spring:
+  config:
+    activate:
+      on-profile: real1
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://moabuza.cyvpzdbrywmx.ap-northeast-2.rds.amazonaws.com/moabuzaDB
+    username: admin
+    password: moabuza123
+
+  profiles:
+    active: local
+
+  reids:
+    host: #여기 부분은 자신의 ip에 맞춰서 바꾸기 -> ec2 redis 설치 후 연결 ip
+      127.0.0.1
+    port:
+      6379
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    root: error
+
+jwt:
+  secret: abwieineprmdspowejropsadasdasdasdvsddvsdvasd
