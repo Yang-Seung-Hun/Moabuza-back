@@ -10,7 +10,6 @@ import com.project.moabuja.domain.record.Record;
 import com.project.moabuja.domain.record.RecordType;
 import com.project.moabuja.dto.Msg;
 import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
-import com.project.moabuja.dto.request.alarm.GoalAlarmSaveDto;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import com.project.moabuja.dto.request.goal.WaitingGoalSaveDto;
 import com.project.moabuja.dto.response.goal.*;
@@ -33,7 +32,8 @@ import java.util.stream.Collectors;
 import static com.project.moabuja.domain.alarm.AlarmDetailType.*;
 import static com.project.moabuja.domain.alarm.AlarmType.CHALLENGE;
 import static com.project.moabuja.dto.ResponseMsg.*;
-import static com.project.moabuja.exception.ErrorCode.*;
+import static com.project.moabuja.exception.ErrorCode.ALARM_NOT_EXIST;
+import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
 import static com.project.moabuja.service.GroupGoalServiceImpl.*;
 
 @Slf4j
@@ -197,6 +197,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         if (Optional.ofNullable(goalAlarmRequestDto.getFriendNickname()).isEmpty()) {
             CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), null);
             save(createChallengeRequestDto, currentMember);
+            goalAlarm(currentMember, currentMember, CHALLENGE, create, goalAlarmRequestDto.getGoalName(), goalAlarmRequestDto.getGoalAmount(), null, alarmRepository);
             return new ResponseEntity<>(new Msg(ChallengePost.getMsg()), HttpStatus.OK);
         }
 
@@ -210,9 +211,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Override
     public ResponseEntity<Msg> postChallengeAccept(Member currentMemberTemp, Long alarmId) {
         Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
-
         Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
-
         WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
         MemberWaitingGoal currentMemberWaitingGoal = memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal);
         currentMemberWaitingGoal.changeIsAcceptedGoal();
@@ -223,7 +222,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         if (! checkAccepted(friends)) {
 
             List<String> friendListTmp = new ArrayList<>();
-            sendChallengeAlarm(friends, friendListTmp, currentMember, accept, waitingGoal);
+            sendGoalAlarm(friends, friendListTmp, currentMember, CHALLENGE, accept, waitingGoal, alarmRepository);
 
             alarmRepository.delete(alarm);
         }
@@ -232,24 +231,25 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         else if (checkAccepted(friends)) {
 
             List<String> friendListTmp = new ArrayList<>();
-            List<String> friendList = sendChallengeAlarm(friends, friendListTmp, currentMember, create, waitingGoal);
-            GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
-                    .alarmType(CHALLENGE)
-                    .alarmDetailType(create)
-                    .goalName(waitingGoal.getWaitingGoalName())
-                    .goalAmount(waitingGoal.getWaitingGoalAmount())
-                    .waitingGoalId(waitingGoal.getId())
-                    .friendNickname(currentMember.getNickname())
-                    .member(currentMember)
-                    .build();
-            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
-
+            List<String> friendList = sendGoalAlarm(friends, friendListTmp, currentMember, CHALLENGE, create, waitingGoal, alarmRepository);
+            goalAlarm(currentMember, currentMember, CHALLENGE, create, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
 
             // ChallengeGoal 생성
             CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
             save(createChallengeRequestDto, currentMember);
             waitingGoalRepository.delete(waitingGoal);
             alarmRepository.delete(alarm);
+
+            // 다른 수락대기 상태의 Challenge Goal 폭파 및 알람
+            List<MemberWaitingGoal> deleteMemberWaitingGoals = memberWaitingGoalRepository.findMemberWaitingGoalsByMember(currentMember);
+            for (MemberWaitingGoal delete : deleteMemberWaitingGoals) {
+                WaitingGoal deleteWaiting = waitingGoalRepository.findWaitingGoalById(delete.getWaitingGoal().getId());
+                List<MemberWaitingGoal> alarmMemberList = deleteWaiting.getMemberWaitingGoals();
+                sendGoalAlarm(alarmMemberList, friendListTmp, currentMember, CHALLENGE, boom, deleteWaiting, alarmRepository);
+
+                // waitingGoal 삭제
+                waitingGoalRepository.delete(deleteWaiting);
+            }
         }
 
         return new ResponseEntity<>(new Msg(ChallengeAccept.getMsg()), HttpStatus.OK);
@@ -258,18 +258,17 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Transactional
     @Override
     public ResponseEntity<Msg> postChallengeRefuse(Member currentMemberTemp, Long alarmId) {
-
         Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
-
         Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
-
         WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
         List<MemberWaitingGoal> friends = memberWaitingGoalRepository.findMemberWaitingGoalsByWaitingGoal(waitingGoal);
 
         List<String> friendListTmp = new ArrayList<>();
-        sendChallengeAlarm(friends, friendListTmp, currentMember, boom, waitingGoal);
+        sendGoalAlarm(friends, friendListTmp, currentMember, CHALLENGE, boom, waitingGoal, alarmRepository);
+        goalAlarm(currentMember, currentMember, CHALLENGE, boom, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
 
-        alarmRepository.delete(alarm);
+        List<Alarm> deleteAlarmList = alarmRepository.findAlarmsByWaitingGoalIdAndAlarmDetailType(alarm.getWaitingGoalId(), AlarmDetailType.invite);
+        alarmRepository.deleteAll(deleteAlarmList);
         waitingGoalRepository.delete(waitingGoal);
 
         return new ResponseEntity<>(new Msg(ChallengeRefuse.getMsg()), HttpStatus.OK);
@@ -284,14 +283,19 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         ChallengeGoal challengeGoal = currentMember.getChallengeGoal();
         Long id = challengeGoal.getId();
 
-        List<Alarm> alarmList = alarmRepository.findAlarmsByGoalNameAndMember(challengeGoal.getChallengeGoalName(), currentMember);
-        alarmRepository.deleteAll(alarmList);
-
         List<Member> members = challengeGoal.getMembers();
         if(members.size() == 1) {
+            goalAlarm(currentMember, currentMember, CHALLENGE, boom, challengeGoal.getChallengeGoalName(), challengeGoal.getChallengeGoalAmount(), null, alarmRepository);
+
             challengeGoal.removeMember(currentMember);
             challengeGoalRepository.deleteById(id);
-        } else challengeGoal.removeMember(currentMember);
+        } else {
+            List<Member> challengeGoalMembers = challengeGoal.getMembers();
+            for (Member member : challengeGoalMembers) {
+                goalAlarm(member, currentMember, CHALLENGE, talju, challengeGoal.getChallengeGoalName(), challengeGoal.getChallengeGoalAmount(), null, alarmRepository);
+            }
+            challengeGoal.removeMember(currentMember);
+        }
 
        return new ResponseEntity<>(new Msg(ChallengeExit.getMsg()), HttpStatus.OK);
     }
@@ -299,38 +303,9 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Override
     @Transactional
     public ResponseEntity<Msg> exitWaitingChallenge(Member currentMemberTemp, Long id) {
-        exitWaitingGoal(currentMemberTemp, id, memberRepository, waitingGoalRepository, memberWaitingGoalRepository);
+        exitWaitingGoal(currentMemberTemp, id, CHALLENGE, memberRepository, waitingGoalRepository, memberWaitingGoalRepository, alarmRepository);
 
         return new ResponseEntity<>(new Msg(ChallengeExit.getMsg()), HttpStatus.OK);
-    }
-
-    public List<String> sendChallengeAlarm(List<MemberWaitingGoal> friends, List<String> friendList,Member currentMember, AlarmDetailType alarmDetailType, WaitingGoal waitingGoal){
-        for (MemberWaitingGoal friend : friends) {
-            if (friend.getMember() != currentMember) {
-                friendList.add(friend.getMember().getNickname());
-                GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
-                        .alarmType(CHALLENGE)
-                        .alarmDetailType(alarmDetailType)
-                        .goalName(waitingGoal.getWaitingGoalName())
-                        .goalAmount(waitingGoal.getWaitingGoalAmount())
-                        .waitingGoalId(waitingGoal.getId())
-                        .friendNickname(currentMember.getNickname())
-                        .member(friend.getMember())
-                        .build();
-                alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
-            }
-        }
-        return friendList;
-    }
-
-    public boolean checkAccepted(List<MemberWaitingGoal> memberWaitingGoals) {
-        boolean result = true;
-
-        for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
-            if (! memberWaitingGoal.isAcceptedGoal()) {
-                result = false;
-                break; }}
-        return result;
     }
 
     @NotNull
