@@ -17,7 +17,7 @@ sleep 10
 
 for RETRY_COUNT in {1..10}
 do
-  RESPONSE=$(curl -s http://localhost:${IDLE_PORT}/profile)
+  RESPONSE=$(curl -s http://moabuza.panghoon.shop:${IDLE_PORT}/profile)
   UP_COUNT=$(echo ${RESPONSE} | grep 'real' | wc -l)
 
   echo "> 현재 응답 ${RESPONSE}"
