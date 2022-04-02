@@ -12,4 +12,5 @@ public interface MemberWaitingGoalRepository extends JpaRepository<MemberWaiting
     MemberWaitingGoal findMemberWaitingGoalByMemberAndWaitingGoal(Member member, WaitingGoal waitingGoal);
 
     List<MemberWaitingGoal> findMemberWaitingGoalsByWaitingGoal(WaitingGoal waitingGoal);
+    List<MemberWaitingGoal> findMemberWaitingGoalsByMember(Member member);
 }

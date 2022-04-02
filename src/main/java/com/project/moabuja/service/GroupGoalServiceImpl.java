@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.project.moabuja.domain.alarm.AlarmDetailType.*;
 import static com.project.moabuja.domain.alarm.AlarmType.GROUP;
 import static com.project.moabuja.dto.ResponseMsg.*;
 import static com.project.moabuja.exception.ErrorCode.*;
@@ -180,7 +181,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         List<Friend> friends = new ArrayList<>();
         for (Friend friend : friendsTemp) {
             if (friendService.friendCheck(friend.getMember(), friend.getFriend()).equals(FriendStatus.FRIEND)) {
-                friends.add(new Friend(friend.getMember(), friend.getFriend(), true));
+                friends.add(friend);
             }
         }
         List<CreateGroupMemberDto> groupMembers = new ArrayList<>();
@@ -192,9 +193,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         for(Friend friend : friends){
             //친구의 그룹 골을 확인
-            Member friendById = Optional
-                    .of(memberRepository.findById(friend.getFriend().getId())).get()
-                    .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+            Member friendById = Optional.of(memberRepository.findById(friend.getFriend().getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
             Optional<GroupGoal> friendGroupGoal = Optional.ofNullable(friendById.getGroupGoal());
 
             //이미 진행중인 챌린지 있음
@@ -221,13 +220,8 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     @Transactional
     @Override
     public ResponseEntity<Msg> postGroupAccept(Member currentMemberTemp, Long alarmId) {
-        Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
-
-        Alarm alarm = Optional
-                .of(alarmRepository.findById(alarmId)).get()
-                .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
+        Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
         WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
         MemberWaitingGoal currentMemberWaitingGoal = memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal);
         currentMemberWaitingGoal.changeIsAcceptedGoal();
@@ -236,101 +230,53 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         // 전체 수락 전
         if (! checkAccepted(friends)) {
-            List<String> friendList = new ArrayList<>();
+            List<String> friendListTmp = new ArrayList<>();
+            sendGoalAlarm(friends, friendListTmp, currentMember, GROUP, accept, waitingGoal, alarmRepository);
 
-            for (MemberWaitingGoal friend : friends) {
-                if (friend.getMember() != currentMember) {
-                    friendList.add(friend.getMember().getNickname());
-                    GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
-                            .alarmType(GROUP)
-                            .alarmDetailType(AlarmDetailType.accept)
-                            .goalName(waitingGoal.getWaitingGoalName())
-                            .goalAmount(waitingGoal.getWaitingGoalAmount())
-                            .waitingGoalId(waitingGoal.getId())
-                            .friendNickname(currentMember.getNickname())
-                            .member(friend.getMember())
-                            .build();
-                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
-                }
-            }
             alarmRepository.delete(alarm);
         }
 
         // 전체 수락 후 마지막 수락
         else if (checkAccepted(friends)) {
-            List<String> friendList = new ArrayList<>();
-            GoalAlarmSaveDto alarmSave = GoalAlarmSaveDto.builder()
-                    .alarmType(GROUP)
-                    .alarmDetailType(AlarmDetailType.create)
-                    .goalName(waitingGoal.getWaitingGoalName())
-                    .goalAmount(waitingGoal.getWaitingGoalAmount())
-                    .waitingGoalId(waitingGoal.getId())
-                    .friendNickname(currentMember.getNickname())
-                    .member(currentMember)
-                    .build();
-            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSave));
+            List<String> friendListTmp = new ArrayList<>();
 
-            for (MemberWaitingGoal friend : friends) {
-                if (friend.getMember() != currentMember) {
-                    friendList.add(friend.getMember().getNickname());
-                    GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
-                            .alarmType(GROUP)
-                            .alarmDetailType(AlarmDetailType.create)
-                            .goalName(waitingGoal.getWaitingGoalName())
-                            .goalAmount(waitingGoal.getWaitingGoalAmount())
-                            .waitingGoalId(waitingGoal.getId())
-                            .friendNickname(currentMember.getNickname())
-                            .member(friend.getMember())
-                            .build();
-                    alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
-                }
-            }
+            List<String> friendList = sendGoalAlarm(friends, friendListTmp, currentMember, GROUP, create, waitingGoal, alarmRepository);
+            goalAlarm(currentMember, currentMember, GROUP, create, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
+
             // GroupGoal 생성
             CreateGroupRequestDto createGroupRequestDto = new CreateGroupRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
             save(createGroupRequestDto, currentMember);
             waitingGoalRepository.delete(waitingGoal);
-
             alarmRepository.delete(alarm);
+
+            // 다른 수락대기 상태의 Group Goal 폭파 및 알람
+            List<MemberWaitingGoal> deleteMemberWaitingGoals = memberWaitingGoalRepository.findMemberWaitingGoalsByMember(currentMember);
+            for (MemberWaitingGoal delete : deleteMemberWaitingGoals) {
+                WaitingGoal deleteWaiting = waitingGoalRepository.findWaitingGoalById(delete.getWaitingGoal().getId());
+                List<MemberWaitingGoal> alarmMemberList = deleteWaiting.getMemberWaitingGoals();
+                sendGoalAlarm(alarmMemberList, friendListTmp, currentMember, GROUP, boom, deleteWaiting, alarmRepository);
+                // waitingGoal 삭제
+                waitingGoalRepository.delete(deleteWaiting);
+            }
         }
 
         return new ResponseEntity<>(new Msg(GroupAccept.getMsg()), HttpStatus.OK);
     }
 
-    public boolean checkAccepted(List<MemberWaitingGoal> memberWaitingGoals) {
-        boolean result = true;
-
-        for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
-            if (! memberWaitingGoal.isAcceptedGoal()) {
-                result = false;
-                break; }}
-        return result;
-    }
-
     @Transactional
     @Override
-    public ResponseEntity<Msg> postGroupRefuse(Member currentMember, Long alarmId) {
-        Alarm alarm = Optional
-                .of(alarmRepository.findById(alarmId)).get()
-                .orElseThrow(() -> new ErrorException(ErrorCode.ALARM_NOT_EXIST));
+    public ResponseEntity<Msg> postGroupRefuse(Member currentMemberTemp, Long alarmId) {
+        Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ErrorCode.ALARM_NOT_EXIST));
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
         WaitingGoal waitingGoal = waitingGoalRepository.findWaitingGoalById(alarm.getWaitingGoalId());
         List<MemberWaitingGoal> friends = memberWaitingGoalRepository.findMemberWaitingGoalsByWaitingGoal(waitingGoal);
 
-        List<String> friendList = new ArrayList<>();
-
-        for (MemberWaitingGoal friend : friends) {
-            friendList.add(friend.getMember().getNickname());
-            GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
-                    .alarmType(GROUP)
-                    .alarmDetailType(AlarmDetailType.boom)
-                    .goalName(waitingGoal.getWaitingGoalName())
-                    .goalAmount(waitingGoal.getWaitingGoalAmount())
-                    .waitingGoalId(waitingGoal.getId())
-                    .friendNickname(currentMember.getNickname())
-                    .member(friend.getMember())
-                    .build();
-            alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
-        }
-        alarmRepository.delete(alarm);
+        List<String> friendListTmp = new ArrayList<>();
+        sendGoalAlarm(friends, friendListTmp, currentMember, GROUP, boom, waitingGoal, alarmRepository);
+        goalAlarm(currentMember, currentMember, GROUP, boom, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
+        // 자신과 다른 사용자들에게 남아있는 초대 알람을 삭제
+        List<Alarm> deleteAlarmList = alarmRepository.findAlarmsByWaitingGoalIdAndAlarmDetailType(alarm.getWaitingGoalId(), AlarmDetailType.invite);
+        alarmRepository.deleteAll(deleteAlarmList);
         waitingGoalRepository.delete(waitingGoal);
 
         return new ResponseEntity<>(new Msg(GroupRefuse.getMsg()), HttpStatus.OK);
@@ -345,15 +291,29 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         GroupGoal groupGoal = currentMember.getGroupGoal();
         Long id = groupGoal.getId();
 
-        List<Alarm> alarmList = alarmRepository.findAlarmsByGoalNameAndMember(groupGoal.getGroupGoalName(), currentMember);
-        alarmRepository.deleteAll(alarmList);
-
         List<Member> memberList = currentMember.getGroupGoal().getMembers();
         if (memberList.size() == 2) {
             while (memberList.size() > 0) {
+                GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
+                        .alarmType(GROUP)
+                        .alarmDetailType(AlarmDetailType.boom)
+                        .goalName(groupGoal.getGroupGoalName())
+                        .goalAmount(groupGoal.getGroupGoalAmount())
+                        .waitingGoalId(id)
+                        .friendNickname(currentMember.getNickname())
+                        .member(memberList.get(0))
+                        .build();
+                alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
+
                 groupGoal.removeMember(memberList.get(0));
-            }groupGoalRepository.deleteById(id);
-        }else groupGoal.removeMember(currentMember);
+            } groupGoalRepository.deleteById(id);
+        }else {
+            List<Member> groupGoalMembers = groupGoal.getMembers();
+            for (Member member : groupGoalMembers) {
+                goalAlarm(member, currentMember, GROUP, talju, groupGoal.getGroupGoalName(), groupGoal.getGroupGoalAmount(), null, alarmRepository);
+            }
+            groupGoal.removeMember(currentMember);
+        }
 
         return new ResponseEntity<>(new Msg(GroupExit.getMsg()), HttpStatus.OK);
     }
@@ -361,7 +321,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     @Override
     @Transactional
     public ResponseEntity<Msg> exitWaitingGroup(Member currentMemberTemp, Long id) {
-        exitWaitingGoal(currentMemberTemp, id, memberRepository, waitingGoalRepository, memberWaitingGoalRepository);
+        exitWaitingGoal(currentMemberTemp, id, GROUP, memberRepository, waitingGoalRepository, memberWaitingGoalRepository, alarmRepository);
 
         return new ResponseEntity<>(new Msg(GroupExit.getMsg()), HttpStatus.OK);
     }
@@ -388,14 +348,61 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     }
 
     //challengeGoalServiceImpl에서도 사용
-    static void exitWaitingGoal(Member currentMemberTemp, Long id, MemberRepository memberRepository, WaitingGoalRepository waitingGoalRepository, MemberWaitingGoalRepository memberWaitingGoalRepository) {
+    static void exitWaitingGoal(Member currentMemberTemp, Long id, AlarmType alarmType, MemberRepository memberRepository, WaitingGoalRepository waitingGoalRepository, MemberWaitingGoalRepository memberWaitingGoalRepository, AlarmRepository alarmRepository) {
         Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
-
         WaitingGoal waitingGoal = Optional.of(waitingGoalRepository.findWaitingGoalById(id)).orElseThrow(() -> new ErrorException(GOAL_NOT_EXIST));
-        MemberWaitingGoal memberWaitingGoal = Optional
-                .of(memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal))
-                .orElseThrow(() -> new ErrorException(GOAL_MEMBER_NOT_MATCH));
+        MemberWaitingGoal memberWaitingGoal = Optional.of(memberWaitingGoalRepository.findMemberWaitingGoalByMemberAndWaitingGoal(currentMember, waitingGoal)).orElseThrow(() -> new ErrorException(GOAL_MEMBER_NOT_MATCH));
+
+        List<String> friendListTmp = new ArrayList<>();
+        sendGoalAlarm(waitingGoal.getMemberWaitingGoals(), friendListTmp, currentMember, alarmType, boom, waitingGoal, alarmRepository);
+        goalAlarm(currentMember, currentMember, alarmType, boom, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
 
         waitingGoalRepository.delete(waitingGoal);
     }
+
+    //challengeGoalServiceImpl에서도 사용
+    static boolean checkAccepted(List<MemberWaitingGoal> memberWaitingGoals) {
+        boolean result = true;
+
+        for (MemberWaitingGoal memberWaitingGoal : memberWaitingGoals) {
+            if (! memberWaitingGoal.isAcceptedGoal()) {
+                result = false;
+                break; }}
+        return result;
+    }
+
+    //challengeGoalServiceImpl에서도 사용
+    static List<String> sendGoalAlarm(List<MemberWaitingGoal> friends, List<String> friendList, Member currentMember, AlarmType alarmType, AlarmDetailType alarmDetailType, WaitingGoal waitingGoal, AlarmRepository alarmRepository) {
+        for (MemberWaitingGoal friend : friends) {
+            if (friend.getMember() != currentMember) {
+                friendList.add(friend.getMember().getNickname());
+                GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
+                        .alarmType(alarmType)
+                        .alarmDetailType(alarmDetailType)
+                        .goalName(waitingGoal.getWaitingGoalName())
+                        .goalAmount(waitingGoal.getWaitingGoalAmount())
+                        .waitingGoalId(waitingGoal.getId())
+                        .friendNickname(currentMember.getNickname())
+                        .member(friend.getMember())
+                        .build();
+                alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
+            }
+        }
+        return friendList;
+    }
+
+    //challengeGoalServiceImpl에서도 사용
+    static void goalAlarm(Member member, Member nicknameMember, AlarmType alarmType, AlarmDetailType alarmDetailType, String goalName, int goalAmount, Long id, AlarmRepository alarmRepository) {
+        GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
+                .alarmType(alarmType)
+                .alarmDetailType(alarmDetailType)
+                .goalName(goalName)
+                .goalAmount(goalAmount)
+                .waitingGoalId(id)
+                .friendNickname(nicknameMember.getNickname())
+                .member(member)
+                .build();
+        alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
+    }
+
 }

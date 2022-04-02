@@ -93,11 +93,8 @@ public class FriendServiceImpl implements FriendService{
     @Transactional
     @Override
     public ResponseEntity<Msg> postFriend(FriendAlarmDto friendAlarmDto, Member currentMemberTemp) {
-        Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
-        Optional<Member> friend = Optional
-                .ofNullable(memberRepository.findMemberByNickname(friendAlarmDto.getFriendNickname())).get();
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Optional<Member> friend = Optional.ofNullable(memberRepository.findMemberByNickname(friendAlarmDto.getFriendNickname())).get();
         if (friend.isEmpty()) {
             return new ResponseEntity<>(new Msg(FriendNotExist.getMsg()), HttpStatus.OK);
         }
@@ -114,16 +111,12 @@ public class FriendServiceImpl implements FriendService{
 
     @Transactional
     @Override
-    public ResponseEntity<Msg> postFriendAccept(Member currentMember, Long alarmId) {
-        Alarm alarm = Optional
-                .of(alarmRepository.findById(alarmId)).get()
-                .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
-        Member friend = Optional
-                .of(memberRepository.findMemberByNickname(alarm.getFriendNickname())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+    public ResponseEntity<Msg> postFriendAccept(Member currentMemberTemp, Long alarmId) {
+        Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Member friend = Optional.of(memberRepository.findMemberByNickname(alarm.getFriendNickname())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
-        Friend friendship = friendRepository.findByMemberAndFriend(currentMember, friend);
-        friendship.changeIsAcceptedFriend();
+        save(currentMember, friend);
 
         alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.accept, friend, currentMember.getNickname()));
 
@@ -135,43 +128,18 @@ public class FriendServiceImpl implements FriendService{
     @Transactional
     @Override
     public void save(Member currentMember, Member friend) {
-        friendRepository.save(new Friend(currentMember, friend, true));
-        friendRepository.save(new Friend(friend, currentMember, false));
-    }
-
-    @Transactional
-    @Override
-    public FriendStatus friendCheck(Member currentMember, Member friend) {
-        Optional<Friend> friendship1 = Optional.ofNullable(friendRepository.findByMemberAndFriend(currentMember, friend));
-        Optional<Friend> friendship2 = Optional.ofNullable(friendRepository.findByMemberAndFriend(friend, currentMember));
-
-        if (friendship1.isPresent() && friendship2.isPresent()) {
-            if (!friendship1.get().isAcceptedFriend() || !friendship2.get().isAcceptedFriend()) {
-                return WAITING;
-            } else if (friendship1.get().isAcceptedFriend() && friendship2.get().isAcceptedFriend()) {
-                return FRIEND;
-            }
-        }
-        return NOT_FRIEND;
+        friendRepository.save(new Friend(currentMember, friend));
     }
 
     @Transactional
     @Override
     public ResponseEntity<Msg> postFriendRefuse(Member currentMemberTemp, Long alarmId) {
-        Member currentMember = Optional
-                .of(memberRepository.findById(currentMemberTemp.getId())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
-        Alarm alarm = Optional
-                .of(alarmRepository.findById(alarmId)).get()
-                .orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
-        Member friend = Optional
-                .of(memberRepository.findMemberByNickname(alarm.getFriendNickname())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Member currentMember = Optional.of(memberRepository.findById(currentMemberTemp.getId())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
+        Member friend = Optional.of(memberRepository.findMemberByNickname(alarm.getFriendNickname())).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
-        Friend friendship1 = friendRepository.findByMemberAndFriend(currentMember, friend);
-        Friend friendship2 = friendRepository.findByMemberAndFriend(friend, currentMember);
-        friendRepository.delete(friendship1);
-        friendRepository.delete(friendship2);
+        Friend friendship = friendRepository.findByMemberAndFriend(friend, currentMember);
+        friendRepository.delete(friendship);
 
         alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.refuse, friend, currentMember.getNickname()));
         alarmRepository.delete(alarm);
@@ -190,5 +158,20 @@ public class FriendServiceImpl implements FriendService{
         friendRepository.delete(friendRepository.findByMemberAndFriend(friend, currentMember));
 
         return new ResponseEntity<>(new Msg(FriendDelete.getMsg()), HttpStatus.OK);
+    }
+
+    @Transactional
+    @Override
+    public FriendStatus friendCheck(Member currentMember, Member friend) {
+        Optional<Friend> friendship1 = Optional.ofNullable(friendRepository.findByMemberAndFriend(currentMember, friend));
+        Optional<Friend> friendship2 = Optional.ofNullable(friendRepository.findByMemberAndFriend(friend, currentMember));
+
+        if (friendship1.isPresent() && friendship2.isPresent()) {
+            return FRIEND;
+        }
+        else if (friendship1.isPresent() || friendship2.isPresent()) {
+            return WAITING;
+        }
+        else { return NOT_FRIEND; }
     }
 }
