@@ -338,10 +338,10 @@ public class RecordServiceImpl implements RecordService{
             if (recordData.getRecordType() == RecordType.income) {
                 wallet += recordData.getRecordAmount();
             }
-            if (recordData.getRecordType() == RecordType.challenge && recordData.getRecordAmount() > 0 && recordData.getCreatedAt().isAfter(currentMember.getChallengeGoal().getCreatedAt())) {
+            if (recordData.getRecordType() == RecordType.challenge && recordData.getRecordAmount() > 0 ) {
                 wallet -= recordData.getRecordAmount();
             }
-            if (recordData.getRecordType() == RecordType.group && recordData.getRecordAmount() > 0 && recordData.getCreatedAt().isAfter(currentMember.getGroupGoal().getCreatedAt())) {
+            if (recordData.getRecordType() == RecordType.group && recordData.getRecordAmount() > 0 ) {
                 wallet -= recordData.getRecordAmount();
             }
         }
