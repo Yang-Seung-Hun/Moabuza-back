@@ -3,7 +3,7 @@
 function find_idle_profile()
 {
     # curl 결과로 연결할 서비스 결정
-    RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/profile)
+    RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/profile)
 
     if [ ${RESPONSE_CODE} -ge 400 ] # 400 보다 크면 (즉, 40x/50x 에러 모두 포함)
     then
@@ -19,7 +19,6 @@ function find_idle_profile()
     else
       IDLE_PROFILE=real1
     fi
-
     # bash script는 값의 반환이 안된다.
     # echo로 결과 출력 후, 그 값을 잡아서 사용한다.
     echo "${IDLE_PROFILE}"
@@ -34,6 +33,6 @@ function find_idle_port()
     then
       echo "8081"
     else
-      echo "8080"
+      echo "8082"
     fi
 }
