@@ -18,9 +18,9 @@ function find_idle_profile()
     # IDLE_PROFILE : nginx와 연결되지 않은 profile
     if [ ${CURRENT_PROFILE} == real1 ]
     then
-      IDLE_PROFILE=real1
-    else
       IDLE_PROFILE=real2
+    else
+      IDLE_PROFILE=real1
     fi
     # bash script는 값의 반환이 안된다.
     # echo로 결과 출력 후, 그 값을 잡아서 사용한다.
