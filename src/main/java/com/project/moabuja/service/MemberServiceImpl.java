@@ -58,7 +58,6 @@ public class MemberServiceImpl implements MemberService{
     @Transactional
     @Override
     public ResponseEntity<HomeResponseDto> getHomeInfo(Member currentMemberTemp) {
-        log.info("----------엔진엑스 배포된건가?: ");
         Member currentMember = Optional
                 .of(memberRepository.findById(currentMemberTemp.getId())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
@@ -223,9 +222,9 @@ public class MemberServiceImpl implements MemberService{
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         Long kakaoId = jsonNode.get("id").asLong();
-        Optional<String> email = Optional.ofNullable(jsonNode.get("kakao_account").get("email").asText());
+//        Optional<String> email = Optional.ofNullable(jsonNode.get("kakao_account").get("email").asText());
 
-        return new KakaoUserInfoDto(kakaoId, email.get());
+        return new KakaoUserInfoDto(kakaoId, null);
     }
 
     @Transactional
