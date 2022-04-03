@@ -29,6 +29,6 @@ public class Hello {
 
     @GetMapping("/health")
     public ResponseEntity healthCheck(){
-        return ResponseEntity.ok().body("데이터 : 건강해요!");
+        return ResponseEntity.ok().body("데이터 : 건강합니다!");
     }
 }

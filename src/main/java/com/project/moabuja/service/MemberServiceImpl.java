@@ -63,6 +63,7 @@ public class MemberServiceImpl implements MemberService{
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         Hero hero = currentMember.getHero();
+        String nickname = currentMember.getNickname();
 
         int groupCurrentAmount = 0;
         int groupNeedAmount = 0;
@@ -133,6 +134,7 @@ public class MemberServiceImpl implements MemberService{
                 .challengePercent(challengePercent)
                 .challengeName(challengeName)
                 .hero(hero)
+                .nickname(nickname)
                 .totalAmount(totalAmount)
                 .wallet(wallet)
                 .alarmCount(alarmCount)

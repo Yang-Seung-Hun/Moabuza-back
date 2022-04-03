@@ -23,6 +23,7 @@ public class HomeResponseDto {
     private String challengeName;
 
     private Hero hero;
+    private String nickname;
 
     private int totalAmount;
     private int wallet;
@@ -32,7 +33,7 @@ public class HomeResponseDto {
     @Builder
     public HomeResponseDto(int groupCurrentAmount, int groupNeedAmount, int groupAmount, int groupPercent,
                            String groupName, int challengeCurrentAmount, int challengeNeedAmount,
-                           int challengeAmount, int challengePercent, String challengeName, Hero hero,
+                           int challengeAmount, int challengePercent, String challengeName, Hero hero, String nickname,
                            int totalAmount, int wallet, int alarmCount) {
         this.groupCurrentAmount = groupCurrentAmount;
         this.groupNeedAmount = groupNeedAmount;
@@ -45,6 +46,7 @@ public class HomeResponseDto {
         this.challengePercent = challengePercent;
         this.challengeName = challengeName;
         this.hero = hero;
+        this.nickname = nickname;
         this.totalAmount = totalAmount;
         this.wallet = wallet;
         this.alarmCount = alarmCount;
