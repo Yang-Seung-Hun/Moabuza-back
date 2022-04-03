@@ -57,7 +57,7 @@ public class MemberController {
     public ResponseEntity<Msg> update(@Valid @RequestBody MemberUpdateRequestDto dto,
                                               @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
         fcmService.register(dto.getNickname(), dto.getFcmToken());
-        return memberService.updateMemberInfo(dto, userDetails.getMember().getEmail());
+        return memberService.updateMemberInfo(dto, userDetails.getMember().getPassword());
     }
 
     @ApiOperation(value = "access 토큰 재발급")
