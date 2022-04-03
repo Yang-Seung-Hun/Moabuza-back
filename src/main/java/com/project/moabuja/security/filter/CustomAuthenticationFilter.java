@@ -1,7 +1,6 @@
 package com.project.moabuja.security.filter;
 
 import com.project.moabuja.exception.ErrorException;
-import com.project.moabuja.exception.exceptionClass.LogoutJwtUseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -19,7 +18,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-import static com.project.moabuja.exception.ErrorCode.*;
+import static com.project.moabuja.exception.ErrorCode.GEUST_TO_LOGIN;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -47,7 +46,8 @@ public class CustomAuthenticationFilter extends GenericFilterBean {
                 Authentication authentication = jwtProvider.getAuthentication(jwtAccess);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } else{
-                throw new ErrorException(LOGOUT_TOKEN_VALID);
+                // throw new ErrorException(LOGOUT_TOKEN_VALID);
+                throw new ErrorException(GEUST_TO_LOGIN);
             }
         } else if (jwtRefresh != null){
             checkToken(jwtRefresh);
