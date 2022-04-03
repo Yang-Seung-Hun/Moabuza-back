@@ -157,7 +157,9 @@ public class MemberServiceImpl implements MemberService{
                 .build();
 
         redisTemplate.opsForValue()
-                .set("RT:" + kakaoUserInfoDto.getEmail(), dto.getRefresh(), jwtTokenProvider.getExpiration(dto.getRefresh()), TimeUnit.MILLISECONDS);
+                // Email 을 redis에 key로 저장했었는데, 전체 로직에서 redis에는 Password를 키값으로 저장해서 해당 로직 키 부분 수정
+                // 기존 로직 : .set("RT:" + kakaoUserInfoDto.getEmail(), dto.getRefresh(), jwtTokenProvider.getExpiration(dto.getRefresh()), TimeUnit.MILLISECONDS);
+                .set("RT:" + regToLoginDto.getPassword(), dto.getRefresh(), jwtTokenProvider.getExpiration(dto.getRefresh()), TimeUnit.MILLISECONDS);
 
          CustomResponseEntity response = CustomResponseEntity.builder()
                 .code(HttpStatus.OK)
@@ -221,9 +223,9 @@ public class MemberServiceImpl implements MemberService{
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         Long kakaoId = jsonNode.get("id").asLong();
-        String email = jsonNode.get("kakao_account").get("email").asText();
+        Optional<String> email = Optional.ofNullable(jsonNode.get("kakao_account").get("email").asText());
 
-        return new KakaoUserInfoDto(kakaoId, email);
+        return new KakaoUserInfoDto(kakaoId, email.get());
     }
 
     @Transactional
@@ -233,7 +235,8 @@ public class MemberServiceImpl implements MemberService{
         RegToLoginDto regToLoginDto = new RegToLoginDto();
 
         // 기존회원이 아니면 회원가입 완료
-        if(!memberRepository.existsByEmail(dto.getEmail())){
+        // 기존 로직 : if(!memberRepository.existsByEmail(dto.getEmail())){        ======>>> Email이용 하는 부분 KakaoId 로 수정 ( String -> Long )
+        if(!memberRepository.existsByKakaoId(dto.getKakaoId())){
             String password = UUID.randomUUID().toString().substring(0,8);
             memberRepository.save(member.fromDto(dto, password));
             regToLoginDto.setPassword(password);
@@ -241,12 +244,10 @@ public class MemberServiceImpl implements MemberService{
             return regToLoginDto;
         }
 
-        Member memberByEmail = Optional
-                .of(memberRepository.findByEmails(dto.getEmail())).get()
-                .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
+        Member memberByKakaoId = Optional.of(memberRepository.findByKakaoId(dto.getKakaoId())).orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
-        regToLoginDto.setNickname(memberByEmail.getNickname());
-        regToLoginDto.setPassword(memberByEmail.getPassword());
+        regToLoginDto.setNickname(memberByKakaoId.getNickname());
+        regToLoginDto.setPassword(memberByKakaoId.getPassword());
         return regToLoginDto;
     }
 
@@ -262,12 +263,13 @@ public class MemberServiceImpl implements MemberService{
 
     @Transactional
     @Override
-    public ResponseEntity<Msg> updateMemberInfo(MemberUpdateRequestDto dto, String email) {
-        Member byEmail = memberRepository.findByEmail(email);
-        if(byEmail == null){
+    public ResponseEntity<Msg> updateMemberInfo(MemberUpdateRequestDto dto, String password) {
+        // Email -> Password 수정 , 기존 로직은 Password 부분 전체 email 로 되어있었음
+        Member byPassword = memberRepository.findByPassword(password);
+        if(byPassword == null){
             throw new ErrorException(MEMBER_NOT_FOUND);
         }
-        byEmail.updateInfo(dto);
+        byPassword.updateInfo(dto);
         return new ResponseEntity<>(new Msg(UpdateInfo.getMsg()), HttpStatus.OK);
     }
 
@@ -278,20 +280,24 @@ public class MemberServiceImpl implements MemberService{
         String refresh = request.getHeader("R-AUTH-TOKEN").substring(7);
 
         if (!jwtTokenProvider.validateToken(refresh)) {
-            throw new ErrorException(REFRESH_NOT_VALID);
+            // throw new ErrorException(REFRESH_NOT_VALID);
+            throw new ErrorException(GEUST_TO_LOGIN);
         }
         Authentication authentication = jwtTokenProvider.getAuthentication(access);
 
         String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
 
         if(ObjectUtils.isEmpty(refreshToken)) {
-            throw new ErrorException(REFRESH_NOT_EXIST);
+            // throw new ErrorException(REFRESH_NOT_EXIST);
+            throw new ErrorException(GEUST_TO_LOGIN);
         }
         if(!refreshToken.equals(refresh)) {
-            throw new ErrorException(REFRESH_NOT_MATCH);
+            // throw new ErrorException(REFRESH_NOT_MATCH);
+            throw new ErrorException(GEUST_TO_LOGIN);
         }
 
-        String password = memberRepository.findByEmail(authentication.getName()).getPassword();
+        // String password = memberRepository.findByEmail(authentication.getName()).getPassword();
+        String password = memberRepository.findByPassword(authentication.getName()).getPassword();
         ReissueDto dto = ReissueDto.builder()
                 .refresh(jwtTokenProvider.createRefreshToken(password))
                 .access(jwtTokenProvider.createAccessToken(password))
@@ -313,7 +319,8 @@ public class MemberServiceImpl implements MemberService{
     public ResponseEntity<Msg> logout(HttpServletRequest request) {
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         if (!jwtTokenProvider.validateToken(access)) {
-            throw new ErrorException(ACCESS_NOT_VALID);
+            // throw new ErrorException(ACCESS_NOT_VALID);
+            throw new ErrorException(GEUST_TO_LOGIN);
         }
         Authentication authentication = jwtTokenProvider.getAuthentication(access);
 
