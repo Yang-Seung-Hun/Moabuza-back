@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http:/localhost/profile)
+echo "리스폰스 코드 : $RESPONSE_CODE"
+
 function find_idle_profile()
 {
     # curl 결과로 연결할 서비스 결정
