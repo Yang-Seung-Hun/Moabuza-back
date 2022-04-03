@@ -4,7 +4,6 @@ import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.security.userdetails.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +14,7 @@ import javax.annotation.PostConstruct;
 import java.util.Base64;
 import java.util.Date;
 
+import static com.project.moabuja.exception.ErrorCode.GEUST_TO_LOGIN;
 import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
 
 @Component
@@ -78,11 +78,14 @@ public class JwtTokenProvider {
             claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(jwtToken);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (UnsupportedJwtException e) {
-            throw new JwtException("인수가 Claims JWS를 나타내지 않는 경우");
+            // throw new JwtException("인수가 Claims JWS를 나타내지 않는 경우");
+            throw new ErrorException(GEUST_TO_LOGIN);
         } catch (MalformedJwtException e) {
-            throw new MalformedJwtException(" 문자열이 유효한 JWS가 아닌 경우");
+            // throw new MalformedJwtException(" 문자열이 유효한 JWS가 아닌 경우");
+            throw new ErrorException(GEUST_TO_LOGIN);
         }  catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("문자열이 null이거나 비어 있거나 공백만 있는 경우");
+            // throw new IllegalArgumentException("문자열이 null이거나 비어 있거나 공백만 있는 경우");
+            throw new ErrorException(GEUST_TO_LOGIN);
         }
     }
 
