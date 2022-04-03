@@ -28,8 +28,5 @@ IDLE_PROFILE=$(find_idle_profile)
 
 echo "> $JAR_NAME 를 profile=$IDLE_PROFILE 로 실행합니다. ==== start 쉘 스크립트"
 nohup java -jar \
-    -javaagent:${pinpointPath}/pinpoint-bootstrap-version.jar \
-    -Dpinpoint.applicationName=moabuza.dev \
-    -Dpinpoint.agentId=pangpang \
     -Dspring.config.location=classpath:/application-$IDLE_PROFILE.yml \
     -Dspring.profiles.active=$IDLE_PROFILE $JAR_NAME > $REPOSITORY1/nohup.out 2>&1 &
