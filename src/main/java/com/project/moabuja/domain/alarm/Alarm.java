@@ -50,4 +50,8 @@ public class Alarm extends Timestamped {
     }
 
     protected Alarm () {}
+
+    public void changeAlarm(Member member) {
+        this.member = member;
+    }
 }
