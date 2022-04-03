@@ -1,5 +1,6 @@
 //package com.project.moabuja.service;
 //
+//import com.project.moabuja.domain.alarm.Alarm;
 //import com.project.moabuja.domain.friend.Friend;
 //import com.project.moabuja.domain.goal.ChallengeGoal;
 //import com.project.moabuja.domain.member.Hero;
@@ -11,10 +12,7 @@
 //import com.project.moabuja.dto.response.goal.ChallengeMemberDto;
 //import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
 //import com.project.moabuja.dto.response.goal.CreateChallengeResponseDto;
-//import com.project.moabuja.repository.ChallengeGoalRepository;
-//import com.project.moabuja.repository.FriendRepository;
-//import com.project.moabuja.repository.MemberRepository;
-//import com.project.moabuja.repository.RecordRepository;
+//import com.project.moabuja.repository.*;
 //import org.assertj.core.api.Assertions;
 //import org.junit.jupiter.api.DisplayName;
 //import org.junit.jupiter.api.Test;
@@ -30,27 +28,22 @@
 //import java.util.List;
 //import java.util.Optional;
 //
-//import static com.project.moabuja.domain.goal.GoalType.CHALLENGE;
+//import static com.project.moabuja.domain.alarm.AlarmDetailType.*;
+//import static com.project.moabuja.domain.goal.GoalType.*;
 //
 //@SpringBootTest
 //@Rollback(value = true)
 //@Transactional
 //class ChallengeGoalServiceImplTest {
 //
-//    @Autowired
-//    private MemberRepository memberRepository;
-//    @Autowired
-//    private ChallengeGoalService challengeGoalService;
-//    @Autowired
-//    private ChallengeGoalRepository challengeGoalRepository;
-//    @Autowired
-//    private RecordService recordService;
-//    @Autowired
-//    private EntityManager em;
-//    @Autowired
-//    private MemberService memberService;
-//    @Autowired
-//    private FriendRepository friendRepository;
+//    @Autowired private MemberRepository memberRepository;
+//    @Autowired private ChallengeGoalService challengeGoalService;
+//    @Autowired private ChallengeGoalRepository challengeGoalRepository;
+//    @Autowired private RecordService recordService;
+//    @Autowired private EntityManager em;
+//    @Autowired private MemberService memberService;
+//    @Autowired private FriendRepository friendRepository;
+//    @Autowired private AlarmRepository alarmRepository;
 //
 //    @Test
 //    @DisplayName("1인 도전해부자 생성")
@@ -304,7 +297,7 @@
 //        Member savedFriend3 = memberRepository.save(friend3);
 //
 //        Member friend4 = new Member("123460", 123460L, "nickname5", "email5@naver.com", Hero.bunny);
-//        Member savedFriend4 = memberRepository.save(friend4);
+//        memberRepository.save(friend4);
 //
 //        Friend relate1 = new Friend(savedMember1,savedFriend1);
 //        Friend relate2 = new Friend(friend1,savedMember1);
@@ -318,16 +311,35 @@
 //        friendRepository.save(relate4);
 //
 //        Friend relate5 = new Friend(savedMember1,savedFriend3);
-//        Friend relate6 = new Friend(savedFriend3,savedMember1);
 //        friendRepository.save(relate5);
-//        friendRepository.save(relate6);
+//
+//        CreateChallengeRequestDto createChallengeRequestDto1 = new CreateChallengeRequestDto("10만원 모으기", 100000, null);
+//        challengeGoalService.save(createChallengeRequestDto1, savedFriend1);
 //
 //        //when
 //        ResponseEntity<CreateChallengeResponseDto> challengeMemberCandidatesTmp = challengeGoalService.getChallengeMemberCandidates(savedMember1);
-//        CreateChallengeResponseDto friends = challengeMemberCandidatesTmp.getBody();
+//        CreateChallengeResponseDto allFriends = challengeMemberCandidatesTmp.getBody();
 //
-//        if (friends != null) {
-//            Assertions.assertThat(friends.getChallengeMembers().size()).isEqualTo(3);
+//        boolean canInvite1 = false;
+//        String nickname1 = null;
+//        boolean canInvite2 = false;
+//        String nickname2 = null;
+//        if (allFriends != null) {
+//            canInvite1 = allFriends.getChallengeMembers().get(0).isChallengeMemberCanInvite();
+//            nickname1 = allFriends.getChallengeMembers().get(0).getChallengeMemberNickname();
+//
+//            canInvite2 = allFriends.getChallengeMembers().get(1).isChallengeMemberCanInvite();
+//            nickname2 = allFriends.getChallengeMembers().get(1).getChallengeMemberNickname();
+//        }
+//
+//        //then
+//        if (allFriends != null) {
+//            Assertions.assertThat(allFriends.getChallengeMembers().size()).isEqualTo(2);
+//            Assertions.assertThat(canInvite1).isFalse();
+//            Assertions.assertThat(nickname1).isEqualTo("nickname2");
+//
+//            Assertions.assertThat(canInvite2).isTrue();
+//            Assertions.assertThat(nickname2).isEqualTo("nickname3");
 //        }
 //
 //    }
@@ -379,5 +391,93 @@
 //
 //        //then
 //        Assertions.assertThat(savedMember1.getChallengeGoal()).isNull();
+//    }
+//
+//    @Test
+//    @DisplayName("혼자 도전하기")
+//    public void postChallenge(){
+//
+//        //given
+//        Member member = new Member("123456", 123456L, "nickname1", "email1@naver.com", Hero.tongki);
+//        Member savedMember1 = memberRepository.save(member);
+//
+//        //when
+//        GoalAlarmRequestDto goalAlarmRequestDto = new GoalAlarmRequestDto(CHALLENGE,"100만원 도전",1000000,null);
+//        challengeGoalService.postChallenge(savedMember1,goalAlarmRequestDto);
+//
+//        //then
+//        Assertions.assertThat(savedMember1.getChallengeGoal()).isNotNull();
+//        Assertions.assertThat(savedMember1.getChallengeGoal().getChallengeGoalName()).isEqualTo("100만원 도전");
+//        Assertions.assertThat(savedMember1.getChallengeGoal().getChallengeGoalAmount()).isEqualTo(1000000);
+//        Assertions.assertThat(savedMember1.getMemberWaitingGoals()).isEmpty();
+//    }
+//
+//    @Test
+//    @DisplayName("같이 도전하기 초대 1개")
+//    public void postChallenge2(){
+//
+//        //given
+//        Member member1 = new Member("123456", 123456L, "nickname1", "email1@naver.com", Hero.tongki);
+//        Member savedMember1 = memberRepository.save(member1);
+//
+//        Member member2 = new Member("123457", 123457L, "nickname2", "email2@naver.com", Hero.tanni);
+//        Member savedMember2 = memberRepository.save(member2);
+//
+//        Member member3 = new Member("123458", 123458L, "nickname3", "email3@naver.com", Hero.bunny);
+//        Member savedMember3 = memberRepository.save(member3);
+//
+//        List<String> friends = new ArrayList<>(Arrays.asList("nickname2","nickname3"));
+//        //when
+//        GoalAlarmRequestDto goalAlarmRequestDto = new GoalAlarmRequestDto(CHALLENGE,"100만원 도전",1000000,friends);
+//        challengeGoalService.postChallenge(savedMember1,goalAlarmRequestDto);
+//
+//        List<Alarm> allByMember1 = alarmRepository.findAllByMember(savedMember2);
+//        List<Alarm> allByMember2 = alarmRepository.findAllByMember(savedMember3);
+//
+//        //then
+//        Assertions.assertThat(savedMember1.getChallengeGoal()).isNull();
+//        Assertions.assertThat(allByMember1).isNotEmpty();
+//        Assertions.assertThat(allByMember1.get(0).getAlarmDetailType()).isEqualTo(invite);
+//        Assertions.assertThat(allByMember2).isNotEmpty();
+//        Assertions.assertThat(allByMember2.get(0).getAlarmDetailType()).isEqualTo(invite);
+//    }
+//
+//    @Test
+//    @DisplayName("같이 도전하기 초대 여러개")
+//    public void postChallenge3(){
+//
+//        //given
+//        Member member1 = new Member("123456", 123456L, "nickname1", "email1@naver.com", Hero.tongki);
+//        Member savedMember1 = memberRepository.save(member1);
+//
+//        Member member2 = new Member("123457", 123457L, "nickname2", "email2@naver.com", Hero.tanni);
+//        Member savedMember2 = memberRepository.save(member2);
+//
+//        Member member3 = new Member("123458", 123458L, "nickname3", "email3@naver.com", Hero.bunny);
+//        Member savedMember3 = memberRepository.save(member3);
+//
+//        List<String> friends = new ArrayList<>(Arrays.asList("nickname2","nickname3"));
+//        List<String> friends2 = new ArrayList<>(Arrays.asList("nickname3"));
+//        //when
+//        GoalAlarmRequestDto goalAlarmRequestDto = new GoalAlarmRequestDto(CHALLENGE,"100만원 도전",1000000,friends);
+//        challengeGoalService.postChallenge(savedMember1,goalAlarmRequestDto);
+//
+//        GoalAlarmRequestDto goalAlarmRequestDto2 = new GoalAlarmRequestDto(CHALLENGE,"10만원 도전",100000,friends2);
+//        challengeGoalService.postChallenge(savedMember2,goalAlarmRequestDto2);
+//
+//
+//        List<Alarm> allByMember1 = alarmRepository.findAllByMember(savedMember2);
+//        List<Alarm> allByMember2 = alarmRepository.findAllByMember(savedMember3);
+//
+//        //then
+//        Assertions.assertThat(savedMember1.getChallengeGoal()).isNull();
+//        Assertions.assertThat(allByMember1).isNotEmpty();
+//        Assertions.assertThat(allByMember1.size()).isEqualTo(1);
+//        Assertions.assertThat(allByMember1.get(0).getAlarmDetailType()).isEqualTo(invite);
+//
+//        Assertions.assertThat(allByMember2).isNotEmpty();
+//        Assertions.assertThat(allByMember2.size()).isEqualTo(2);
+//        Assertions.assertThat(allByMember2.get(0).getAlarmDetailType()).isEqualTo(invite);
+//        Assertions.assertThat(allByMember2.get(1).getAlarmDetailType()).isEqualTo(invite);
 //    }
 //}

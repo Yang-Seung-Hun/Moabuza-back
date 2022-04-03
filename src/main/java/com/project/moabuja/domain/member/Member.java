@@ -89,4 +89,9 @@ public class Member {
         this.doneGaols.add(doneGoal);
         doneGoal.changeMember(this);
     }
+
+    public void addAlarm(Alarm alarm){
+        this.alarms.add(alarm);
+        alarm.changeAlarm(this);
+    }
 }
