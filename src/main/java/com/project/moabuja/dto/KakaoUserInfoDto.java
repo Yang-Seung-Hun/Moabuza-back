@@ -9,6 +9,5 @@ import javax.annotation.Nullable;
 @AllArgsConstructor
 public class KakaoUserInfoDto {
     private Long kakaoId;
-    @Nullable
     private String email;
 }
