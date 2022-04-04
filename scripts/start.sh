@@ -10,7 +10,7 @@ source ${ABSDIR}/profile.sh
 REPOSITORY=/home/ubuntu/app
 REPOSITORY1=/home/ubuntu
 PROJECT_NAME=moabuja-0.0.1-SNAPSHOT
-pinpointPath=/home/ubuntu/pinpoint-agent-2.2.3-NCP-RC1u
+pinpointPath=/home/ubuntu/pinpoint-agent-2.2.3-NCP-RC1
 
 echo "> 새 어플리케이션 배포"
 
