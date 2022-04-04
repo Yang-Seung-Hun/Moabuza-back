@@ -31,8 +31,6 @@ nohup java -jar \
     -Dspring.config.location=classpath:/application-$IDLE_PROFILE.yml \
     -Dspring.profiles.active=$IDLE_PROFILE $JAR_NAME > $REPOSITORY1/nohup.out 2>&1 &
 
-
-
 #nohup java -jar \
 #  -javaagent:${pinpointPath}/pinpoint-bootstrap-2.2.3-NCP-RC1.jar \
 #  -Dpinpoint.applicationName=moabuza.dev \
