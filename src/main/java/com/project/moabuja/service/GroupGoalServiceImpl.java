@@ -117,17 +117,18 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             int leftAmount = groupGoal.get().getGroupGoalAmount() - currentAmount;
             int percent = (int) (((double) currentAmount / (double) (groupGoal.get().getGroupGoalAmount())) * 100);
 
-            GroupResponseDto haveGoal = GroupResponseDto.builder()
+            GroupResponseDto goalResponseDto = GroupResponseDto.builder()
                     .goalStatus(goalStatus)
                     .groupMembers(groupMembers)
                     .groupName(groupGoal.get().getGroupGoalName())
+                    .groupGoalAmount(groupGoal.get().getGroupGoalAmount())
                     .groupLeftAmount(leftAmount)
                     .groupNowPercent(percent)
                     .groupDoneGoals(groupDoneGoalNames)
                     .groupLists(groupList)
                     .waitingGoals(null)
                     .build();
-            return new ResponseEntity<>(haveGoal, HttpStatus.OK);
+            return new ResponseEntity<>(goalResponseDto, HttpStatus.OK);
 
         } else {
             List<MemberWaitingGoal> checkWaitingGoal = new ArrayList<>();
@@ -144,10 +145,11 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                     waitingGoals.add(new WaitingGoalResponseDto(memberWaitingGoal.getWaitingGoal().getId(), memberWaitingGoal.getWaitingGoal().getWaitingGoalName()));
                 }
 
-                GroupResponseDto waiting = GroupResponseDto.builder()
+                GroupResponseDto waitingResponseDto = GroupResponseDto.builder()
                         .goalStatus(goalStatus)
                         .groupMembers(null)
                         .groupName(null)
+                        .groupGoalAmount(0)
                         .groupLeftAmount(0)
                         .groupNowPercent(0)
                         .groupDoneGoals(groupDoneGoalNames)
@@ -155,13 +157,14 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                         .waitingGoals(waitingGoals)
                         .build();
 
-                return new ResponseEntity<>(waiting, HttpStatus.OK);
+                return new ResponseEntity<>(waitingResponseDto, HttpStatus.OK);
             } else { //GroupGoal 없을때
                 String goalStatus = "noGoal";
-                GroupResponseDto noGoal = GroupResponseDto.builder()
+                GroupResponseDto noGoalResponseDto = GroupResponseDto.builder()
                         .goalStatus(goalStatus)
                         .groupMembers(null)
                         .groupName(null)
+                        .groupGoalAmount(0)
                         .groupLeftAmount(0)
                         .groupNowPercent(0)
                         .groupDoneGoals(groupDoneGoalNames)
@@ -169,7 +172,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
                         .waitingGoals(null)
                         .build();
 
-                return new ResponseEntity<>(noGoal, HttpStatus.OK);
+                return new ResponseEntity<>(noGoalResponseDto, HttpStatus.OK);
             }
         }
     }
@@ -251,13 +254,17 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
             // 다른 수락대기 상태의 Group Goal 폭파 및 알람
             List<MemberWaitingGoal> deleteMemberWaitingGoals = memberWaitingGoalRepository.findMemberWaitingGoalsByMember(currentMember);
+            List<WaitingGoal> deleteWaitings = new ArrayList<>();
             for (MemberWaitingGoal delete : deleteMemberWaitingGoals) {
-                WaitingGoal deleteWaiting = waitingGoalRepository.findWaitingGoalById(delete.getWaitingGoal().getId());
-                List<MemberWaitingGoal> alarmMemberList = deleteWaiting.getMemberWaitingGoals();
-                sendGoalAlarm(alarmMemberList, friendListTmp, currentMember, GROUP, boom, deleteWaiting, alarmRepository);
-                // waitingGoal 삭제
-                waitingGoalRepository.delete(deleteWaiting);
+                WaitingGoal waiting = delete.getWaitingGoal();
+                deleteWaitings.add(waiting);
+                // WaitingGoal waiting = waitingGoalRepository.findWaitingGoalById(delete.getWaitingGoal().getId());
+
+                List<MemberWaitingGoal> alarmMemberList = waiting.getMemberWaitingGoals();
+                sendGoalAlarm(alarmMemberList, friendListTmp, currentMember, GROUP, boom, waiting, alarmRepository);
             }
+            // waitingGoal 삭제
+            waitingGoalRepository.deleteAll(deleteWaitings);
         }
 
         return new ResponseEntity<>(new Msg(GroupAccept.getMsg()), HttpStatus.OK);

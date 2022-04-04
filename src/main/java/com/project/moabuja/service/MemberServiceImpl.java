@@ -70,12 +70,15 @@ public class MemberServiceImpl implements MemberService{
         int groupAmount = 0;
         int groupPercent = 0;
         String groupName = null;
+        int groupGoalAmount = 0;
 
         int challengeCurrentAmount = 0;
         int challengeNeedAmount = 0;
         int challengeAmount = 0;
         int challengePercent = 0;
         String challengeName = null;
+        int challengeGoalAmount = 0;
+
 
         int totalAmount = 0;
         int wallet = 0;
@@ -94,6 +97,7 @@ public class MemberServiceImpl implements MemberService{
             groupNeedAmount = groupGoal.getGroupGoalAmount() - groupCurrentAmount;
             groupPercent = (int) (((double) groupCurrentAmount / (double) (groupGoal.getGroupGoalAmount())) * 100);
             groupName = groupGoal.getGroupGoalName();
+            groupGoalAmount = groupGoal.getGroupGoalAmount();
         }
 
         ChallengeGoal challengeGoal = currentMember.getChallengeGoal();
@@ -106,6 +110,7 @@ public class MemberServiceImpl implements MemberService{
             challengeNeedAmount = challengeGoal.getChallengeGoalAmount() - challengeCurrentAmount;
             challengePercent = (int) (((double) challengeCurrentAmount / (double) (challengeGoal.getChallengeGoalAmount())) * 100);
             challengeName = challengeGoal.getChallengeGoalName();
+            challengeGoalAmount = challengeGoal.getChallengeGoalAmount();
         }
 
         //hero랑 heroLevel(레벨은 기준 정해야 함)
@@ -128,11 +133,13 @@ public class MemberServiceImpl implements MemberService{
                 .groupAmount(groupAmount)
                 .groupPercent(groupPercent)
                 .groupName(groupName)
+                .groupGoalAmount(groupGoalAmount)
                 .challengeCurrentAmount(challengeCurrentAmount)
                 .challengeNeedAmount(challengeNeedAmount)
                 .challengeAmount(challengeAmount)
                 .challengePercent(challengePercent)
                 .challengeName(challengeName)
+                .challengeGoalAmount(challengeGoalAmount)
                 .hero(hero)
                 .nickname(nickname)
                 .totalAmount(totalAmount)

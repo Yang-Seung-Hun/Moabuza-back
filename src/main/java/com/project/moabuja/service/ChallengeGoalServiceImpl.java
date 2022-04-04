@@ -108,6 +108,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                     .goalStatus(goalStatus)
                     .challengeMembers(challengeMembers)
                     .challengeName(challengeGoal.get().getChallengeGoalName())
+                    .challengeGoalAmount(challengeGoal.get().getChallengeGoalAmount())
                     .challengeDoneGoals(challengeDoneGoalNames)
                     .challengeLists(challengeLists)
                     .waitingGoals(null)
@@ -134,6 +135,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                         .goalStatus(goalStatus)
                         .challengeMembers(null)
                         .challengeName(null)
+                        .challengeGoalAmount(0)
                         .challengeDoneGoals(challengeDoneGoalNames)
                         .challengeLists(null)
                         .waitingGoals(waitingGoals)
@@ -147,6 +149,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                         .goalStatus(goalStatus)
                         .challengeMembers(null)
                         .challengeName(null)
+                        .challengeGoalAmount(0)
                         .challengeDoneGoals(challengeDoneGoalNames)
                         .challengeLists(null)
                         .waitingGoals(null)
@@ -242,14 +245,18 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
             // 다른 수락대기 상태의 Challenge Goal 폭파 및 알람
             List<MemberWaitingGoal> deleteMemberWaitingGoals = memberWaitingGoalRepository.findMemberWaitingGoalsByMember(currentMember);
+            List<WaitingGoal> deleteWaitings = new ArrayList<>();
             for (MemberWaitingGoal delete : deleteMemberWaitingGoals) {
-                WaitingGoal deleteWaiting = waitingGoalRepository.findWaitingGoalById(delete.getWaitingGoal().getId());
-                List<MemberWaitingGoal> alarmMemberList = deleteWaiting.getMemberWaitingGoals();
-                sendGoalAlarm(alarmMemberList, friendListTmp, currentMember, CHALLENGE, boom, deleteWaiting, alarmRepository);
 
-                // waitingGoal 삭제
-                waitingGoalRepository.delete(deleteWaiting);
+                // WaitingGoal deleteWaiting = waitingGoalRepository.findWaitingGoalById(delete.getWaitingGoal().getId());
+                WaitingGoal waiting = delete.getWaitingGoal();
+                deleteWaitings.add(waiting);
+
+                List<MemberWaitingGoal> alarmMemberList = waiting.getMemberWaitingGoals();
+                sendGoalAlarm(alarmMemberList, friendListTmp, currentMember, CHALLENGE, boom, waiting, alarmRepository);
             }
+            // waitingGoal 삭제
+            waitingGoalRepository.deleteAll(deleteWaitings);
         }
 
         return new ResponseEntity<>(new Msg(ChallengeAccept.getMsg()), HttpStatus.OK);
