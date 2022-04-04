@@ -56,6 +56,7 @@ public class MemberController {
     @PutMapping("/member/info")
     public ResponseEntity<Msg> update(@Valid @RequestBody MemberUpdateRequestDto dto,
                                               @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
+        log.info("================memberContorller ======= " + dto.getNickname(), dto.getFcmToken());
         fcmService.register(dto.getNickname(), dto.getFcmToken());
         return memberService.updateMemberInfo(dto, userDetails.getMember().getPassword());
     }

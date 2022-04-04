@@ -34,6 +34,7 @@ public class FCMServiceImpl implements FCMService{
 
     @Override
     public void register(final String nickname, final String token) {
+        log.info("token : " + token + " ====== 닉네임 : " + nickname);
         redisTemplate.opsForValue().set("Nickname:"+nickname, token);
     }
 

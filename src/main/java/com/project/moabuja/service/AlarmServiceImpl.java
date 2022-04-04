@@ -49,7 +49,6 @@ public class AlarmServiceImpl implements AlarmService {
         List<GoalAlarmResponseDto> groupAlarmList = alarms.stream()
                 .map(GoalAlarmResponseDto::of)
                 .collect(Collectors.toList());
-
         return new ResponseEntity<>(groupAlarmList, HttpStatus.OK);
     }
 
