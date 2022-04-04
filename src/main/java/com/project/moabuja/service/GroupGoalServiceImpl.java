@@ -251,13 +251,17 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
             // 다른 수락대기 상태의 Group Goal 폭파 및 알람
             List<MemberWaitingGoal> deleteMemberWaitingGoals = memberWaitingGoalRepository.findMemberWaitingGoalsByMember(currentMember);
+            List<WaitingGoal> deleteWaitings = new ArrayList<>();
             for (MemberWaitingGoal delete : deleteMemberWaitingGoals) {
-                WaitingGoal deleteWaiting = waitingGoalRepository.findWaitingGoalById(delete.getWaitingGoal().getId());
-                List<MemberWaitingGoal> alarmMemberList = deleteWaiting.getMemberWaitingGoals();
-                sendGoalAlarm(alarmMemberList, friendListTmp, currentMember, GROUP, boom, deleteWaiting, alarmRepository);
-                // waitingGoal 삭제
-                waitingGoalRepository.delete(deleteWaiting);
+                WaitingGoal waiting = delete.getWaitingGoal();
+                deleteWaitings.add(waiting);
+                // WaitingGoal waiting = waitingGoalRepository.findWaitingGoalById(delete.getWaitingGoal().getId());
+
+                List<MemberWaitingGoal> alarmMemberList = waiting.getMemberWaitingGoals();
+                sendGoalAlarm(alarmMemberList, friendListTmp, currentMember, GROUP, boom, waiting, alarmRepository);
             }
+            // waitingGoal 삭제
+            waitingGoalRepository.deleteAll(deleteWaitings);
         }
 
         return new ResponseEntity<>(new Msg(GroupAccept.getMsg()), HttpStatus.OK);
