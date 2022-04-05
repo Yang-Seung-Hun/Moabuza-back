@@ -1,10 +1,8 @@
 #!/bin/bash
 
-#===========
 REPOSITORY1=/home/ubuntu
 REPOSITORY=/home/ubuntu/app
 PROJECT_NAME=moabuja
-pinpointPath=/home/ubuntu/pinpoint-agent-2.2.3-NCP-RC1
 
 echo "> Build 파일 복사"
 #cp ./build/libs/*.jar $REPOSITORY/
@@ -33,16 +31,4 @@ chmod +x $JAR_NAME
 echo "> $JAR_NAME 실행"
 
 nohup java -jar $JAR_NAME > $REPOSITORY1/nohup.out 2>&1 &
-#nohup java -jar \
-#  -javaagent:$pinpointPath/pinpoint-bootstrap-2.2.3-NCP-RC1.jar \
-#  -Dpinpoint.applicationName=moabuza.dev \
-#  -Dpinpoint.agentId=pangpang > $REPOSITORY1/nohup.out 2>&1 &
 
-echo "> 마지막 $JAR_NAME 실행"
-
-#===========
-
-# shellcheck disable=SC2261
-#nohup java -jar $JAR_NAME  1 > $REPOSITORY1/stdout.out 2 > $REPOSITORY1/stderr.out &
-#nohup java -jar $JAR_NAME > /dev/null 2> /dev/null < /dev/null &
-#nohup java -jar $JAR_NAME > /dev/null 2>&1 &
