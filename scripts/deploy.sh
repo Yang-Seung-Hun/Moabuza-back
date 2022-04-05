@@ -10,7 +10,6 @@ echo "> 현재 구동중인 애플리케이션 pid 확인"
 
 CURRENT_PID=$(pgrep -fl $PROJECT_NAME | grep java | awk '{print $1}')
 
-
 echo "$CURRENT_PID"
 
 if [ -z $CURRENT_PID ]; then
@@ -24,7 +23,6 @@ fi
 echo "> 새 어플리케이션 배포"
 JAR_NAME=$(ls -tr $REPOSITORY/*.jar | tail -n 1)
 
-
 echo "> JAR Name: $JAR_NAME"
 
 echo "> $JAR_NAME에 실행권한 추가"
@@ -32,5 +30,10 @@ chmod +x $JAR_NAME
 
 echo "> $JAR_NAME 실행"
 
-nohup java -jar $JAR_NAME > $REPOSITORY1/nohup.out 2>&1 &
+#nohup java -jar $JAR_NAME > $REPOSITORY1/nohup.out 2>&1 &
+nohup java -jar /home/ubuntu/app/moabuja-0.0.1-SNAPSHOT.jar > /home/ubuntu/nohup.out 2>&1 &
 
+#nohup java -jar \
+#  -javaagent:$pinpointPath/pinpoint-bootstrap-2.2.3-NCP-RC1.jar \
+#  -Dpinpoint.applicationName=moabuza.dev \
+#  -Dpinpoint.agentId=pangpang > $REPOSITORY1/nohup.out 2>&1 &
