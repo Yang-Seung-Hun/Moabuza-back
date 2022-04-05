@@ -41,6 +41,8 @@ nohup java -jar \
   -Dspring.config.location=classpath:/application.yml \
   -Dspring.profiles.active=real > $REPOSITORY1/nohup.out 2>&1 &
 
+echo "> 마지막 $JAR_NAME 실행"
+
 #===========
 
 # shellcheck disable=SC2261
