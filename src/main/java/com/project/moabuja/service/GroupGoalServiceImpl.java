@@ -335,12 +335,15 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     //challengeGoalServiceImpl에서도 사용
     static void inviteFriends(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto, WaitingGoal waitingGoal, MemberWaitingGoalRepository memberWaitingGoalRepository, MemberRepository memberRepository, AlarmRepository alarmRepository, AlarmType alarmType) {
-        memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, true));
+        MemberWaitingGoal memberWaitingGoalAccepted = new MemberWaitingGoal(currentMember, waitingGoal, true);
+        memberWaitingGoalRepository.save(memberWaitingGoalAccepted);
+        waitingGoal.addMemberWaitingGoals(memberWaitingGoalAccepted);
 
         for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
             Member member = Optional.of(memberRepository.findMemberByNickname(friendNickname)).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
             MemberWaitingGoal memberWaitingGoal = new MemberWaitingGoal(member, waitingGoal, false);
             memberWaitingGoalRepository.save(memberWaitingGoal);
+            waitingGoal.addMemberWaitingGoals(memberWaitingGoal);
             GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
                     .alarmType(alarmType)
                     .alarmDetailType(AlarmDetailType.invite)
@@ -381,7 +384,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     //challengeGoalServiceImpl에서도 사용
     static List<String> sendGoalAlarm(List<MemberWaitingGoal> friends, List<String> friendList, Member currentMember, AlarmType alarmType, AlarmDetailType alarmDetailType, WaitingGoal waitingGoal, AlarmRepository alarmRepository) {
         for (MemberWaitingGoal friend : friends) {
-            if (friend.getMember() != currentMember) {
+            if (alarmDetailType == AlarmDetailType.boom ||friend.getMember() != currentMember) {
                 friendList.add(friend.getMember().getNickname());
                 GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
                         .alarmType(alarmType)

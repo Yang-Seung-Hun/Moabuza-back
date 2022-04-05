@@ -240,7 +240,13 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             // ChallengeGoal 생성
             CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
             save(createChallengeRequestDto, currentMember);
-            waitingGoalRepository.delete(waitingGoal);
+
+            List<MemberWaitingGoal> memberWaitingGoals = waitingGoal.getMemberWaitingGoals();
+            while(!memberWaitingGoals.isEmpty()){
+                Long id = memberWaitingGoals.get(0).getId();
+                waitingGoal.removeMemberWaitingGoals(memberWaitingGoals.get(0));
+                memberWaitingGoalRepository.deleteById(id);
+            }waitingGoalRepository.delete(waitingGoal);
             alarmRepository.delete(alarm);
 
             // 다른 수락대기 상태의 Challenge Goal 폭파 및 알람
@@ -253,6 +259,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                 deleteWaitings.add(waiting);
 
                 List<MemberWaitingGoal> alarmMemberList = waiting.getMemberWaitingGoals();
+
                 sendGoalAlarm(alarmMemberList, friendListTmp, currentMember, CHALLENGE, boom, waiting, alarmRepository);
             }
             // waitingGoal 삭제
