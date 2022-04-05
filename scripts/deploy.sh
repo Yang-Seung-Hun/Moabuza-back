@@ -36,9 +36,7 @@ echo "> $JAR_NAME 실행"
 nohup java -jar \
   -javaagent:$pinpointPath/pinpoint-bootstrap-2.2.3-NCP-RC1.jar \
   -Dpinpoint.applicationName=moabuza.dev \
-  -Dpinpoint.agentId=pangpang \
-  -Dspring.config.location=classpath:/application.yml \
-  -Dspring.profiles.active=real > $REPOSITORY1/nohup.out 2>&1 &
+  -Dpinpoint.agentId=pangpang > $REPOSITORY1/nohup.out 2>&1 &
 
 echo "> 마지막 $JAR_NAME 실행"
 
