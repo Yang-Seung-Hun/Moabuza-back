@@ -1,5 +1,5 @@
 server:
-  port: 8081  # Sp
+  port: 8080  # Sp
 
 spring:
   config:
