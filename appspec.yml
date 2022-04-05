@@ -27,7 +27,7 @@ permissions:
 
 hooks:
   ApplicationStart:
-    - location: deploy.sh # nginx와 연결되어 있지 않은 포트로 스프링 부트 시작.
+    - location: deploy.sh
       timeout: 120
       runas: ubuntu
 
