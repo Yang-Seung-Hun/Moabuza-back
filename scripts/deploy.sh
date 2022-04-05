@@ -1,6 +1,6 @@
-!/bin/bash
+#!/bin/bash
 
-===========
+#===========
 REPOSITORY1=/home/ubuntu
 REPOSITORY=/home/ubuntu/app
 PROJECT_NAME=moabuja
@@ -41,7 +41,7 @@ nohup java -jar \
   -Dspring.config.location=classpath:/application.yml \
   -Dspring.profiles.active=real > $REPOSITORY1/nohup.out 2>&1 &
 
-===========
+#===========
 
 # shellcheck disable=SC2261
 #nohup java -jar $JAR_NAME  1 > $REPOSITORY1/stdout.out 2 > $REPOSITORY1/stderr.out &
