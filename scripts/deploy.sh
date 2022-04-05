@@ -32,11 +32,11 @@ chmod +x $JAR_NAME
 
 echo "> $JAR_NAME 실행"
 
-#nohup java -jar $JAR_NAME > $REPOSITORY1/nohup.out 2>&1 &
-nohup java -jar \
-  -javaagent:$pinpointPath/pinpoint-bootstrap-2.2.3-NCP-RC1.jar \
-  -Dpinpoint.applicationName=moabuza.dev \
-  -Dpinpoint.agentId=pangpang > $REPOSITORY1/nohup.out 2>&1 &
+nohup java -jar $JAR_NAME > $REPOSITORY1/nohup.out 2>&1 &
+#nohup java -jar \
+#  -javaagent:$pinpointPath/pinpoint-bootstrap-2.2.3-NCP-RC1.jar \
+#  -Dpinpoint.applicationName=moabuza.dev \
+#  -Dpinpoint.agentId=pangpang > $REPOSITORY1/nohup.out 2>&1 &
 
 echo "> 마지막 $JAR_NAME 실행"
 

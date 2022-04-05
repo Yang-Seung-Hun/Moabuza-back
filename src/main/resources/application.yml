@@ -2,10 +2,6 @@ server:
   port: 8080  # Sp
 
 spring:
-  config:
-    activate:
-      on-profile: real
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${spring.datasource.url}
