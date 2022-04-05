@@ -1,30 +1,30 @@
-server:
-  port: 8080  # Sp
-
-spring:
-  config:
-    activate:
-      on-profile: real1
-
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${spring.datasource.url}
-    username: ${spring.datasource.username}
-    password: ${spring.datasource.password}
-
-  redis:
-    host: #여기 부분은 자신의 ip에 맞춰서 바꾸기 -> ec2 redis 설치 후 연결 ip
-      127.0.0.1
-    port:
-      6379
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-
-logging:
-  level:
-    root: error
-
-jwt:
-  secret: ${jwt.secret}
+#server:
+#  port: 8080  # Sp
+#
+#spring:
+#  config:
+#    activate:
+#      on-profile: real1
+#
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: ${spring.datasource.url}
+#    username: ${spring.datasource.username}
+#    password: ${spring.datasource.password}
+#
+#  redis:
+#    host: #여기 부분은 자신의 ip에 맞춰서 바꾸기 -> ec2 redis 설치 후 연결 ip
+#      127.0.0.1
+#    port:
+#      6379
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#
+#logging:
+#  level:
+#    root: error
+#
+#jwt:
+#  secret: ${jwt.secret}
