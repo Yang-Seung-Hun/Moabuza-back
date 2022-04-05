@@ -1,8 +1,10 @@
 //package com.project.moabuja.service;
 //
 //import com.project.moabuja.domain.alarm.Alarm;
+//import com.project.moabuja.domain.alarm.AlarmDetailType;
 //import com.project.moabuja.domain.friend.Friend;
 //import com.project.moabuja.domain.goal.ChallengeGoal;
+//import com.project.moabuja.domain.goal.WaitingGoal;
 //import com.project.moabuja.domain.member.Hero;
 //import com.project.moabuja.domain.member.Member;
 //import com.project.moabuja.domain.record.RecordType;
@@ -32,7 +34,7 @@
 //import static com.project.moabuja.domain.goal.GoalType.*;
 //
 //@SpringBootTest
-//@Rollback(value = true)
+//@Rollback(value = false)
 //@Transactional
 //class ChallengeGoalServiceImplTest {
 //
@@ -44,6 +46,7 @@
 //    @Autowired private MemberService memberService;
 //    @Autowired private FriendRepository friendRepository;
 //    @Autowired private AlarmRepository alarmRepository;
+//    @Autowired private WaitingGoalRepository waitingGoalRepository;
 //
 //    @Test
 //    @DisplayName("1인 도전해부자 생성")
@@ -479,5 +482,193 @@
 //        Assertions.assertThat(allByMember2.size()).isEqualTo(2);
 //        Assertions.assertThat(allByMember2.get(0).getAlarmDetailType()).isEqualTo(invite);
 //        Assertions.assertThat(allByMember2.get(1).getAlarmDetailType()).isEqualTo(invite);
+//    }
+//
+//    @Test
+//    @DisplayName("not EveryOne Accepts invitation")
+//    public void postChallengeAccept1(){
+//
+//        //given
+//        Member member1 = new Member("123456", 123456L, "nickname1", "email1@naver.com", Hero.tongki);
+//        Member savedMember1 = memberRepository.save(member1);
+//
+//        Member member2 = new Member("123457", 123457L, "nickname2", "email2@naver.com", Hero.tanni);
+//        Member savedMember2 = memberRepository.save(member2);
+//
+//        Member member3 = new Member("123458", 123458L, "nickname3", "email3@naver.com", Hero.bunny);
+//        Member savedMember3 = memberRepository.save(member3);
+//
+//        List<String> friends = new ArrayList<>(Arrays.asList("nickname2","nickname3"));
+//
+//        //when
+//        GoalAlarmRequestDto goalAlarmRequestDto = new GoalAlarmRequestDto(CHALLENGE,"100만원 도전",1000000,friends);
+//        challengeGoalService.postChallenge(savedMember1,goalAlarmRequestDto);
+//
+//        List<Alarm> allByMember2Before = alarmRepository.findAllByMember(savedMember2);
+//        List<Alarm> allByMember3Before = alarmRepository.findAllByMember(savedMember3);
+//        Long alarmId1 = allByMember2Before.get(0).getId();
+//        Long alarmId2 = allByMember3Before.get(0).getId();
+//
+//        //member2의 invite알람 삭제, member1 이랑 member2한테 accept 알람 보냄
+//        challengeGoalService.postChallengeAccept(savedMember2, alarmId1);
+//
+//        List<Alarm> allByMember1After = alarmRepository.findAllByMember(savedMember1);
+//        List<Alarm> allByMember2After = alarmRepository.findAllByMember(savedMember2);
+//        List<Alarm> allByMember3After = alarmRepository.findAllByMember(savedMember3);
+//
+//        //then
+//        Assertions.assertThat(allByMember1After.size()).isEqualTo(1);//member2의 수락
+//        Assertions.assertThat(allByMember1After.get(0).getAlarmDetailType()).isEqualTo(accept);
+//        Assertions.assertThat(allByMember2After.size()).isEqualTo(0);
+//        Assertions.assertThat(allByMember3After.size()).isEqualTo(2);//member2의 수락, member1의 초대
+//        Assertions.assertThat(allByMember3After.get(0).getAlarmDetailType()).isEqualTo(invite);
+//        Assertions.assertThat(allByMember3After.get(1).getAlarmDetailType()).isEqualTo(accept);
+//    }
+//
+//    @Test
+//    @DisplayName("EveryOne Accepts invitation")
+//    public void postChallengeAccept2(){
+//
+//        //given
+//        Member member1 = new Member("123456", 123456L, "nickname1", "email1@naver.com", Hero.tongki);
+//        Member savedMember1 = memberRepository.save(member1);
+//
+//        Member member2 = new Member("123457", 123457L, "nickname2", "email2@naver.com", Hero.tanni);
+//        Member savedMember2 = memberRepository.save(member2);
+//
+//        Member member3 = new Member("123458", 123458L, "nickname3", "email3@naver.com", Hero.bunny);
+//        Member savedMember3 = memberRepository.save(member3);
+//
+//        List<String> friends = new ArrayList<>(Arrays.asList("nickname2","nickname3"));
+//        List<String> friends2 = new ArrayList<>(Arrays.asList("nickname3"));
+//
+//        //member2,3한테 invite 알람
+//        GoalAlarmRequestDto goalAlarmRequestDto = new GoalAlarmRequestDto(CHALLENGE,"100만원 도전",1000000,friends);
+//        challengeGoalService.postChallenge(savedMember1,goalAlarmRequestDto);
+//
+//        //member3한테 invite 알람
+//        GoalAlarmRequestDto goalAlarmRequestDto2 = new GoalAlarmRequestDto(CHALLENGE,"300만원 도전",3000000,friends2);
+//        challengeGoalService.postChallenge(savedMember2,goalAlarmRequestDto2);
+//
+//        List<Alarm> allByMember2Before = alarmRepository.findAllByMember(savedMember2);
+//        List<Alarm> allByMember3Before = alarmRepository.findAllByMember(savedMember3);
+//        Long alarmId1 = allByMember2Before.get(0).getId();
+//        Long alarmId2 = allByMember3Before.get(0).getId();
+//        Long alarmId3 = allByMember3Before.get(1).getId();
+//
+//        //when
+//        //member2의 invite알람 삭제, member1 이랑 member3한테 accept 알람 보냄
+//        challengeGoalService.postChallengeAccept(savedMember2, alarmId1);
+//        //member3의 invite알람 삭제, member1 이랑 member2한테 accept 알람 보냄, member1,2,3한테 create알람 보냄, member2,3한테 대기 challenge boom 알람
+//        challengeGoalService.postChallengeAccept(savedMember3, alarmId2);
+//
+//        List<Alarm> allByMember1After = alarmRepository.findAllByMember(savedMember1);
+//        List<Alarm> allByMember2After = alarmRepository.findAllByMember(savedMember2);
+//        List<Alarm> allByMember3After = alarmRepository.findAllByMember(savedMember3);
+//
+//        //then
+//        Assertions.assertThat(allByMember1After.size()).isEqualTo(2);
+//        Assertions.assertThat(allByMember1After.get(0).getAlarmDetailType()).isEqualTo(accept);
+//        Assertions.assertThat(allByMember1After.get(1).getAlarmDetailType()).isEqualTo(create);
+//        Assertions.assertThat(allByMember2After.size()).isEqualTo(2);
+//        Assertions.assertThat(allByMember2After.get(0).getAlarmDetailType()).isEqualTo(create);
+//        Assertions.assertThat(allByMember2After.get(1).getAlarmDetailType()).isEqualTo(boom);
+//        Assertions.assertThat(allByMember3After.size()).isEqualTo(4);
+//        Assertions.assertThat(allByMember3After.get(0).getAlarmDetailType()).isEqualTo(invite);
+//        Assertions.assertThat(allByMember3After.get(1).getAlarmDetailType()).isEqualTo(accept);
+//        Assertions.assertThat(allByMember3After.get(2).getAlarmDetailType()).isEqualTo(create);
+//        Assertions.assertThat(allByMember3After.get(3).getAlarmDetailType()).isEqualTo(boom);
+//    }
+//
+//    @Test
+//    @DisplayName("delete waiting goals when one refuse")
+//    public void postChallengeRefuse(){
+//        //given
+//        Member member1 = new Member("123456", 123456L, "nickname1", "email1@naver.com", Hero.tongki);
+//        Member savedMember1 = memberRepository.save(member1);
+//
+//        Member member2 = new Member("123457", 123457L, "nickname2", "email2@naver.com", Hero.tanni);
+//        Member savedMember2 = memberRepository.save(member2);
+//
+//        Member member3 = new Member("123458", 123458L, "nickname3", "email3@naver.com", Hero.bunny);
+//        Member savedMember3 = memberRepository.save(member3);
+//
+//        Member member4 = new Member("123459", 123459L, "nickname4", "email4@naver.com", Hero.bunny);
+//        Member savedMember4 = memberRepository.save(member4);
+//
+//        List<String> friends = new ArrayList<>(Arrays.asList("nickname2","nickname3"));
+//        List<String> friends2 = new ArrayList<>(Arrays.asList("nickname3", "nickname4"));
+//
+//        GoalAlarmRequestDto goalAlarmRequestDto = new GoalAlarmRequestDto(CHALLENGE,"100만원 도전",1000000,friends);
+//        challengeGoalService.postChallenge(savedMember1,goalAlarmRequestDto);
+//
+//        GoalAlarmRequestDto goalAlarmRequestDto2 = new GoalAlarmRequestDto(CHALLENGE,"200만원 도전",2000000,friends2);
+//        challengeGoalService.postChallenge(savedMember2,goalAlarmRequestDto2);
+//
+//        //when
+//        List<Alarm> allByMember2Before = alarmRepository.findAllByMember(savedMember2);
+//        Long alarmId1 = allByMember2Before.get(0).getId();
+//        challengeGoalService.postChallengeRefuse(savedMember2, alarmId1);
+//
+//        List<Alarm> allByMember1After = alarmRepository.findAllByMember(savedMember1);
+//        List<Alarm> allByMember2After = alarmRepository.findAllByMember(savedMember2);
+//        List<Alarm> allByMember3After = alarmRepository.findAllByMember(savedMember3);
+//        List<Alarm> allByMember4After = alarmRepository.findAllByMember(savedMember4);
+//
+//        List<WaitingGoal> allWaitingGoal = waitingGoalRepository.findAll();
+//
+//        //then
+//        Assertions.assertThat(allByMember1After.size()).isEqualTo(1);
+//        Assertions.assertThat(allByMember1After.get(0).getAlarmDetailType()).isEqualTo(boom);
+//        Assertions.assertThat(allByMember2After.size()).isEqualTo(1);
+//        Assertions.assertThat(allByMember2After.get(0).getAlarmDetailType()).isEqualTo(boom);
+//        Assertions.assertThat(allByMember3After.size()).isEqualTo(2);
+//        Assertions.assertThat(allByMember3After.get(0).getAlarmDetailType()).isEqualTo(invite);
+//        Assertions.assertThat(allByMember3After.get(1).getAlarmDetailType()).isEqualTo(boom);
+//        Assertions.assertThat(allByMember4After.size()).isEqualTo(1);
+//        Assertions.assertThat(allByMember4After.get(0).getAlarmDetailType()).isEqualTo(invite);
+//        Assertions.assertThat(allWaitingGoal.size()).isEqualTo(1);
+//        Assertions.assertThat(allWaitingGoal.get(0).getWaitingGoalName()).isEqualTo("200만원 도전");
+//    }
+//
+//    @Test
+//    @DisplayName("delete waiting goals when one cancel")
+//    public void exitWaitingChallenge(){
+//        //given
+//        Member member1 = new Member("123456", 123456L, "nickname1", "email1@naver.com", Hero.tongki);
+//        Member savedMember1 = memberRepository.save(member1);
+//
+//        Member member2 = new Member("123457", 123457L, "nickname2", "email2@naver.com", Hero.tanni);
+//        Member savedMember2 = memberRepository.save(member2);
+//
+//        Member member3 = new Member("123458", 123458L, "nickname3", "email3@naver.com", Hero.bunny);
+//        Member savedMember3 = memberRepository.save(member3);
+//
+//        List<String> friends = new ArrayList<>(Arrays.asList("nickname2","nickname3"));
+//
+//        GoalAlarmRequestDto goalAlarmRequestDto = new GoalAlarmRequestDto(CHALLENGE,"100만원 도전",1000000,friends);
+//        challengeGoalService.postChallenge(savedMember1,goalAlarmRequestDto);
+//
+//        //when
+//        List<Alarm> allByMember2Before = alarmRepository.findAllByMember(savedMember2);
+//        List<WaitingGoal> all = waitingGoalRepository.findAll();
+//
+//        challengeGoalService.exitWaitingChallenge(savedMember2,all.get(0).getId());
+//
+//        List<Alarm> allByMember1After = alarmRepository.findAllByMember(savedMember1);
+//        List<Alarm> allByMember2After = alarmRepository.findAllByMember(savedMember2);
+//        List<Alarm> allByMember3After = alarmRepository.findAllByMember(savedMember3);
+//
+//        List<WaitingGoal> allWaitingGoal = waitingGoalRepository.findAll();
+//
+//        //then
+//        Assertions.assertThat(allByMember1After.size()).isEqualTo(1);
+//        Assertions.assertThat(allByMember1After.get(0).getAlarmDetailType()).isEqualTo(boom);
+//        Assertions.assertThat(allByMember2After.size()).isEqualTo(1);
+//        Assertions.assertThat(allByMember2After.get(0).getAlarmDetailType()).isEqualTo(boom);
+//        Assertions.assertThat(allByMember3After.size()).isEqualTo(2);
+//        Assertions.assertThat(allByMember3After.get(0).getAlarmDetailType()).isEqualTo(invite);
+//        Assertions.assertThat(allByMember3After.get(1).getAlarmDetailType()).isEqualTo(boom);
+//        Assertions.assertThat(allWaitingGoal.size()).isEqualTo(0);
 //    }
 //}

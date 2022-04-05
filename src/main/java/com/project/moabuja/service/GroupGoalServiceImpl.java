@@ -180,13 +180,9 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     @Override
     public ResponseEntity<CreateGroupResponseDto> getGroupMemberCandidates(Member currentMember) {
 
-        List<Friend> friendsTemp = friendRepository.findFriendsByMember(currentMember);
-        List<Friend> friends = new ArrayList<>();
-        for (Friend friend : friendsTemp) {
-            if (friendService.friendCheck(friend.getMember(), friend.getFriend()).equals(FriendStatus.FRIEND)) {
-                friends.add(friend);
-            }
-        }
+        List<Friend> friendsTmp = new ArrayList<>();
+        List<Friend> friends =  makeFriendList(friendRepository,currentMember,friendsTmp,friendService);
+
         List<CreateGroupMemberDto> groupMembers = new ArrayList<>();
 
         if (friends.size() == 0){
@@ -335,12 +331,15 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     //challengeGoalServiceImpl에서도 사용
     static void inviteFriends(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto, WaitingGoal waitingGoal, MemberWaitingGoalRepository memberWaitingGoalRepository, MemberRepository memberRepository, AlarmRepository alarmRepository, AlarmType alarmType) {
-        memberWaitingGoalRepository.save(new MemberWaitingGoal(currentMember, waitingGoal, true));
+        MemberWaitingGoal memberWaitingGoalAccepted = new MemberWaitingGoal(currentMember, waitingGoal, true);
+        memberWaitingGoalRepository.save(memberWaitingGoalAccepted);
+        waitingGoal.addMemberWaitingGoals(memberWaitingGoalAccepted);
 
         for (String friendNickname : goalAlarmRequestDto.getFriendNickname()) {
             Member member = Optional.of(memberRepository.findMemberByNickname(friendNickname)).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
             MemberWaitingGoal memberWaitingGoal = new MemberWaitingGoal(member, waitingGoal, false);
             memberWaitingGoalRepository.save(memberWaitingGoal);
+            waitingGoal.addMemberWaitingGoals(memberWaitingGoal);
             GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
                     .alarmType(alarmType)
                     .alarmDetailType(AlarmDetailType.invite)
@@ -362,7 +361,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         List<String> friendListTmp = new ArrayList<>();
         sendGoalAlarm(waitingGoal.getMemberWaitingGoals(), friendListTmp, currentMember, alarmType, boom, waitingGoal, alarmRepository);
-        goalAlarm(currentMember, currentMember, alarmType, boom, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
+//        goalAlarm(currentMember, currentMember, alarmType, boom, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
 
         waitingGoalRepository.delete(waitingGoal);
     }
@@ -381,7 +380,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     //challengeGoalServiceImpl에서도 사용
     static List<String> sendGoalAlarm(List<MemberWaitingGoal> friends, List<String> friendList, Member currentMember, AlarmType alarmType, AlarmDetailType alarmDetailType, WaitingGoal waitingGoal, AlarmRepository alarmRepository) {
         for (MemberWaitingGoal friend : friends) {
-            if (friend.getMember() != currentMember) {
+            if (alarmDetailType == AlarmDetailType.boom ||friend.getMember() != currentMember) {
                 friendList.add(friend.getMember().getNickname());
                 GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
                         .alarmType(alarmType)
@@ -412,4 +411,13 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         alarmRepository.save(GoalAlarmSaveDto.goalToEntity(alarmSaveDto));
     }
 
+    static public List<Friend> makeFriendList(FriendRepository friendRepository, Member currentMember,List<Friend> friends, FriendService friendService){
+        List<Friend> friendsTemp = friendRepository.findFriendsByMember(currentMember);
+        for (Friend friend : friendsTemp) {
+            if (friendService.friendCheck(friend.getMember(), friend.getFriend()).equals(FriendStatus.FRIEND)) {
+                friends.add(friend);
+            }
+        }
+        return friends;
+    }
 }

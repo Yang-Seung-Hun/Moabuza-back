@@ -36,4 +36,14 @@ public class WaitingGoal {
 
     protected WaitingGoal () {}
 
+    public void removeMemberWaitingGoals(MemberWaitingGoal memberWaitingGoal){
+        this.memberWaitingGoals.remove(memberWaitingGoal);
+        memberWaitingGoal.changeWaitingGoal(null);
+    }
+
+    public void addMemberWaitingGoals(MemberWaitingGoal memberWaitingGoal){
+        this.memberWaitingGoals.add(memberWaitingGoal);
+        memberWaitingGoal.changeWaitingGoal(this);
+    }
+
 }

@@ -34,4 +34,8 @@ public class MemberWaitingGoal {
     }
 
     protected MemberWaitingGoal () {}
+
+    public void changeWaitingGoal(WaitingGoal waitingGoal){
+        this.waitingGoal = waitingGoal;
+    }
 }

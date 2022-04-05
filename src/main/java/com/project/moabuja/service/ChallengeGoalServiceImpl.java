@@ -163,15 +163,10 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Override
     public ResponseEntity<CreateChallengeResponseDto> getChallengeMemberCandidates(Member currentMember) {
 
-        List<Friend> friendsTemp = friendRepository.findFriendsByMember(currentMember);
-        List<Friend> friends = new ArrayList<>();
-        for (Friend friend : friendsTemp) {
-            if (friendService.friendCheck(friend.getMember(), friend.getFriend()).equals(FriendStatus.FRIEND)) {
-                friends.add(friend);
-            }
-        }
-        List<CreateChallengeMemberDto> challengeMembers = new ArrayList<>();
+        List<Friend> friendsTmp = new ArrayList<>();
+        List<Friend> friends = makeFriendList(friendRepository,currentMember, friendsTmp, friendService);
 
+        List<CreateChallengeMemberDto> challengeMembers = new ArrayList<>();
         if (friends.size() == 0){
             CreateChallengeResponseDto createChallengeResponseDto = new CreateChallengeResponseDto(challengeMembers);
             return new ResponseEntity<>(createChallengeResponseDto, HttpStatus.OK);
@@ -240,7 +235,13 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             // ChallengeGoal 생성
             CreateChallengeRequestDto createChallengeRequestDto = new CreateChallengeRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
             save(createChallengeRequestDto, currentMember);
-            waitingGoalRepository.delete(waitingGoal);
+
+            List<MemberWaitingGoal> memberWaitingGoals = waitingGoal.getMemberWaitingGoals();
+            while(!memberWaitingGoals.isEmpty()){
+                Long id = memberWaitingGoals.get(0).getId();
+                waitingGoal.removeMemberWaitingGoals(memberWaitingGoals.get(0));
+                memberWaitingGoalRepository.deleteById(id);
+            }waitingGoalRepository.delete(waitingGoal);
             alarmRepository.delete(alarm);
 
             // 다른 수락대기 상태의 Challenge Goal 폭파 및 알람
@@ -253,6 +254,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
                 deleteWaitings.add(waiting);
 
                 List<MemberWaitingGoal> alarmMemberList = waiting.getMemberWaitingGoals();
+
                 sendGoalAlarm(alarmMemberList, friendListTmp, currentMember, CHALLENGE, boom, waiting, alarmRepository);
             }
             // waitingGoal 삭제
@@ -272,7 +274,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         List<String> friendListTmp = new ArrayList<>();
         sendGoalAlarm(friends, friendListTmp, currentMember, CHALLENGE, boom, waitingGoal, alarmRepository);
-        goalAlarm(currentMember, currentMember, CHALLENGE, boom, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
+//        goalAlarm(currentMember, currentMember, CHALLENGE, boom, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
 
         List<Alarm> deleteAlarmList = alarmRepository.findAlarmsByWaitingGoalIdAndAlarmDetailType(alarm.getWaitingGoalId(), AlarmDetailType.invite);
         alarmRepository.deleteAll(deleteAlarmList);
