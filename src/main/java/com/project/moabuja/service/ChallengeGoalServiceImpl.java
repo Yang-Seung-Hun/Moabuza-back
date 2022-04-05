@@ -163,15 +163,10 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Override
     public ResponseEntity<CreateChallengeResponseDto> getChallengeMemberCandidates(Member currentMember) {
 
-        List<Friend> friendsTemp = friendRepository.findFriendsByMember(currentMember);
-        List<Friend> friends = new ArrayList<>();
-        for (Friend friend : friendsTemp) {
-            if (friendService.friendCheck(friend.getMember(), friend.getFriend()).equals(FriendStatus.FRIEND)) {
-                friends.add(friend);
-            }
-        }
-        List<CreateChallengeMemberDto> challengeMembers = new ArrayList<>();
+        List<Friend> friendsTmp = new ArrayList<>();
+        List<Friend> friends = makeFriendList(friendRepository,currentMember, friendsTmp, friendService);
 
+        List<CreateChallengeMemberDto> challengeMembers = new ArrayList<>();
         if (friends.size() == 0){
             CreateChallengeResponseDto createChallengeResponseDto = new CreateChallengeResponseDto(challengeMembers);
             return new ResponseEntity<>(createChallengeResponseDto, HttpStatus.OK);

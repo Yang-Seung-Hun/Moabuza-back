@@ -555,26 +555,26 @@ class ChallengeGoalServiceImplTest {
         Long alarmId2 = allByMember3Before.get(0).getId();
         Long alarmId3 = allByMember3Before.get(1).getId();
 
-        System.out.println("================");
-        System.out.println(alarmId2);
-        System.out.println(alarmId3);
-
         //member2의 invite알람 삭제, member1 이랑 member3한테 accept 알람 보냄
         challengeGoalService.postChallengeAccept(savedMember2, alarmId1);
         //member3의 invite알람 삭제, member1 이랑 member2한테 accept 알람 보냄, member1,2,3한테 create알람 보냄, member2,3한테 대기 challenge boom 알람
         challengeGoalService.postChallengeAccept(savedMember3, alarmId2);
 
-//        List<Alarm> allByMember1After = alarmRepository.findAllByMember(savedMember1);
-//        List<Alarm> allByMember2After = alarmRepository.findAllByMember(savedMember2);
-//        List<Alarm> allByMember3After = alarmRepository.findAllByMember(savedMember3);
-//
-//        //then
-//        Assertions.assertThat(allByMember1After.size()).isEqualTo(1);//member2의 수락
-//        Assertions.assertThat(allByMember1After.get(0).getAlarmDetailType()).isEqualTo(accept);
-//        Assertions.assertThat(allByMember2After.size()).isEqualTo(0);
-//        Assertions.assertThat(allByMember3After.size()).isEqualTo(2);//member2의 수락, member1의 초대
-//        Assertions.assertThat(allByMember3After.get(0).getAlarmDetailType()).isEqualTo(invite);
-//        Assertions.assertThat(allByMember3After.get(1).getAlarmDetailType()).isEqualTo(accept);
-    }
+        List<Alarm> allByMember1After = alarmRepository.findAllByMember(savedMember1);
+        List<Alarm> allByMember2After = alarmRepository.findAllByMember(savedMember2);
+        List<Alarm> allByMember3After = alarmRepository.findAllByMember(savedMember3);
 
+        //then
+        Assertions.assertThat(allByMember1After.size()).isEqualTo(2);//member2의 수락
+        Assertions.assertThat(allByMember1After.get(0).getAlarmDetailType()).isEqualTo(accept);
+        Assertions.assertThat(allByMember1After.get(1).getAlarmDetailType()).isEqualTo(create);
+        Assertions.assertThat(allByMember2After.size()).isEqualTo(2);
+        Assertions.assertThat(allByMember2After.get(0).getAlarmDetailType()).isEqualTo(create);
+        Assertions.assertThat(allByMember2After.get(1).getAlarmDetailType()).isEqualTo(boom);
+        Assertions.assertThat(allByMember3After.size()).isEqualTo(4);//member2의 수락, member1의 초대
+        Assertions.assertThat(allByMember3After.get(0).getAlarmDetailType()).isEqualTo(invite);
+        Assertions.assertThat(allByMember3After.get(1).getAlarmDetailType()).isEqualTo(accept);
+        Assertions.assertThat(allByMember3After.get(2).getAlarmDetailType()).isEqualTo(create);
+        Assertions.assertThat(allByMember3After.get(3).getAlarmDetailType()).isEqualTo(boom);
+    }
 }
