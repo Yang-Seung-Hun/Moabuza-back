@@ -361,7 +361,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         List<String> friendListTmp = new ArrayList<>();
         sendGoalAlarm(waitingGoal.getMemberWaitingGoals(), friendListTmp, currentMember, alarmType, boom, waitingGoal, alarmRepository);
-        goalAlarm(currentMember, currentMember, alarmType, boom, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
+//        goalAlarm(currentMember, currentMember, alarmType, boom, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
 
         waitingGoalRepository.delete(waitingGoal);
     }

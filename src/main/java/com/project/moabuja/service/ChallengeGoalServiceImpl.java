@@ -274,7 +274,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         List<String> friendListTmp = new ArrayList<>();
         sendGoalAlarm(friends, friendListTmp, currentMember, CHALLENGE, boom, waitingGoal, alarmRepository);
-        goalAlarm(currentMember, currentMember, CHALLENGE, boom, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
+//        goalAlarm(currentMember, currentMember, CHALLENGE, boom, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
 
         List<Alarm> deleteAlarmList = alarmRepository.findAlarmsByWaitingGoalIdAndAlarmDetailType(alarm.getWaitingGoalId(), AlarmDetailType.invite);
         alarmRepository.deleteAll(deleteAlarmList);
