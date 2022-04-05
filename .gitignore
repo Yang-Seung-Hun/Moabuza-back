@@ -39,3 +39,4 @@ out/
 #*.properties
 #application.yml
 #application-local.properties
+test-application.yml
