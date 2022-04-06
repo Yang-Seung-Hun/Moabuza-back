@@ -43,7 +43,6 @@
 //    @Autowired private ChallengeGoalRepository challengeGoalRepository;
 //    @Autowired private RecordService recordService;
 //    @Autowired private EntityManager em;
-//    @Autowired private MemberService memberService;
 //    @Autowired private FriendRepository friendRepository;
 //    @Autowired private AlarmRepository alarmRepository;
 //    @Autowired private WaitingGoalRepository waitingGoalRepository;
@@ -666,9 +665,8 @@
 //        Assertions.assertThat(allByMember1After.get(0).getAlarmDetailType()).isEqualTo(boom);
 //        Assertions.assertThat(allByMember2After.size()).isEqualTo(1);
 //        Assertions.assertThat(allByMember2After.get(0).getAlarmDetailType()).isEqualTo(boom);
-//        Assertions.assertThat(allByMember3After.size()).isEqualTo(2);
-//        Assertions.assertThat(allByMember3After.get(0).getAlarmDetailType()).isEqualTo(invite);
-//        Assertions.assertThat(allByMember3After.get(1).getAlarmDetailType()).isEqualTo(boom);
+//        Assertions.assertThat(allByMember3After.size()).isEqualTo(1);
+//        Assertions.assertThat(allByMember3After.get(0).getAlarmDetailType()).isEqualTo(boom);
 //        Assertions.assertThat(allWaitingGoal.size()).isEqualTo(0);
 //    }
 //}
