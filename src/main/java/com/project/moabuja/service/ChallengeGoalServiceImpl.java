@@ -67,6 +67,8 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         }
 
         for(String name :createChallengeRequestDto.getChallengeFriends()){
+            System.out.println("=============================================");
+            System.out.println(name);
             Member member = Optional.of(memberRepository.findMemberByNickname(name)).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
             challengeGoal.addMember(member);
         }
