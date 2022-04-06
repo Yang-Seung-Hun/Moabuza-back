@@ -232,9 +232,14 @@ public class MemberServiceImpl implements MemberService{
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         Long kakaoId = jsonNode.get("id").asLong();
-//        Optional<String> email = Optional.ofNullable(jsonNode.get("kakao_account").get("email").asText());
+        String email;
+        if(jsonNode.get("kakao_account").get("has_email").asBoolean(false) &&
+                jsonNode.get("kakao_account").get("email_needs_agreement").asBoolean(true)){
+            email="";} else {
+            email = jsonNode.get("kakao_account").get("email").asText();
+        }
 
-        return new KakaoUserInfoDto(kakaoId, null);
+        return new KakaoUserInfoDto(kakaoId, email);
     }
 
     @Transactional
