@@ -19,8 +19,8 @@ import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
 
 @Component
 public class JwtTokenProvider {
-    private long accessTokenTime = 1000 * 60 * 60 * 24; // 1시간
-    private long refreshTokenTime = 1000 * 60 * 60 * 24; // 하루
+    private long accessTokenTime = 1000 * 60 * 60 * 24; // 하루
+    private long refreshTokenTime = 1000 * 60 * 60 * 24 * 3; // 3일
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
