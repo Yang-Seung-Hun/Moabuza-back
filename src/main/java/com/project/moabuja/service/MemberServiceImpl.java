@@ -149,6 +149,7 @@ public class MemberServiceImpl implements MemberService{
                 .totalAmount(totalAmount)
                 .wallet(wallet)
                 .alarmCount(alarmCount)
+                .isFirstLogin(currentMember.isFirstLogin())
                 .build();
 
         return new ResponseEntity<>(homeResponseDto, HttpStatus.OK);

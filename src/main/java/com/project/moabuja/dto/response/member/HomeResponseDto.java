@@ -30,11 +30,13 @@ public class HomeResponseDto {
 
     private int alarmCount;
 
+    private boolean isFirstLogin;
+
     @Builder
     public HomeResponseDto(int groupCurrentAmount, int groupNeedAmount, int groupAmount, int groupPercent,
                            String groupName, int groupGoalAmount, int challengeCurrentAmount, int challengeNeedAmount,
                            int challengeAmount, int challengePercent, String challengeName, int challengeGoalAmount,
-                           Hero hero, String nickname, int totalAmount, int wallet, int alarmCount) {
+                           Hero hero, String nickname, int totalAmount, int wallet, int alarmCount, boolean isFirstLogin) {
         this.groupCurrentAmount = groupCurrentAmount;
         this.groupNeedAmount = groupNeedAmount;
         this.groupAmount = groupAmount;
@@ -52,5 +54,6 @@ public class HomeResponseDto {
         this.totalAmount = totalAmount;
         this.wallet = wallet;
         this.alarmCount = alarmCount;
+        this.isFirstLogin = isFirstLogin;
     }
 }
