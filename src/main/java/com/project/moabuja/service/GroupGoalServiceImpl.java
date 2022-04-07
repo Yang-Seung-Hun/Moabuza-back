@@ -268,7 +268,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
             // waitingGoal 삭제
             waitingGoalRepository.deleteAll(deleteWaitings);
 
-            List<Member> members = currentMember.getChallengeGoal().getMembers();
+            List<Member> members = currentMember.getGroupGoal().getMembers();
             for (Member member : members) {
                 List<Alarm> deleteAlarms = alarmRepository.findAlarmsByFriendNicknameAndAlarmDetailType(member.getNickname(), invite);
                 alarmRepository.deleteAll(deleteAlarms);
