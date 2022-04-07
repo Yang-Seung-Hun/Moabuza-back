@@ -55,7 +55,6 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     private final FriendServiceImpl friendService;
 
     @Transactional
-    @CacheEvict(key = "#currentMemberTemp.id", value = "homeData")
     @Override
     public ResponseEntity<Msg> save(CreateChallengeRequestDto createChallengeRequestDto, Member currentMemberTemp) {
 
@@ -270,7 +269,6 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     }
 
     @Transactional
-    @CacheEvict(key = "#currentMemberTemp.id", value = "homeData")
     @Override
     public ResponseEntity<Msg> postChallengeRefuse(Member currentMemberTemp, Long alarmId) {
         Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
@@ -290,7 +288,6 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     }
 
     @Override
-    @CacheEvict(key = "#currentMemberTemp.id", value = "homeData")
     @Transactional
     public ResponseEntity<Msg> exitChallenge(Member currentMemberTemp) {
 
@@ -317,7 +314,6 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     }
 
     @Override
-    @CacheEvict(key = "#currentMemberTemp.id", value = "homeData")
     @Transactional
     public ResponseEntity<Msg> exitWaitingChallenge(Member currentMemberTemp, Long id) {
         exitWaitingGoal(currentMemberTemp, id, CHALLENGE, memberRepository, waitingGoalRepository, memberWaitingGoalRepository, alarmRepository);
