@@ -26,6 +26,7 @@ import com.project.moabuja.security.filter.JwtTokenProvider;
 import com.project.moabuja.util.CustomResponseEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
@@ -56,6 +57,7 @@ public class MemberServiceImpl implements MemberService{
     private final AlarmRepository alarmRepository;
 
     @Transactional
+    @Cacheable
     @Override
     public ResponseEntity<HomeResponseDto> getHomeInfo(Member currentMemberTemp) {
         Member currentMember = Optional
