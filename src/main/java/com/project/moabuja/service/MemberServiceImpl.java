@@ -57,7 +57,6 @@ public class MemberServiceImpl implements MemberService{
     private final AlarmRepository alarmRepository;
 
     @Transactional
-    @Cacheable
     @Override
     public ResponseEntity<HomeResponseDto> getHomeInfo(Member currentMemberTemp) {
         Member currentMember = Optional
