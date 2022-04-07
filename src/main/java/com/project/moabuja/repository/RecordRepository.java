@@ -27,8 +27,8 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
     List<Record> findRecordsByMember(Member member);
 
 
-    @Query("select sum(r.recordAmount) from Record r where r.recordType =:recordType and r.createdAt > :createdAt")
-    int sumCurrentAmount(@Param("recordType") RecordType recordType, @Param("createdAt") LocalDateTime createAt);
+    @Query("select sum(r.recordAmount) from Record r where r.recordType =:recordType and r.createdAt > :createdAt and r.member =:member")
+    int sumCurrentAmount(@Param("recordType") RecordType recordType, @Param("createdAt") LocalDateTime createAt, @Param("member") Member member);
 
     void deleteRecordById(Long id);
 }
