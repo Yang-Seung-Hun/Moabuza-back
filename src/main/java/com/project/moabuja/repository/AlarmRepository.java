@@ -21,4 +21,5 @@ public interface AlarmRepository extends JpaRepository<Alarm,Long> {
 
     List<Alarm> findAlarmsByWaitingGoalIdAndAlarmDetailType(Long id, AlarmDetailType alarmDetailType);
 
+    List<Alarm> findAlarmsByFriendNicknameAndAlarmDetailType(String nickname, AlarmDetailType invite);
 }

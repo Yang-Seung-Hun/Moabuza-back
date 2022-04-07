@@ -62,6 +62,10 @@ public class MemberServiceImpl implements MemberService{
                 .of(memberRepository.findById(currentMemberTemp.getId())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
+        if(!currentMember.isFirstLogin()){
+            currentMember.loginChecked();
+        }
+
         Hero hero = currentMember.getHero();
         String nickname = currentMember.getNickname();
 
@@ -145,6 +149,7 @@ public class MemberServiceImpl implements MemberService{
                 .totalAmount(totalAmount)
                 .wallet(wallet)
                 .alarmCount(alarmCount)
+                .isFirstLogin(currentMember.isFirstLogin())
                 .build();
 
         return new ResponseEntity<>(homeResponseDto, HttpStatus.OK);
