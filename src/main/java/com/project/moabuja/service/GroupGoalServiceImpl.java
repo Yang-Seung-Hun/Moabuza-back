@@ -19,6 +19,7 @@ import com.project.moabuja.exception.ErrorCode;
 import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     private final FriendServiceImpl friendService;
 
     @Override
+    @CacheEvict(cacheNames = "homeData", key = "#currentMemberTemp.id")
     @Transactional
     public ResponseEntity<Msg> save(CreateGroupRequestDto groupRequestDto, Member currentMemberTemp) {
 
@@ -215,7 +217,6 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         return new ResponseEntity<>(new Msg(GroupPost.getMsg()), HttpStatus.OK);
     }
-
     @Transactional
     @Override
     public ResponseEntity<Msg> postGroupAccept(Member currentMemberTemp, Long alarmId) {
