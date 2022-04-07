@@ -19,6 +19,7 @@ import com.project.moabuja.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     private final FriendServiceImpl friendService;
 
     @Transactional
+    @CacheEvict(key = "#currentMemberTemp.id", value = "homeData")
     @Override
     public ResponseEntity<Msg> save(CreateChallengeRequestDto createChallengeRequestDto, Member currentMemberTemp) {
 
@@ -268,6 +270,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     }
 
     @Transactional
+    @CacheEvict(key = "#currentMemberTemp.id", value = "homeData")
     @Override
     public ResponseEntity<Msg> postChallengeRefuse(Member currentMemberTemp, Long alarmId) {
         Alarm alarm = Optional.of(alarmRepository.findById(alarmId)).get().orElseThrow(() -> new ErrorException(ALARM_NOT_EXIST));
@@ -287,6 +290,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     }
 
     @Override
+    @CacheEvict(key = "#currentMemberTemp.id", value = "homeData")
     @Transactional
     public ResponseEntity<Msg> exitChallenge(Member currentMemberTemp) {
 
@@ -313,6 +317,7 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     }
 
     @Override
+    @CacheEvict(key = "#currentMemberTemp.id", value = "homeData")
     @Transactional
     public ResponseEntity<Msg> exitWaitingChallenge(Member currentMemberTemp, Long id) {
         exitWaitingGoal(currentMemberTemp, id, CHALLENGE, memberRepository, waitingGoalRepository, memberWaitingGoalRepository, alarmRepository);

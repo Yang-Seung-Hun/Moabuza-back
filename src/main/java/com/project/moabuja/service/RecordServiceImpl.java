@@ -51,7 +51,7 @@ public class RecordServiceImpl implements RecordService{
     private final AlarmRepository alarmRepository;
 
     @Transactional
-    @CacheEvict(cacheNames = "homeData", key = "#currentMemberTemp.id")
+    @CacheEvict(key = "#currentMemberTemp.id", value = "homeData")
     @Override
     public ResponseEntity<RecordResponseDto> save(RecordRequestDto recordRequestDto, Member currentMemberTemp) {
 
@@ -185,7 +185,7 @@ public class RecordServiceImpl implements RecordService{
     }
 
     @Override
-    @CacheEvict(cacheNames = "homeData", key = "#currentMember.id")
+    @CacheEvict(key = "#currentMember.id", value = "homeData")
     @Transactional
     public ResponseEntity<Msg> deleteRecord(Long id, Member currentMember) {
 
