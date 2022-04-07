@@ -217,7 +217,6 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         return new ResponseEntity<>(new Msg(GroupPost.getMsg()), HttpStatus.OK);
     }
-
     @Transactional
     @Override
     public ResponseEntity<Msg> postGroupAccept(Member currentMemberTemp, Long alarmId) {
