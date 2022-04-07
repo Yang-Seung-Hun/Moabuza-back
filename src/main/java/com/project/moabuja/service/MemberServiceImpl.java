@@ -95,11 +95,11 @@ public class MemberServiceImpl implements MemberService{
             List<Member> members = groupGoal.getMembers();
             int currentGroupAmount = 0;
             for (Member member : members) {
-                groupCurrentAmount = recordRepository.sumCurrentAmount(RecordType.group,groupGoal.getCreatedAt(),member);
-//                List<Record> memberGroupRecord = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
-//                for (Record record : memberGroupRecord) {
-//                    if(record.getCreatedAt().isAfter(groupGoal.getCreatedAt())) groupCurrentAmount += record.getRecordAmount();
-//                }
+//                groupCurrentAmount = recordRepository.sumCurrentAmount(RecordType.group,groupGoal.getCreatedAt(),member);
+                List<Record> memberGroupRecord = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
+                for (Record record : memberGroupRecord) {
+                    if(record.getCreatedAt().isAfter(groupGoal.getCreatedAt())) groupCurrentAmount += record.getRecordAmount();
+                }
             }
             groupNeedAmount = groupGoal.getGroupGoalAmount() - groupCurrentAmount;
             groupPercent = (int) (((double) groupCurrentAmount / (double) (groupGoal.getGroupGoalAmount())) * 100);
@@ -110,12 +110,12 @@ public class MemberServiceImpl implements MemberService{
         ChallengeGoal challengeGoal = currentMember.getChallengeGoal();
         if (challengeGoal != null) { //  && challengeGoal.isAcceptedChallenge()
 
-//            List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentMember);
-//            for (Record record : challengeRecords) {
-//                if(record.getCreatedAt().isAfter(challengeGoal.getCreatedAt())) challengeCurrentAmount += record.getRecordAmount();
-//            }
+            List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentMember);
+            for (Record record : challengeRecords) {
+                if(record.getCreatedAt().isAfter(challengeGoal.getCreatedAt())) challengeCurrentAmount += record.getRecordAmount();
+            }
 
-            challengeCurrentAmount = recordRepository.sumCurrentAmount(RecordType.challenge,challengeGoal.getCreatedAt(),currentMember);
+//            challengeCurrentAmount = recordRepository.sumCurrentAmount(RecordType.challenge,challengeGoal.getCreatedAt(),currentMember);
 
             challengeNeedAmount = challengeGoal.getChallengeGoalAmount() - challengeCurrentAmount;
             challengePercent = (int) (((double) challengeCurrentAmount / (double) (challengeGoal.getChallengeGoalAmount())) * 100);
