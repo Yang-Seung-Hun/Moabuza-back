@@ -49,7 +49,6 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     private final FriendServiceImpl friendService;
 
     @Override
-    @CacheEvict(key = "#currentMemberTemp.id", value = "homeData")
     @Transactional
     public ResponseEntity<Msg> save(CreateGroupRequestDto groupRequestDto, Member currentMemberTemp) {
 
@@ -300,7 +299,6 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     }
 
     @Override
-    @CacheEvict(key = "#currentMemberTemp.id", value = "homeData")
     @Transactional
     public ResponseEntity<Msg> exitGroup(Member currentMemberTemp) {
 
@@ -338,7 +336,6 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
     @Override
     @Transactional
-    @CacheEvict(key = "#currentMemberTemp.id", value = "homeData")
     public ResponseEntity<Msg> exitWaitingGroup(Member currentMemberTemp, Long id) {
             exitWaitingGoal(currentMemberTemp, id, GROUP, memberRepository, waitingGoalRepository, memberWaitingGoalRepository, alarmRepository);
 
