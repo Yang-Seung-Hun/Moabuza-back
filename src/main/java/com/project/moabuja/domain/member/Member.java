@@ -33,6 +33,8 @@ public class Member {
 
     private String nickname;
 
+    private boolean isFirstLogin = false;
+
     @Enumerated(EnumType.STRING)
     private Hero hero;
 
@@ -94,5 +96,9 @@ public class Member {
     public void addAlarm(Alarm alarm){
         this.alarms.add(alarm);
         alarm.changeAlarm(this);
+    }
+
+    public void loginChecked(){
+        this.isFirstLogin = true;
     }
 }

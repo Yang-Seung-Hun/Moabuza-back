@@ -34,7 +34,7 @@ import static com.project.moabuja.domain.alarm.AlarmDetailType.*;
 import static com.project.moabuja.domain.goal.GoalType.*;
 
 @SpringBootTest
-@Rollback(value = false)
+@Rollback(value = true)
 @Transactional
 class ChallengeGoalServiceImplTest {
 

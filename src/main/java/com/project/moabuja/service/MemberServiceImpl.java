@@ -62,6 +62,10 @@ public class MemberServiceImpl implements MemberService{
                 .of(memberRepository.findById(currentMemberTemp.getId())).get()
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
+        if(!currentMember.isFirstLogin()){
+            currentMember.loginChecked();
+        }
+
         Hero hero = currentMember.getHero();
         String nickname = currentMember.getNickname();
 
