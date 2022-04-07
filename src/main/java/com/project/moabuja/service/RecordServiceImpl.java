@@ -21,6 +21,7 @@ import com.project.moabuja.repository.DoneGoalRepository;
 import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,7 @@ public class RecordServiceImpl implements RecordService{
     private final AlarmRepository alarmRepository;
 
     @Transactional
+    @CacheEvict(cacheNames = "homeData", key = "#currentMemberTemp.id")
     @Override
     public ResponseEntity<RecordResponseDto> save(RecordRequestDto recordRequestDto, Member currentMemberTemp) {
 
@@ -183,6 +185,7 @@ public class RecordServiceImpl implements RecordService{
     }
 
     @Override
+    @CacheEvict(cacheNames = "homeData", key = "#currentMember.id")
     @Transactional
     public ResponseEntity<Msg> deleteRecord(Long id, Member currentMember) {
 
