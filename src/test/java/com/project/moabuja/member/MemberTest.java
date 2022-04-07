@@ -28,7 +28,7 @@
 //
 //@SpringBootTest
 //@Transactional
-//@Rollback(value = false)
+//@Rollback(value = true)
 //public class MemberTest {
 //
 //    @Autowired private MemberRepository memberRepository;
