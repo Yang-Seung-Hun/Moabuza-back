@@ -237,30 +237,42 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 
         // 전체 수락 후 마지막 수락
         else if (checkAccepted(friends)) {
-            List<String> friendListTmp = new ArrayList<>();
 
+            List<String> friendListTmp = new ArrayList<>();
             List<String> friendList = sendGoalAlarm(friends, friendListTmp, currentMember, GROUP, create, waitingGoal, alarmRepository);
             goalAlarm(currentMember, currentMember, GROUP, create, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
 
             // GroupGoal 생성
             CreateGroupRequestDto createGroupRequestDto = new CreateGroupRequestDto(waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), friendList);
             save(createGroupRequestDto, currentMember);
-            waitingGoalRepository.delete(waitingGoal);
+
+            List<MemberWaitingGoal> memberWaitingGoals = waitingGoal.getMemberWaitingGoals();
+            while(!memberWaitingGoals.isEmpty()){
+                Long id = memberWaitingGoals.get(0).getId();
+                waitingGoal.removeMemberWaitingGoals(memberWaitingGoals.get(0));
+                memberWaitingGoalRepository.deleteById(id);
+            }waitingGoalRepository.delete(waitingGoal);
             alarmRepository.delete(alarm);
 
             // 다른 수락대기 상태의 Group Goal 폭파 및 알람
             List<MemberWaitingGoal> deleteMemberWaitingGoals = memberWaitingGoalRepository.findMemberWaitingGoalsByMember(currentMember);
             List<WaitingGoal> deleteWaitings = new ArrayList<>();
             for (MemberWaitingGoal delete : deleteMemberWaitingGoals) {
+
                 WaitingGoal waiting = delete.getWaitingGoal();
                 deleteWaitings.add(waiting);
-                // WaitingGoal waiting = waitingGoalRepository.findWaitingGoalById(delete.getWaitingGoal().getId());
 
                 List<MemberWaitingGoal> alarmMemberList = waiting.getMemberWaitingGoals();
                 sendGoalAlarm(alarmMemberList, friendListTmp, currentMember, GROUP, boom, waiting, alarmRepository);
             }
             // waitingGoal 삭제
             waitingGoalRepository.deleteAll(deleteWaitings);
+
+            List<Member> members = currentMember.getChallengeGoal().getMembers();
+            for (Member member : members) {
+                List<Alarm> deleteAlarms = alarmRepository.findAlarmsByFriendNicknameAndAlarmDetailType(member.getNickname(), invite);
+                alarmRepository.deleteAll(deleteAlarms);
+            }
         }
 
         return new ResponseEntity<>(new Msg(GroupAccept.getMsg()), HttpStatus.OK);
@@ -324,7 +336,7 @@ public class GroupGoalServiceImpl implements GroupGoalService{
     @Override
     @Transactional
     public ResponseEntity<Msg> exitWaitingGroup(Member currentMemberTemp, Long id) {
-        exitWaitingGoal(currentMemberTemp, id, GROUP, memberRepository, waitingGoalRepository, memberWaitingGoalRepository, alarmRepository);
+            exitWaitingGoal(currentMemberTemp, id, GROUP, memberRepository, waitingGoalRepository, memberWaitingGoalRepository, alarmRepository);
 
         return new ResponseEntity<>(new Msg(GroupExit.getMsg()), HttpStatus.OK);
     }

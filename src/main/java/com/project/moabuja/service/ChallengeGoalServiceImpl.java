@@ -2,6 +2,7 @@ package com.project.moabuja.service;
 
 import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.alarm.AlarmDetailType;
+import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.friend.Friend;
 import com.project.moabuja.domain.friend.FriendStatus;
 import com.project.moabuja.domain.goal.*;
@@ -32,8 +33,8 @@ import java.util.stream.Collectors;
 import static com.project.moabuja.domain.alarm.AlarmDetailType.*;
 import static com.project.moabuja.domain.alarm.AlarmType.CHALLENGE;
 import static com.project.moabuja.dto.ResponseMsg.*;
-import static com.project.moabuja.exception.ErrorCode.ALARM_NOT_EXIST;
-import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
+import static com.project.moabuja.exception.ErrorCode.*;
+import static com.project.moabuja.exception.ErrorCode.GOAL_MEMBER_NOT_MATCH;
 import static com.project.moabuja.service.GroupGoalServiceImpl.*;
 
 @Slf4j
@@ -67,8 +68,6 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         }
 
         for(String name :createChallengeRequestDto.getChallengeFriends()){
-            System.out.println("=============================================");
-            System.out.println(name);
             Member member = Optional.of(memberRepository.findMemberByNickname(name)).get().orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
             challengeGoal.addMember(member);
         }
@@ -220,10 +219,8 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
 
         // 전체 수락 전
         if (! checkAccepted(friends)) {
-
             List<String> friendListTmp = new ArrayList<>();
             sendGoalAlarm(friends, friendListTmp, currentMember, CHALLENGE, accept, waitingGoal, alarmRepository);
-
             alarmRepository.delete(alarm);
         }
 
@@ -251,16 +248,20 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
             List<WaitingGoal> deleteWaitings = new ArrayList<>();
             for (MemberWaitingGoal delete : deleteMemberWaitingGoals) {
 
-                // WaitingGoal deleteWaiting = waitingGoalRepository.findWaitingGoalById(delete.getWaitingGoal().getId());
                 WaitingGoal waiting = delete.getWaitingGoal();
                 deleteWaitings.add(waiting);
 
                 List<MemberWaitingGoal> alarmMemberList = waiting.getMemberWaitingGoals();
-
                 sendGoalAlarm(alarmMemberList, friendListTmp, currentMember, CHALLENGE, boom, waiting, alarmRepository);
             }
             // waitingGoal 삭제
             waitingGoalRepository.deleteAll(deleteWaitings);
+
+            List<Member> members = currentMember.getChallengeGoal().getMembers();
+            for (Member member : members) {
+                List<Alarm> deleteAlarms = alarmRepository.findAlarmsByFriendNicknameAndAlarmDetailType(member.getNickname(), invite);
+                alarmRepository.deleteAll(deleteAlarms);
+            }
         }
 
         return new ResponseEntity<>(new Msg(ChallengeAccept.getMsg()), HttpStatus.OK);
@@ -315,7 +316,6 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
     @Transactional
     public ResponseEntity<Msg> exitWaitingChallenge(Member currentMemberTemp, Long id) {
         exitWaitingGoal(currentMemberTemp, id, CHALLENGE, memberRepository, waitingGoalRepository, memberWaitingGoalRepository, alarmRepository);
-
         return new ResponseEntity<>(new Msg(ChallengeExit.getMsg()), HttpStatus.OK);
     }
 
