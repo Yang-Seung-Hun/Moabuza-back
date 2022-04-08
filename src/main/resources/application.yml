@@ -18,5 +18,8 @@ spring:
     hibernate:
       ddl-auto: update
 
+logging:
+  path: /home/ubuntu//log.config.path_IS_UNDEFINED
+
 jwt:
   secret: ${jwt.secret}
