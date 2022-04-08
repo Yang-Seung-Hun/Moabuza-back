@@ -1,8 +1,8 @@
 package com.project.moabuja.domain.goal;
 
+import com.project.moabuja.domain.Timestamped;
 import com.project.moabuja.domain.member.Member;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,8 +10,7 @@ import java.util.List;
 
 @Getter
 @Entity
-@NoArgsConstructor
-public class GroupGoal {
+public class GroupGoal extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,16 +23,13 @@ public class GroupGoal {
 
     private int currentAmount;
 
-    private boolean isAcceptedGroup;
-
     @OneToMany(mappedBy = "groupGoal",cascade = CascadeType.ALL)
     private List<Member> members = new ArrayList<>();
 
-    public GroupGoal(String groupGoalName, int groupGoalAmount, int groupCurrentAmount, boolean isAcceptedGroup) {
+    public GroupGoal(String groupGoalName, int groupGoalAmount, int groupCurrentAmount) {
         this.groupGoalName = groupGoalName;
         this.groupGoalAmount = groupGoalAmount;
         this.currentAmount = groupCurrentAmount;
-        this.isAcceptedGroup = isAcceptedGroup;
     }
 
     public void addMember(Member member){
@@ -46,8 +42,5 @@ public class GroupGoal {
         member.changeGroupGoal(null);
     }
 
-    //테스트용 setter입니다.
-    public void setIsAcceptedGroup(Boolean bool){
-        this.isAcceptedGroup = bool;
-    }
+    protected GroupGoal () {}
 }

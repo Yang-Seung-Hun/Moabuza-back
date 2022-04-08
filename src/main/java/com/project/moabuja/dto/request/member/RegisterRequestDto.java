@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.validation.constraints.Email;
+
 @Getter
 @AllArgsConstructor
 @Builder
 public class RegisterRequestDto {
     private Long kakaoId;
-    private String nickname;
+    @Email
     private String email;
-
 }

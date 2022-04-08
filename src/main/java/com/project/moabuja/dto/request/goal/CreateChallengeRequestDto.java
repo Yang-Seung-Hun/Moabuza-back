@@ -1,8 +1,10 @@
 package com.project.moabuja.dto.request.goal;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Positive;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,12 +13,14 @@ import java.util.List;
 public class CreateChallengeRequestDto {
 
     private String createChallengeName;
+    @Positive
     private int createChallengeAmount;
-    private List<String> challengeFiends = new ArrayList<>();
+    private List<String> challengeFriends = new ArrayList<>();
 
-    public CreateChallengeRequestDto(String createChallengeName, int createChallengeAmount, List<String> challengeFiends) {
+    @Builder
+    public CreateChallengeRequestDto(String createChallengeName, int createChallengeAmount, List<String> challengeFriends) {
         this.createChallengeName = createChallengeName;
         this.createChallengeAmount = createChallengeAmount;
-        this.challengeFiends = challengeFiends;
+        this.challengeFriends = challengeFriends;
     }
 }

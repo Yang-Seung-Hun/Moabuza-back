@@ -1,5 +1,5 @@
 server:
-  port: 8080  # Spring boot Server port
+  port: 8080  # Sp
 
 spring:
   datasource:
@@ -8,7 +8,7 @@ spring:
     username: admin
     password: moabuza123
 
-  reids:
+  redis:
     host: #여기 부분은 자신의 ip에 맞춰서 바꾸기 -> ec2 redis 설치 후 연결 ip
       127.0.0.1
     port:
@@ -17,12 +17,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
 
-logging.level:
-  org.hibernate.SQL: debug
+logging:
+  level:
+    root: TRACE
 
 jwt:
-  secret: abwieineprmdspowejropsadasdasdasdvsddvsdvasd
+  secret: ${jwt.secret}

@@ -1,18 +1,28 @@
 package com.project.moabuja.service;
 
-import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.member.Member;
+import com.project.moabuja.dto.Msg;
+import com.project.moabuja.dto.request.alarm.GoalAlarmRequestDto;
 import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import com.project.moabuja.dto.response.goal.ChallengeResponseDto;
 import com.project.moabuja.dto.response.goal.CreateChallengeResponseDto;
+import org.springframework.http.ResponseEntity;
 
 public interface ChallengeGoalService {
 
-    public ChallengeGoal save(CreateChallengeRequestDto challengeRequestDto, Member currentUser);
+    ResponseEntity<Msg> save(CreateChallengeRequestDto challengeRequestDto, Member currentMember);
 
-    public ChallengeResponseDto getChallengeInfo(Member currentUser);
+    ResponseEntity<ChallengeResponseDto> getChallengeInfo(Member currentMember);
 
-    public CreateChallengeResponseDto getChallengeMemberCandidates(Member currentUser);
+    ResponseEntity<CreateChallengeResponseDto> getChallengeMemberCandidates(Member currentMember);
 
-    public void exitChallenge(Long id);
+    ResponseEntity<Msg> postChallenge(Member currentMember, GoalAlarmRequestDto goalAlarmRequestDto);
+
+    ResponseEntity<Msg> postChallengeAccept(Member currentMember, Long alarmId);
+
+    ResponseEntity<Msg> postChallengeRefuse(Member currentMember, Long alarmId);
+
+    ResponseEntity<Msg> exitChallenge(Member currentMember);
+
+    ResponseEntity<Msg> exitWaitingChallenge(Member currentMember, Long id);
 }

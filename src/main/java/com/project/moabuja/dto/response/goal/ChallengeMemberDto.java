@@ -1,6 +1,7 @@
 package com.project.moabuja.dto.response.goal;
 
 import com.project.moabuja.domain.member.Hero;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ public class ChallengeMemberDto {
     private int challengeMemberLeftAmount;
     private int challengeMemberNowPercent;
 
+    @Builder
     public ChallengeMemberDto(String challengeMemberNickname, Hero challengeMemberHero, int challengeMemberLeftAmount, int challengeMemberNowPercent) {
         this.challengeMemberNickname = challengeMemberNickname;
         this.challengeMemberHero = challengeMemberHero;

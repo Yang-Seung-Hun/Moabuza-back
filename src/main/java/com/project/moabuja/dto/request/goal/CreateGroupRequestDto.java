@@ -1,8 +1,10 @@
 package com.project.moabuja.dto.request.goal;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Positive;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,12 +12,14 @@ import java.util.List;
 @NoArgsConstructor
 public class CreateGroupRequestDto {
     private String createGroupName;
+    @Positive
     private int createGroupAmount;
-    private List<String> groupFiends = new ArrayList<>();
+    private List<String> groupFriends = new ArrayList<>();
 
+    @Builder
     public CreateGroupRequestDto(String createGroupName, int createGroupAmount, List<String> groupFiends) {
         this.createGroupName = createGroupName;
         this.createGroupAmount = createGroupAmount;
-        this.groupFiends = groupFiends;
+        this.groupFriends = groupFiends;
     }
 }

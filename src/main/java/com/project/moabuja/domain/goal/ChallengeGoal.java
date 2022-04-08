@@ -1,9 +1,8 @@
 package com.project.moabuja.domain.goal;
 
+import com.project.moabuja.domain.Timestamped;
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.request.goal.CreateChallengeRequestDto;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,8 +10,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
-public class ChallengeGoal {
+public class ChallengeGoal extends Timestamped {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "challenge_goal_id")
@@ -24,16 +22,13 @@ public class ChallengeGoal {
 
     private int currentAmount;
 
-    private boolean isAcceptedChallenge;
-
     @OneToMany(mappedBy = "challengeGoal",cascade = CascadeType.ALL)
     private List<Member> members = new ArrayList<>();
 
-    public ChallengeGoal(String challengeGoalName, int challengeGoalAmount, int currentAmount, boolean isAcceptedChallenge) {
+    public ChallengeGoal(String challengeGoalName, int challengeGoalAmount, int currentAmount) {
         this.challengeGoalName = challengeGoalName;
         this.challengeGoalAmount = challengeGoalAmount;
         this.currentAmount = currentAmount;
-        this.isAcceptedChallenge = isAcceptedChallenge;
     }
 
     public void addMember(Member member){
@@ -46,8 +41,5 @@ public class ChallengeGoal {
         member.changeChallengeGoal(null);
     }
 
-    //테스트용 setter입니다.
-    public void setIsAcceptedChallenge(Boolean bool){
-        this.isAcceptedChallenge = bool;
-    }
+    protected ChallengeGoal () {}
 }

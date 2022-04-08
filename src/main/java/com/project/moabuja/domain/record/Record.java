@@ -3,6 +3,7 @@ package com.project.moabuja.domain.record;
 import com.project.moabuja.domain.Timestamped;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.dto.request.record.RecordRequestDto;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +13,6 @@ import java.time.format.DateTimeFormatter;
 
 @Entity
 @Getter
-@NoArgsConstructor
 public class Record extends Timestamped {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +32,7 @@ public class Record extends Timestamped {
     @Enumerated(EnumType.STRING)
     private RecordType recordType;
 
+    @Builder
     public Record(RecordRequestDto recordRequestDto, Member currentMember){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(("yyyy-MM-dd HH:mm:ss.SSS"));
         this.recordType = recordRequestDto.getRecordType();
@@ -40,5 +41,7 @@ public class Record extends Timestamped {
         this.recordAmount = recordRequestDto.getRecordAmount();
         this.member = currentMember;
     }
+
+    protected Record () {}
 
 }

@@ -1,83 +1,75 @@
 package com.project.moabuja.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.dto.TokenDto;
+import com.project.moabuja.dto.Msg;
 import com.project.moabuja.dto.request.member.MemberUpdateRequestDto;
+import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
+import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.security.userdetails.UserDetailsImpl;
+import com.project.moabuja.service.FCMServiceImpl;
 import com.project.moabuja.service.MemberService;
 import com.project.moabuja.util.CustomResponseEntity;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.Charset;
+import javax.validation.Valid;
+
+import static com.project.moabuja.exception.ErrorCode.GEUST_TO_LOGIN;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
+    private final FCMServiceImpl fcmService;
 
-
-    // 카카오 로그인 api
-    @GetMapping("/user/kakao/callback")
-    public ResponseEntity kakaoLogin(@RequestParam String code) throws JsonProcessingException {
-        TokenDto dto = memberService.kakaoLogin(code);
-
-        CustomResponseEntity response = CustomResponseEntity.builder()
-                .authorization(null)
-                .code(HttpStatus.OK)
-                .message("어세스토큰 : authorization")
-                .data(dto)  // data 안에 access, refresh  두개 다 담겨있다.
-                .build();
-        return response.responseAccessRefresh(dto);
-    }
-
-    // 닉네임, 캐릭터 선택 api
-    @PutMapping("/member/info")
-    public ResponseEntity update(@RequestBody MemberUpdateRequestDto dto,
-                                 @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
-        String email = userDetails.getUsername();
-        // 회원이 캐릭터랑 닉네임 설정한 경우
-        return memberService.updateMemberInfo(dto, email);
-    }
-
-    // 닉네임 이름 중복체크  api
-    @PostMapping("/nickname/validation")
-    public ResponseEntity nicknameValid(@RequestBody String nickname){
-        return memberService.nicknameValid(nickname);
-    }
-
-    // access 토큰 만료 시 재발급 api : access, refresh 모두 재발급
-    @GetMapping("/api/reissue")
-    public ResponseEntity reissue(HttpServletRequest request){
-        TokenDto tokenDto = memberService.reissue(request);
-        CustomResponseEntity response = CustomResponseEntity.builder()
-                .data(tokenDto)
-                .message("Redis 저장 성공")
-                .code(HttpStatus.OK)
-                .build();
-        return response.responseAll();
-    }
-
-    @GetMapping("/api/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request){
-        return memberService.logout(request);
-    }
-
-
+    @ApiOperation(value = "로그인 후 home 페이지")
     @GetMapping("/home")
-    public HomeResponseDto getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<HomeResponseDto> getHome(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        if(userDetails == null){
+            throw new ErrorException(GEUST_TO_LOGIN);
+        }
+        log.info("=================== 작동중");
+        return memberService.getHomeInfo(userDetails.getMember());
+    }
 
-        Member currentUser = userDetails.getMember();
-        return memberService.getHomeInfo(currentUser);
+    @ApiOperation(value = "카카오 로그인 api")
+    @GetMapping("/user/kakao/callback")
+    public ResponseEntity<CustomResponseEntity> kakaoLogin(@RequestParam String code) throws JsonProcessingException {
+        return memberService.kakaoLogin(code);
+    }
 
+    @ApiOperation(value = "닉네임 중복체크")
+    @PostMapping("/member/validation")
+    public ResponseEntity<Msg> nicknameValid(@Valid @RequestBody NicknameValidationRequestDto nicknameValidationRequestDto){
+        return memberService.nicknameValid(nicknameValidationRequestDto);
+    }
+
+    @ApiOperation(value = "닉네임, 캐릭터 선택")
+    @PutMapping("/member/info")
+    public ResponseEntity<Msg> update(@Valid @RequestBody MemberUpdateRequestDto dto,
+                                              @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
+        log.info("================memberContorller ======= " + dto.getNickname(), dto.getFcmToken());
+        fcmService.register(dto.getNickname(), dto.getFcmToken());
+        return memberService.updateMemberInfo(dto, userDetails.getMember().getPassword());
+    }
+
+    @ApiOperation(value = "access 토큰 재발급")
+    @GetMapping("/member/reissue")
+    public ResponseEntity<CustomResponseEntity> reissue(HttpServletRequest request){
+        return memberService.reissue(request);
+    }
+
+    @ApiOperation(value = "로그아웃")
+    @GetMapping("/member/logout")
+    public ResponseEntity<Msg> logout(HttpServletRequest request){
+        return memberService.logout(request);
     }
 }

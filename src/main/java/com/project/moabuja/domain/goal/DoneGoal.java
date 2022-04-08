@@ -1,6 +1,7 @@
 package com.project.moabuja.domain.goal;
 
 import com.project.moabuja.domain.member.Member;
+import lombok.Builder;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -23,16 +24,19 @@ public class DoneGoal {
     private Member member;
 
     @Enumerated(EnumType.STRING)
-    private DoneGoalType doneGoalType;
+    private GoalType goalType;
 
     public void changeMember(Member member) {
         this.member = member;
     }
 
-    public DoneGoal(String doneGoalName, int doneGoalAmount, Member member, DoneGoalType doneGoalType) {
+    @Builder
+    public DoneGoal(String doneGoalName, int doneGoalAmount, Member member, GoalType goalType) {
         this.doneGoalName = doneGoalName;
         this.doneGoalAmount = doneGoalAmount;
         this.member = member;
-        this.doneGoalType = doneGoalType;
+        this.goalType = goalType;
     }
+
+    protected DoneGoal () {}
 }

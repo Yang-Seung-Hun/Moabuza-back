@@ -1,9 +1,7 @@
 package com.project.moabuja.security.filter;
 
-import com.project.moabuja.exception.exceptionClass.JwtExpiredException;
 import com.project.moabuja.exception.exceptionClass.LogoutJwtUseException;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import org.json.simple.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -22,7 +20,6 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
         try {
-
             chain.doFilter(req, res); // go to 'JwtAuthenticationFilter'
         } catch (ExpiredJwtException | IOException ex) {
             expiredJwtErrorResponse(HttpStatus.UNAUTHORIZED, res, ex);

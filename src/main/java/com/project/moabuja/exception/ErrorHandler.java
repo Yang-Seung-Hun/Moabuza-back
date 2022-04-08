@@ -1,23 +1,44 @@
 package com.project.moabuja.exception;
 
-import com.project.moabuja.exception.exceptionClass.JwtExpiredException;
-import com.project.moabuja.exception.exceptionClass.LogoutJwtUseException;
-import com.project.moabuja.exception.response.ErrorResponse;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
 
-    private ErrorResponse response;
+    @ExceptionHandler(value = {ErrorException.class})
+    protected ResponseEntity<ErrorResponse> customException(ErrorException e) {
+        log.error("Error : " + e.getErrorCode());
+        return ErrorResponse.of(e.getErrorCode());
+    }
 
-//    @ExceptionHandler(LogoutJwtUseException.class)
-//    public ResponseEntity jwtExpiredException(LogoutJwtUseException e){
-//        response = ErrorResponse.builder()
-//                .message(e.getMessage())
-//                .build();
-//        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+//
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    public ResponseEntity<ErrorResponse> methodArgumentNotValidException(MethodArgumentNotValidException e){
+//        return new ResponseEntity<>(ErrorResponse.badRequest("ValidException"), HttpStatus.BAD_REQUEST);
 //    }
+//
+//    @ExceptionHandler(LogoutJwtUseException.class)
+//    public ResponseEntity<ErrorResponse> jwtExpiredException(LogoutJwtUseException e){
+//        return new ResponseEntity<>(ErrorResponse.badRequest(e.getMessage()), HttpStatus.BAD_REQUEST);
+//    }
+//
+//    @ExceptionHandler(MemberNotFoundException.class)
+//    public ResponseEntity<ErrorResponse> memberNotFoundException(MemberNotFoundException e) {
+//        return new ResponseEntity<>(ErrorResponse.badRequest(e.getMessage()), HttpStatus.BAD_REQUEST);
+//    }
+//
+//    @ExceptionHandler(AlarmErrorException.class)
+//    public ResponseEntity<ErrorResponse> alarmErrorException(AlarmErrorException e) {
+//        return new ResponseEntity<>(ErrorResponse.badRequest(e.getMessage()), HttpStatus.BAD_REQUEST);
+//    }
+//
+//    @ExceptionHandler(RecordErrorException.class)
+//    public ResponseEntity<ErrorResponse> recordErrorException(RecordErrorException e) {
+//        return new ResponseEntity<>(ErrorResponse.badRequest(e.getMessage()), HttpStatus.BAD_REQUEST);
+//    }
+
 }

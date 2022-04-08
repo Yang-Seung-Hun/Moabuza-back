@@ -14,7 +14,7 @@ public class WebConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        //todo : cors 다시 설정해주기
+        // CORS : 프론트 작업을 위해 로컬과 도메인 모두 설정
         config.addAllowedOrigin("https://moabuza.com");
         config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedHeader("*");

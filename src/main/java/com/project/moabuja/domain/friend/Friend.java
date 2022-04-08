@@ -2,13 +2,11 @@ package com.project.moabuja.domain.friend;
 
 import com.project.moabuja.domain.member.Member;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
 public class Friend {
 
     @Id
@@ -16,15 +14,20 @@ public class Friend {
     @Column(name = "friend_id")
     private Long id;
 
+    private boolean isAcceptedFriend;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
-    private Long friend;
+    @ManyToOne
+    @JoinColumn(name = "friend_user")
+    private Member friend;
 
-    //테스트용 생성자입니다.
-    public Friend(Member member, Long friend) {
+    public Friend(Member member, Member friend) {
         this.member = member;
         this.friend = friend;
     }
+
+    protected Friend () {}
 }

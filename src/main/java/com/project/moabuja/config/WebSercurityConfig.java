@@ -28,8 +28,7 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/h2-console/**")
-                .antMatchers("/api/reissue"); }
-
+                .antMatchers("/member/reissue"); }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -41,14 +40,17 @@ public class WebSercurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
-//                .antMatchers("/index.html").permitAll()
-//                .antMatchers(HttpMethod.GET, "/user/kakao/callback").permitAll()
-//                .antMatchers(HttpMethod.GET, "/api/reissue").permitAll()
-//                .antMatchers(HttpMethod.GET, "/health").permitAll()
-                .anyRequest().permitAll();
+                .antMatchers("/index.html").permitAll()
+                .antMatchers(HttpMethod.GET, "/user/kakao/callback").permitAll()
+                .antMatchers(HttpMethod.GET, "/member/reissue").permitAll()
+                .antMatchers(HttpMethod.GET, "/health").permitAll()
+                .antMatchers(HttpMethod.GET, "/home").permitAll()
+                .antMatchers(HttpMethod.GET, "/profile", "/version").permitAll()
+                .antMatchers("/").permitAll()
+                .anyRequest().authenticated();
+                // .anyRequest().permitAll();
 
         http    .addFilterBefore(new CustomAuthenticationFilter(jwtProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
-        // todo : exception을 핸들링 하기 위한 필터를 설치
         http    .addFilterBefore(new JwtExceptionFilter(), CustomAuthenticationFilter.class);
     }
 }
