@@ -16,3 +16,9 @@
 챌린지 진행도에 따라 캐릭터가 성장해요!
 
 2. 기술 스택 소개
+![image](https://user-images.githubusercontent.com/81571069/162346380-1b756fc0-2451-4818-a7b9-214bc58ae209.png)
+
+3. 테이블 설계
+![테이블 설계](https://user-images.githubusercontent.com/81571069/162346848-c7ca2652-3975-4b64-bef3-aad2f8d8d7c2.png)
+
+4. 
