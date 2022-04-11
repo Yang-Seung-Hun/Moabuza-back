@@ -27,7 +27,7 @@ public class FCMServiceImpl implements FCMService{
 //    private final Map<String, String> tokenMap = new HashMap<>();
     private final Map<String, String> messageMap = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(FCMServiceImpl.class);
-    private static final String FIREBASE_CONFIG_PATH = "moabuza-firebase-adminsdk-h9ox1-5af37638bf (1).json";
+//    private static final String FIREBASE_CONFIG_PATH = "moabuza-firebase-adminsdk-h9ox1-5af37638bf (1).json";
 //    @Value("${API_URL}")
     private final String API_URL = "https://fcm.google.api/v1/projects/moabuza/message:send";
     private final ObjectMapper objectMapper;
@@ -57,7 +57,8 @@ public class FCMServiceImpl implements FCMService{
                 .setNotification(new Notification(title, body))
                 .build();
 
-        String response = FirebaseMessaging.getInstance().sendAsync(message).get();
+//        String response = FirebaseMessaging.getInstance().sendAsync(message).get();
+        String response = null;
         logger.info("Sent message: " + response);
 
     }
