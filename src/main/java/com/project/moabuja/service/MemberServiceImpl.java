@@ -26,7 +26,6 @@ import com.project.moabuja.security.filter.JwtTokenProvider;
 import com.project.moabuja.util.CustomResponseEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
@@ -44,7 +43,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.project.moabuja.dto.ResponseMsg.*;
-import static com.project.moabuja.exception.ErrorCode.*;
+import static com.project.moabuja.exception.ErrorCode.GEUST_TO_LOGIN;
+import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -72,14 +72,12 @@ public class MemberServiceImpl implements MemberService{
 
         int groupCurrentAmount = 0;
         int groupNeedAmount = 0;
-        int groupAmount = 0;
         int groupPercent = 0;
         String groupName = null;
         int groupGoalAmount = 0;
 
         int challengeCurrentAmount = 0;
         int challengeNeedAmount = 0;
-        int challengeAmount = 0;
         int challengePercent = 0;
         String challengeName = null;
         int challengeGoalAmount = 0;
@@ -139,13 +137,11 @@ public class MemberServiceImpl implements MemberService{
         HomeResponseDto homeResponseDto = HomeResponseDto.builder()
                 .groupCurrentAmount(groupCurrentAmount)
                 .groupNeedAmount(groupNeedAmount)
-                .groupAmount(groupAmount)
                 .groupPercent(groupPercent)
                 .groupName(groupName)
                 .groupGoalAmount(groupGoalAmount)
                 .challengeCurrentAmount(challengeCurrentAmount)
                 .challengeNeedAmount(challengeNeedAmount)
-                .challengeAmount(challengeAmount)
                 .challengePercent(challengePercent)
                 .challengeName(challengeName)
                 .challengeGoalAmount(challengeGoalAmount)
