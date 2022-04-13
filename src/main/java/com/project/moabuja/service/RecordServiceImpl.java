@@ -21,7 +21,6 @@ import com.project.moabuja.repository.DoneGoalRepository;
 import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

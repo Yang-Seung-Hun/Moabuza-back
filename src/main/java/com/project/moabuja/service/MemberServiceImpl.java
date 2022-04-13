@@ -87,16 +87,12 @@ public class MemberServiceImpl implements MemberService{
         int wallet = 0;
 
         GroupGoal groupGoal = currentMember.getGroupGoal();
-        if (groupGoal != null) { //  && groupGoal.isAcceptedGroup()
+        if (groupGoal != null) {
 
             List<Member> members = groupGoal.getMembers();
             int currentGroupAmount = 0;
             for (Member member : members) {
-//                groupCurrentAmount = recordRepository.sumCurrentAmount(RecordType.group,groupGoal.getCreatedAt(),member);
-                List<Record> memberGroupRecord = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
-                for (Record record : memberGroupRecord) {
-                    if(record.getCreatedAt().isAfter(groupGoal.getCreatedAt())) groupCurrentAmount += record.getRecordAmount();
-                }
+                groupCurrentAmount = recordRepository.sumCurrentAmount(RecordType.group,groupGoal.getCreatedAt(),member);
             }
             groupNeedAmount = groupGoal.getGroupGoalAmount() - groupCurrentAmount;
             groupPercent = (int) (((double) groupCurrentAmount / (double) (groupGoal.getGroupGoalAmount())) * 100);
@@ -105,14 +101,9 @@ public class MemberServiceImpl implements MemberService{
         }
 
         ChallengeGoal challengeGoal = currentMember.getChallengeGoal();
-        if (challengeGoal != null) { //  && challengeGoal.isAcceptedChallenge()
+        if (challengeGoal != null) {
 
-            List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, currentMember);
-            for (Record record : challengeRecords) {
-                if(record.getCreatedAt().isAfter(challengeGoal.getCreatedAt())) challengeCurrentAmount += record.getRecordAmount();
-            }
-
-//            challengeCurrentAmount = recordRepository.sumCurrentAmount(RecordType.challenge,challengeGoal.getCreatedAt(),currentMember);
+            challengeCurrentAmount = recordRepository.sumCurrentAmount(RecordType.challenge,challengeGoal.getCreatedAt(),currentMember);
 
             challengeNeedAmount = challengeGoal.getChallengeGoalAmount() - challengeCurrentAmount;
             challengePercent = (int) (((double) challengeCurrentAmount / (double) (challengeGoal.getChallengeGoalAmount())) * 100);
@@ -120,7 +111,6 @@ public class MemberServiceImpl implements MemberService{
             challengeGoalAmount = challengeGoal.getChallengeGoalAmount();
         }
 
-        //hero랑 heroLevel(레벨은 기준 정해야 함)
         //순자산(지갑+저금통), 지갑 계산
         int groupUserWallet = 0;//해당 user가 group에 넣은 돈
         List<Record> groupUserRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, currentMember);
@@ -171,8 +161,6 @@ public class MemberServiceImpl implements MemberService{
                 .build();
 
         redisTemplate.opsForValue()
-                // Email 을 redis에 key로 저장했었는데, 전체 로직에서 redis에는 Password를 키값으로 저장해서 해당 로직 키 부분 수정
-                // 기존 로직 : .set("RT:" + kakaoUserInfoDto.getEmail(), dto.getRefresh(), jwtTokenProvider.getExpiration(dto.getRefresh()), TimeUnit.MILLISECONDS);
                 .set("RT:" + regToLoginDto.getPassword(), dto.getRefresh(), jwtTokenProvider.getExpiration(dto.getRefresh()), TimeUnit.MILLISECONDS);
 
          CustomResponseEntity response = CustomResponseEntity.builder()
@@ -255,7 +243,6 @@ public class MemberServiceImpl implements MemberService{
         RegToLoginDto regToLoginDto = new RegToLoginDto();
 
         // 기존회원이 아니면 회원가입 완료
-        // 기존 로직 : if(!memberRepository.existsByEmail(dto.getEmail())){        ======>>> Email이용 하는 부분 KakaoId 로 수정 ( String -> Long )
         if(!memberRepository.existsByKakaoId(dto.getKakaoId())){
             String password = UUID.randomUUID().toString().substring(0,8);
             memberRepository.save(member.fromDto(dto, password));
@@ -284,7 +271,6 @@ public class MemberServiceImpl implements MemberService{
     @Transactional
     @Override
     public ResponseEntity<Msg> updateMemberInfo(MemberUpdateRequestDto dto, String password) {
-        // Email -> Password 수정 , 기존 로직은 Password 부분 전체 email 로 되어있었음
         Member byPassword = memberRepository.findByPassword(password);
         if(byPassword == null){
             throw new ErrorException(MEMBER_NOT_FOUND);
@@ -300,7 +286,6 @@ public class MemberServiceImpl implements MemberService{
         String refresh = request.getHeader("R-AUTH-TOKEN").substring(7);
 
         if (!jwtTokenProvider.validateToken(refresh)) {
-            // throw new ErrorException(REFRESH_NOT_VALID);
             throw new ErrorException(GEUST_TO_LOGIN);
         }
         Authentication authentication = jwtTokenProvider.getAuthentication(access);
@@ -308,15 +293,12 @@ public class MemberServiceImpl implements MemberService{
         String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
 
         if(ObjectUtils.isEmpty(refreshToken)) {
-            // throw new ErrorException(REFRESH_NOT_EXIST);
             throw new ErrorException(GEUST_TO_LOGIN);
         }
         if(!refreshToken.equals(refresh)) {
-            // throw new ErrorException(REFRESH_NOT_MATCH);
             throw new ErrorException(GEUST_TO_LOGIN);
         }
 
-        // String password = memberRepository.findByEmail(authentication.getName()).getPassword();
         String password = memberRepository.findByPassword(authentication.getName()).getPassword();
         ReissueDto dto = ReissueDto.builder()
                 .refresh(jwtTokenProvider.createRefreshToken(password))
@@ -339,7 +321,6 @@ public class MemberServiceImpl implements MemberService{
     public ResponseEntity<Msg> logout(HttpServletRequest request) {
         String access = request.getHeader("A-AUTH-TOKEN").substring(7);
         if (!jwtTokenProvider.validateToken(access)) {
-            // throw new ErrorException(ACCESS_NOT_VALID);
             throw new ErrorException(GEUST_TO_LOGIN);
         }
         Authentication authentication = jwtTokenProvider.getAuthentication(access);
