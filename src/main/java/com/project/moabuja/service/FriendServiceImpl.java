@@ -46,11 +46,17 @@ public class FriendServiceImpl implements FriendService{
                 .orElseThrow(() -> new ErrorException(MEMBER_NOT_FOUND));
 
         List<Friend> friendList = friendRepository.findFriendsByMember(currentMember);
+        List<Friend> friendList2 = friendRepository.findFriendsByFriend(currentMember);
 
         List<FriendListDto> waitingFriendListDto = new ArrayList<>();
         for (Friend friend : friendList) {
             if (friendCheck(friend.getMember(), friend.getFriend()).equals(WAITING)) {
                 waitingFriendListDto.add(new FriendListDto(friend.getFriend().getNickname(), friend.getFriend().getHero()));
+            }
+        }
+        for (Friend friend : friendList2) {
+            if (friendCheck(friend.getMember(), friend.getFriend()).equals(WAITING)) {
+                waitingFriendListDto.add(new FriendListDto(friend.getMember().getNickname(), friend.getMember().getHero()));
             }
         }
 
