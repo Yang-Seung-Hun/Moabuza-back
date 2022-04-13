@@ -2,9 +2,7 @@ package com.project.moabuja.service;
 
 import com.project.moabuja.domain.alarm.Alarm;
 import com.project.moabuja.domain.alarm.AlarmDetailType;
-import com.project.moabuja.domain.alarm.AlarmType;
 import com.project.moabuja.domain.friend.Friend;
-import com.project.moabuja.domain.friend.FriendStatus;
 import com.project.moabuja.domain.goal.*;
 import com.project.moabuja.domain.member.Member;
 import com.project.moabuja.domain.record.Record;
@@ -19,7 +17,6 @@ import com.project.moabuja.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,8 +31,8 @@ import java.util.stream.Collectors;
 import static com.project.moabuja.domain.alarm.AlarmDetailType.*;
 import static com.project.moabuja.domain.alarm.AlarmType.CHALLENGE;
 import static com.project.moabuja.dto.ResponseMsg.*;
-import static com.project.moabuja.exception.ErrorCode.*;
-import static com.project.moabuja.exception.ErrorCode.GOAL_MEMBER_NOT_MATCH;
+import static com.project.moabuja.exception.ErrorCode.ALARM_NOT_EXIST;
+import static com.project.moabuja.exception.ErrorCode.MEMBER_NOT_FOUND;
 import static com.project.moabuja.service.GroupGoalServiceImpl.*;
 
 @Slf4j

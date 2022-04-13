@@ -3,16 +3,19 @@ package com.project.moabuja.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.moabuja.domain.member.Hero;
 import com.project.moabuja.domain.member.Member;
+import com.project.moabuja.dto.request.member.NicknameValidationRequestDto;
 import com.project.moabuja.dto.response.member.HomeResponseDto;
 import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.service.MemberServiceImpl;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.transaction.BeforeTransaction;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -44,14 +48,15 @@ public class MemberControllerTest {
             new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 
     @BeforeTransaction
-    public void memberSetup() {
-        memberRepository.save(Member.builder()
+    public Member memberSetup() {
+        Member member = memberRepository.save(Member.builder()
                 .email("test@a.b")
                 .password("password")
                 .kakaoId(21231L)
                 .nickname("통통이")
                 .hero(Hero.tongki)
                 .build());
+        return member;
     }
 
     @Test
@@ -59,7 +64,7 @@ public class MemberControllerTest {
     @DisplayName("[GET] Home 화면 테스트")
     public void getHome() throws Exception {
         // given
-        String object = objectMapper.writeValueAsString(HomeResponseDto.builder()
+        HomeResponseDto homeData = HomeResponseDto.builder()
                 .groupCurrentAmount(3000)
                 .groupNeedAmount(7000)
                 .groupPercent(30)
@@ -76,12 +81,13 @@ public class MemberControllerTest {
                 .wallet(2000)
                 .alarmCount(3)
                 .isFirstLogin(true)
-                .build());
+                .build();
+        given(memberService.getHomeInfo(memberSetup())).willReturn(ArgumentMatchers.any());
 
         // when - then
         mockMvc.perform(MockMvcRequestBuilders
                     .get("/home")
-                    .content(object)
+                    .content(objectMapper.writeValueAsString(homeData))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -97,4 +103,23 @@ public class MemberControllerTest {
 
     }
 
+    @Test
+    @DisplayName("[POST] 닉네임 중복확인")
+    public void nicknameValid() throws Exception {
+        // given
+        NicknameValidationRequestDto nickname = new NicknameValidationRequestDto("테스트");
+        given(memberService.nicknameValid(nickname)).willReturn(ArgumentMatchers.any(ResponseEntity.class));
+
+        // when - then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/member/validation")
+                        .content(objectMapper.writeValueAsString(nickname))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.data.nickname").value("테스트"))
+                .andDo(print());
+    }
 }
