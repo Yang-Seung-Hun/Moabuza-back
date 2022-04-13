@@ -24,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
 import static com.project.moabuja.dto.ResponseMsg.*;
@@ -38,7 +37,6 @@ public class FriendServiceImplTest {
     @Autowired private FriendRepository friendRepository;
     @Autowired private MemberRepository memberRepository;
     @Autowired private AlarmRepository alarmRepository;
-    @Autowired private EntityManager em;
 
     @Test
     @DisplayName("친구 목록 조회")
@@ -96,10 +94,10 @@ public class FriendServiceImplTest {
         if (allFriends != null) {
             Assertions.assertThat(allFriends.getFriendListDto().size()).isEqualTo(2);
             Assertions.assertThat(allFriends.getWaitingFriendListDto().size()).isEqualTo(2);
-            Assertions.assertThat(friendNickname1).isEqualTo("nickname2");
-            Assertions.assertThat(friendNickname2).isEqualTo("nickname3");
-            Assertions.assertThat(friendNickname3).isEqualTo("nickname4");
-            Assertions.assertThat(friendNickname4).isEqualTo("nickname5");
+            Assertions.assertThat(friendNickname1).isEqualTo(savedFriend1.getNickname());
+            Assertions.assertThat(friendNickname2).isEqualTo(savedFriend2.getNickname());
+            Assertions.assertThat(friendNickname3).isEqualTo(savedFriend3.getNickname());
+            Assertions.assertThat(friendNickname4).isEqualTo(savedFriend4.getNickname());
         }
 
     }
@@ -147,7 +145,7 @@ public class FriendServiceImplTest {
         Assertions.assertThat(friendResponse1.getMsg()).isEqualTo(FriendShipExist.getMsg());
         Assertions.assertThat(friendResponse2.getMsg()).isEqualTo(FriendPostValid.getMsg());
         Assertions.assertThat(friendResponse3.getMsg()).isEqualTo(FriendNotExist.getMsg());
-        Assertions.assertThat(friendResponse4.getNickname()).isEqualTo("nickname4");
+        Assertions.assertThat(friendResponse4.getNickname()).isEqualTo(savedFriend3.getNickname());
     }
 
     @Test
@@ -213,9 +211,11 @@ public class FriendServiceImplTest {
         alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, savedFriend1, savedMember1.getNickname()));
 
         // when
-        Member postedFriend = memberRepository.findMemberByNickname(alarmRepository.findById(1L).get().getFriendNickname()).get();
+        Alarm alarmTemp1 = alarmRepository.findAllByMember(savedFriend1).get(0);
+        Member postedFriend = memberRepository.findMemberByNickname(alarmRepository.findById(alarmTemp1.getId()).get().getFriendNickname()).get();
 
-        ResponseEntity<Msg> friendResponse = friendService.postFriendAccept(savedFriend1, 1L);
+        Alarm alarmTemp2 = alarmRepository.findAllByMember(savedFriend1).get(0);
+        ResponseEntity<Msg> friendResponse = friendService.postFriendAccept(savedFriend1, alarmTemp2.getId());
 
         List<Alarm> alarmList1 = alarmRepository.findAllByMember(savedFriend1);
         List<Alarm> alarmList2 = alarmRepository.findAllByMember(savedMember1);
@@ -249,9 +249,11 @@ public class FriendServiceImplTest {
         alarmRepository.save(FriendAlarmDto.friendToEntity(AlarmDetailType.request, savedFriend1, savedMember1.getNickname()));
 
         // when
-        Member postedFriend = memberRepository.findMemberByNickname(alarmRepository.findById(1L).get().getFriendNickname()).get();
+        Alarm alarmTemp1 = alarmRepository.findAllByMember(savedFriend1).get(0);
+        Member postedFriend = memberRepository.findMemberByNickname(alarmRepository.findById(alarmTemp1.getId()).get().getFriendNickname()).get();
 
-        ResponseEntity<Msg> friendResponse = friendService.postFriendRefuse(savedFriend1, 1L);
+        Alarm alarmTemp2 = alarmRepository.findAllByMember(savedFriend1).get(0);
+        ResponseEntity<Msg> friendResponse = friendService.postFriendRefuse(savedFriend1, alarmTemp2.getId());
 
         List<Alarm> alarmList1 = alarmRepository.findAllByMember(savedFriend1);
         List<Alarm> alarmList2 = alarmRepository.findAllByMember(savedMember1);
