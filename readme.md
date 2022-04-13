@@ -57,6 +57,15 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 <details>
     <summary>
+        서비스 로직 테스트 커버리지 75% 이상
+    </summary>
+
+![트러블슈팅](https://velog.velcdn.com/images/90lastday/post/98a3b3d5-a75c-49c9-bcc1-608e94aec22f/image.png)
+
+</details>
+
+<details>
+    <summary>
         Waiting Goal 테이블 추가 (DB 설계 수정)
     </summary>
 
