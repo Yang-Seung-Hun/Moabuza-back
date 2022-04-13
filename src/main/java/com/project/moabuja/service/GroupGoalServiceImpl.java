@@ -19,7 +19,6 @@ import com.project.moabuja.exception.ErrorCode;
 import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -377,7 +376,9 @@ public class GroupGoalServiceImpl implements GroupGoalService{
 //        goalAlarm(currentMember, currentMember, alarmType, boom, waitingGoal.getWaitingGoalName(), waitingGoal.getWaitingGoalAmount(), waitingGoal.getId(), alarmRepository);
 
         List<Alarm> deleteAlarmList = alarmRepository.findAlarmsByWaitingGoalIdAndAlarmDetailType(id, AlarmDetailType.invite);
+        List<Alarm> deleteAlarmList2 = alarmRepository.findAlarmsByWaitingGoalIdAndAlarmDetailType(id, accept);
         alarmRepository.deleteAll(deleteAlarmList);
+        alarmRepository.deleteAll(deleteAlarmList2);
 
         waitingGoalRepository.delete(waitingGoal);
     }

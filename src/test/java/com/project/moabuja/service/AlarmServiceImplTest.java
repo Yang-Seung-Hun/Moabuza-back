@@ -21,6 +21,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @SpringBootTest
@@ -89,9 +90,7 @@ public class AlarmServiceImplTest {
         Member friend2 = new Member("123458", 123458L, "nickname3", "email3@naver.com", Hero.bunny);
         Member savedFriend2 = memberRepository.save(friend2);
 
-        List<String> friendList = new ArrayList<>();
-        friendList.add(savedMember1.getNickname());
-        friendList.add(savedFriend2.getNickname());
+        List<String> friendList = new ArrayList<>(Arrays.asList("nickname1", "nickname3"));
 
         GoalAlarmRequestDto goalAlarmRequestDto = GoalAlarmRequestDto.builder().goalType(GoalType.GROUP).goalName("같이모으기").goalAmount(10000).friendNickname(friendList).build();
 
@@ -164,9 +163,7 @@ public class AlarmServiceImplTest {
         Member friend2 = new Member("123458", 123458L, "nickname3", "email3@naver.com", Hero.bunny);
         Member savedFriend2 = memberRepository.save(friend2);
 
-        List<String> friendList = new ArrayList<>();
-        friendList.add(savedMember1.getNickname());
-        friendList.add(savedFriend2.getNickname());
+        List<String> friendList = new ArrayList<>(Arrays.asList("nickname1", "nickname3"));
 
         GoalAlarmRequestDto goalAlarmRequestDto = GoalAlarmRequestDto.builder().goalType(GoalType.GROUP).goalName("같이모으기").goalAmount(10000).friendNickname(friendList).build();
         groupGoalService.postGroup(savedFriend1, goalAlarmRequestDto);
@@ -197,8 +194,7 @@ public class AlarmServiceImplTest {
         Member friend1 = new Member("123458", 123458L, "nickname3", "email3@naver.com", Hero.bunny);
         Member savedFriend1 = memberRepository.save(friend1);
 
-        List<String> friendList = new ArrayList<>();
-        friendList.add(savedMember2.getNickname());
+        List<String> friendList = new ArrayList<>(Arrays.asList("nickname2"));
 
         GoalAlarmRequestDto goalAlarmRequestDto1 = GoalAlarmRequestDto.builder().goalType(GoalType.CHALLENGE).goalName("도전모으기").goalAmount(10000).friendNickname(null).build();
         GoalAlarmRequestDto goalAlarmRequestDto2 = GoalAlarmRequestDto.builder().goalType(GoalType.CHALLENGE).goalName("도전모으기1").goalAmount(20000).friendNickname(friendList).build();
