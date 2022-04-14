@@ -58,7 +58,6 @@ public class RecordServiceImpl implements RecordService{
         RecordResponseDto recordResponseDto = new RecordResponseDto(false);
         Record record = new Record(recordRequestDto, currentMember);
 
-//        int wallet = walletCheck(currentMember);
         int wallet = currentMember.getWallet().getWallet();
 
         if(recordRequestDto.getRecordType() == RecordType.income) {
@@ -89,16 +88,8 @@ public class RecordServiceImpl implements RecordService{
 
             sendRecordAlarm(members, CHALLENGE, currentMember.getChallengeGoal().getChallengeGoalName(), recordRequestDto.getRecordAmount(), currentMember.getNickname());
 
-//            for (Member member : members) {
-//                Alarm alarm = new Alarm(CHALLENGE, AlarmDetailType.record, currentMember.getChallengeGoal().getChallengeGoalName(),
-//                        recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
-//                alarmRepository.save(alarm);
-//            }
-
             int goalAmount = currentMember.getChallengeGoal().getChallengeGoalAmount();
             int currentAmount = currentMember.getWallet().getCurrentChallengeAmount();
-
-//            int currentAmount = countCurrentChallenge(currentMember);
 
             //목표완료됐는지 확인
             if(currentAmount >= goalAmount){
@@ -121,12 +112,6 @@ public class RecordServiceImpl implements RecordService{
 
             sendRecordAlarm(members, GROUP, currentMember.getGroupGoal().getGroupGoalName(), recordRequestDto.getRecordAmount(), currentMember.getNickname());
 
-//            for (Member member : members) {
-//                Alarm alarm = new Alarm(GROUP, AlarmDetailType.record, currentMember.getGroupGoal().getGroupGoalName(),
-//                        recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
-//                alarmRepository.save(alarm);
-//            }
-
             int goalAmount = currentMember.getGroupGoal().getGroupGoalAmount();
             GroupGoal groupGoal = currentMember.getGroupGoal();
             int currentAmount = 0;
@@ -135,9 +120,9 @@ public class RecordServiceImpl implements RecordService{
             }
 
             HashMap<Member, Integer> separateAmount = countSeparateCurrentGroup(groupGoal);
-//            for (Member member : separateAmount.keySet()) {
-//                currentAmount += separateAmount.get(member);
-//            }
+            for (Member member : separateAmount.keySet()) {
+                currentAmount += separateAmount.get(member);
+            }
 
             //완료로직
             if(currentAmount >= goalAmount){
@@ -237,12 +222,12 @@ public class RecordServiceImpl implements RecordService{
 
         List<Member> members = groupGoal.getMembers();
         for (Member member : members) {
-//            int tmpAmount = 0;
-//            List<Record> groupRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
-//            for (Record groupRecord : groupRecords) {
-//                tmpAmount += groupRecord.getRecordAmount();
-//            }
-            separateAmounts.put(member,member.getWallet().getCurrentGroupAmount());
+            int tmpAmount = 0;
+            List<Record> groupRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
+            for (Record groupRecord : groupRecords) {
+                tmpAmount += groupRecord.getRecordAmount();
+            }
+            separateAmounts.put(member,tmpAmount); // member.getWallet().getCurrentGroupAmount()
         }
         return separateAmounts;
     }
