@@ -58,18 +58,17 @@ public class RecordServiceImpl implements RecordService{
         RecordResponseDto recordResponseDto = new RecordResponseDto(false);
         Record record = new Record(recordRequestDto, currentMember);
 
-        int wallet = walletCheck(currentMember);
-//        int wallet = currentMember.getWallet().getWallet();
+        int wallet = currentMember.getWallet().getWallet();
 
         if(recordRequestDto.getRecordType() == RecordType.income) {
             recordRepository.save(record);
-//            currentMember.getWallet().walletIncome(recordRequestDto.getRecordAmount());
+            currentMember.getWallet().walletIncome(recordRequestDto.getRecordAmount());
         }
 
         else if(recordRequestDto.getRecordType() == RecordType.expense) {
             if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
-//                currentMember.getWallet().walletExpense(recordRequestDto.getRecordAmount());
+                currentMember.getWallet().walletExpense(recordRequestDto.getRecordAmount());
 
             } else { throw new ErrorException(MONEY_LESS_THAN_WALLET); }
         }
@@ -82,23 +81,15 @@ public class RecordServiceImpl implements RecordService{
 
             if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
-//                currentMember.getWallet().updateChallenge(recordRequestDto.getRecordAmount());
+                currentMember.getWallet().updateChallenge(recordRequestDto.getRecordAmount());
             } else { throw new ErrorException(SAVINGS_LESS_THAN_WALLET); }
 
             List<Member> members = currentMember.getChallengeGoal().getMembers();
 
             sendRecordAlarm(members, CHALLENGE, currentMember.getChallengeGoal().getChallengeGoalName(), recordRequestDto.getRecordAmount(), currentMember.getNickname());
 
-//            for (Member member : members) {
-//                Alarm alarm = new Alarm(CHALLENGE, AlarmDetailType.record, currentMember.getChallengeGoal().getChallengeGoalName(),
-//                        recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
-//                alarmRepository.save(alarm);
-//            }
-
             int goalAmount = currentMember.getChallengeGoal().getChallengeGoalAmount();
-//            int currentAmount = currentMember.getWallet().getCurrentChallengeAmount();
-
-            int currentAmount = countCurrentChallenge(currentMember);
+            int currentAmount = currentMember.getWallet().getCurrentChallengeAmount();
 
             //목표완료됐는지 확인
             if(currentAmount >= goalAmount){
@@ -114,25 +105,19 @@ public class RecordServiceImpl implements RecordService{
 
             if (recordRequestDto.getRecordAmount() <= wallet) {
                 recordRepository.save(record);
-//                currentMember.getWallet().updateGroup(recordRequestDto.getRecordAmount());
+                currentMember.getWallet().updateGroup(recordRequestDto.getRecordAmount());
             } else { throw new ErrorException(SAVINGS_LESS_THAN_WALLET); }
 
             List<Member> members = currentMember.getGroupGoal().getMembers();
 
             sendRecordAlarm(members, GROUP, currentMember.getGroupGoal().getGroupGoalName(), recordRequestDto.getRecordAmount(), currentMember.getNickname());
 
-//            for (Member member : members) {
-//                Alarm alarm = new Alarm(GROUP, AlarmDetailType.record, currentMember.getGroupGoal().getGroupGoalName(),
-//                        recordRequestDto.getRecordAmount(), null, currentMember.getNickname(), member);
-//                alarmRepository.save(alarm);
-//            }
-
             int goalAmount = currentMember.getGroupGoal().getGroupGoalAmount();
             GroupGoal groupGoal = currentMember.getGroupGoal();
             int currentAmount = 0;
-//            for (Member member : members) {
-//                currentAmount += member.getWallet().getCurrentGroupAmount();
-//            }
+            for (Member member : members) {
+                currentAmount += member.getWallet().getCurrentGroupAmount();
+            }
 
             HashMap<Member, Integer> separateAmount = countSeparateCurrentGroup(groupGoal);
             for (Member member : separateAmount.keySet()) {

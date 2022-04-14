@@ -54,8 +54,8 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberWaitingGoal> memberWaitingGoals = new ArrayList<>();
 
-//    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
-//    private Wallet wallet;
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+    private Wallet wallet;
 
     @Builder
     public Member(String password, Long kakaoId, String nickname, String email, Hero hero) {
@@ -90,11 +90,10 @@ public class Member {
         this.groupGoal = groupGoal;
     }
 
-    //반대쪽에서 연관관계편의메소드에서 사용될 setter
-//    public void addWallet(Wallet wallet){
-//        this.wallet = wallet;
-//        wallet.addMember(this);
-//    }
+    public void addWallet(Wallet wallet){
+        this.wallet = wallet;
+        wallet.addMember(this);
+    }
 
     public void addDoneGoal(DoneGoal doneGoal){
         this.doneGaols.add(doneGoal);

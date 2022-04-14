@@ -8,8 +8,7 @@ import com.project.moabuja.domain.goal.ChallengeGoal;
 import com.project.moabuja.domain.goal.GroupGoal;
 import com.project.moabuja.domain.member.Hero;
 import com.project.moabuja.domain.member.Member;
-import com.project.moabuja.domain.record.Record;
-import com.project.moabuja.domain.record.RecordType;
+import com.project.moabuja.domain.member.Wallet;
 import com.project.moabuja.dto.KakaoUserInfoDto;
 import com.project.moabuja.dto.Msg;
 import com.project.moabuja.dto.TokenDto;
@@ -92,22 +91,19 @@ public class MemberServiceImpl implements MemberService{
 
             List<Member> members = groupGoal.getMembers();
             for (Member member : members) {
-//                groupCurrentAmount += member.getWallet().getCurrentGroupAmount();
-                groupCurrentAmount = recordRepository.sumCurrentAmount(RecordType.group,groupGoal.getCreatedAt(),member);
+                groupCurrentAmount += member.getWallet().getCurrentGroupAmount();
             }
             groupNeedAmount = groupGoal.getGroupGoalAmount() - groupCurrentAmount;
             groupPercent = (int) (((double) groupCurrentAmount / (double) (groupGoal.getGroupGoalAmount())) * 100);
             groupName = groupGoal.getGroupGoalName();
             groupGoalAmount = groupGoal.getGroupGoalAmount();
-//            groupUserWallet = currentMember.getWallet().getCurrentGroupAmount();//해당 user가 group에 넣은 돈
+            groupUserWallet = currentMember.getWallet().getCurrentGroupAmount();//해당 user가 group에 넣은 돈
         }
 
         ChallengeGoal challengeGoal = currentMember.getChallengeGoal();
         if (challengeGoal != null) {
 
-//            challengeCurrentAmount = currentMember.getWallet().getCurrentChallengeAmount();
-            challengeCurrentAmount = recordRepository.sumCurrentAmount(RecordType.challenge,challengeGoal.getCreatedAt(),currentMember);
-
+            challengeCurrentAmount = currentMember.getWallet().getCurrentChallengeAmount();
             challengeNeedAmount = challengeGoal.getChallengeGoalAmount() - challengeCurrentAmount;
             challengePercent = (int) (((double) challengeCurrentAmount / (double) (challengeGoal.getChallengeGoalAmount())) * 100);
             challengeName = challengeGoal.getChallengeGoalName();
@@ -115,13 +111,7 @@ public class MemberServiceImpl implements MemberService{
         }
 
         //순자산(지갑+저금통), 지갑 계산
-        List<Record> groupUserRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, currentMember);
-        for (Record groupUserRecord : groupUserRecords) {
-            groupUserWallet += groupUserRecord.getRecordAmount();
-        }
-
-//        wallet = currentMember.getWallet().getWallet();
-        wallet = RecordServiceImpl.getWallet(currentMember, wallet, recordRepository);
+        wallet = currentMember.getWallet().getWallet();
         totalAmount = wallet + challengeCurrentAmount + groupUserWallet;
 
         List<Alarm> alarmList = alarmRepository.findAllByMember(currentMember);
@@ -252,8 +242,8 @@ public class MemberServiceImpl implements MemberService{
             regToLoginDto.setPassword(password);
             regToLoginDto.setNickname(null);
 
-//            Wallet newWallet = new Wallet();
-//            member.addWallet(newWallet);
+            Wallet newWallet = new Wallet();
+            member.addWallet(newWallet);
             return regToLoginDto;
         }
 
