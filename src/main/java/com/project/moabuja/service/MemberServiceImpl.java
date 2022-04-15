@@ -66,6 +66,9 @@ public class MemberServiceImpl implements MemberService{
 
         if(!currentMember.isFirstLogin()){
             currentMember.loginChecked();
+            Wallet newWallet = new Wallet();
+            walletRepository.save(newWallet);
+            currentMember.addWallet(newWallet);
         }
 
         Hero hero = currentMember.getHero();
@@ -243,10 +246,6 @@ public class MemberServiceImpl implements MemberService{
             memberRepository.save(member.fromDto(dto, password));
             regToLoginDto.setPassword(password);
             regToLoginDto.setNickname(null);
-
-            Wallet newWallet = new Wallet();
-            walletRepository.save(newWallet);
-            member.addWallet(newWallet);
             return regToLoginDto;
         }
 
