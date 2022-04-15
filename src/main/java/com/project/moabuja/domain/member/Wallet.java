@@ -47,6 +47,6 @@ public class Wallet {
 
     public void updateChallenge(int challenge) {
         this.wallet -= challenge;
-        this.currentGroupAmount += challenge;
+        this.currentChallengeAmount += challenge;
     }
 }
