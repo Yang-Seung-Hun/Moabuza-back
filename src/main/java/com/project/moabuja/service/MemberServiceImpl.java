@@ -21,6 +21,7 @@ import com.project.moabuja.exception.ErrorException;
 import com.project.moabuja.repository.AlarmRepository;
 import com.project.moabuja.repository.MemberRepository;
 import com.project.moabuja.repository.RecordRepository;
+import com.project.moabuja.repository.WalletRepository;
 import com.project.moabuja.security.filter.JwtTokenProvider;
 import com.project.moabuja.util.CustomResponseEntity;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,7 @@ public class MemberServiceImpl implements MemberService{
     private final RedisTemplate redisTemplate;
     private final RecordRepository recordRepository;
     private final AlarmRepository alarmRepository;
+    private final WalletRepository walletRepository;
 
     @Transactional
     @Override
@@ -64,6 +66,12 @@ public class MemberServiceImpl implements MemberService{
 
         if(!currentMember.isFirstLogin()){
             currentMember.loginChecked();
+        }
+
+        if(currentMember.getWallet() == null){
+            Wallet newWallet = new Wallet();
+            walletRepository.save(newWallet);
+            currentMember.addWallet(newWallet);
         }
 
         Hero hero = currentMember.getHero();
@@ -241,9 +249,6 @@ public class MemberServiceImpl implements MemberService{
             memberRepository.save(member.fromDto(dto, password));
             regToLoginDto.setPassword(password);
             regToLoginDto.setNickname(null);
-
-            Wallet newWallet = new Wallet();
-            member.addWallet(newWallet);
             return regToLoginDto;
         }
 
