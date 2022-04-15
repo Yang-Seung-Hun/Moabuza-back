@@ -66,6 +66,9 @@ public class MemberServiceImpl implements MemberService{
 
         if(!currentMember.isFirstLogin()){
             currentMember.loginChecked();
+        }
+
+        if(currentMember.getWallet() == null){
             Wallet newWallet = new Wallet();
             walletRepository.save(newWallet);
             currentMember.addWallet(newWallet);
