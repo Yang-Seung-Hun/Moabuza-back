@@ -306,6 +306,8 @@ public class GroupGoalServiceImpl implements GroupGoalService{
         GroupGoal groupGoal = currentMember.getGroupGoal();
         Long id = groupGoal.getId();
 
+        currentMember.getWallet().exitGroup();
+
         List<Member> memberList = currentMember.getGroupGoal().getMembers();
         if (memberList.size() == 2) {
             while (memberList.size() > 0) {

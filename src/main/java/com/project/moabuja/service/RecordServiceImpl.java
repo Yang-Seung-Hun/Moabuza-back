@@ -120,9 +120,6 @@ public class RecordServiceImpl implements RecordService{
             }
 
             HashMap<Member, Integer> separateAmount = countSeparateCurrentGroup(groupGoal);
-            for (Member member : separateAmount.keySet()) {
-                currentAmount += separateAmount.get(member);
-            }
 
             //완료로직
             if(currentAmount >= goalAmount){
@@ -207,27 +204,13 @@ public class RecordServiceImpl implements RecordService{
         }
     }
 
-    public int countCurrentChallenge(Member member){
-        int currentAmount = 0;
-        List<Record> challengeRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.challenge, member);
-        for (Record challengeRecord : challengeRecords) {
-            currentAmount += challengeRecord.getRecordAmount();
-        }
-        return currentAmount;
-    }
-
     public HashMap<Member,Integer> countSeparateCurrentGroup(GroupGoal groupGoal){
 
         HashMap<Member,Integer> separateAmounts = new HashMap<>();
 
         List<Member> members = groupGoal.getMembers();
         for (Member member : members) {
-            int tmpAmount = 0;
-            List<Record> groupRecords = recordRepository.findRecordsByRecordTypeAndMember(RecordType.group, member);
-            for (Record groupRecord : groupRecords) {
-                tmpAmount += groupRecord.getRecordAmount();
-            }
-            separateAmounts.put(member,tmpAmount); // member.getWallet().getCurrentGroupAmount()
+            separateAmounts.put(member,member.getWallet().getCurrentGroupAmount());
         }
         return separateAmounts;
     }
@@ -286,7 +269,7 @@ public class RecordServiceImpl implements RecordService{
         recordResponseDto.changeIsComplete();
     }
 
-    private void makeGroupDoneGoal(RecordRequestDto recordRequestDto, Member currentMember, RecordResponseDto recordResponseDto, List<Member> members, HashMap<Member, Integer> separateAmount) {
+    private void  makeGroupDoneGoal(RecordRequestDto recordRequestDto, Member currentMember, RecordResponseDto recordResponseDto, List<Member> members, HashMap<Member, Integer> separateAmount) {
         for (Member member : members) {
             GoalAlarmSaveDto alarmSaveDto = GoalAlarmSaveDto.builder()
                     .alarmType(GROUP)
