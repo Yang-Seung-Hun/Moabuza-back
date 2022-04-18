@@ -293,6 +293,8 @@ public class ChallengeGoalServiceImpl implements ChallengeGoalService{
         ChallengeGoal challengeGoal = currentMember.getChallengeGoal();
         Long id = challengeGoal.getId();
 
+        currentMember.getWallet().exitChallenge();
+
         List<Member> members = challengeGoal.getMembers();
         if(members.size() == 1) {
             goalAlarm(currentMember, currentMember, CHALLENGE, boom, challengeGoal.getChallengeGoalName(), challengeGoal.getChallengeGoalAmount(), null, alarmRepository);

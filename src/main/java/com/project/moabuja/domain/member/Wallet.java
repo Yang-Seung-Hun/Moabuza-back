@@ -49,4 +49,14 @@ public class Wallet {
         this.wallet -= challenge;
         this.currentChallengeAmount += challenge;
     }
+
+    public void exitGroup() {
+        this.wallet += this.currentGroupAmount;
+        this.currentGroupAmount = 0;
+    }
+
+    public void exitChallenge() {
+        this.wallet += this.currentChallengeAmount;
+        this.currentChallengeAmount = 0;
+    }
 }
